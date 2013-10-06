@@ -54,9 +54,9 @@ bool World::getCameraIntersection(const line3df &ray, CameraIntersectionInfo **i
 	   http://www.devmaster.net/articles/raytracing_series/A%20faster%20voxel%20traversal%20algorithm%20for%20ray%20tracing.pdf */
 
 	/* The cell in which the ray starts (in chunk coordinate system). */
-	int x = (int) ray.start.X;
-	int y = (int) ray.start.Y;
-	int z = (int) ray.start.Z;
+	int x = (int) floor(ray.start.X);
+	int y = (int) floor(ray.start.Y);
+	int z = (int) floor(ray.start.Z);
 
 	/* Determine which way we go. */
 	const vector3df rayvec = ray.getVector();
