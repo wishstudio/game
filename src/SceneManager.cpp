@@ -1,0 +1,82 @@
+#include "stdafx.h"
+
+#include "Chunk.h"
+#include "ChunkTriangleSelector.h"
+#include "SceneManager.h"
+#include "World.h"
+
+SceneManager::SceneManager()
+{
+	metaSelector = smgr->createMetaTriangleSelector();
+	ISceneNodeAnimator *animator = smgr->createCollisionResponseAnimator(
+		metaSelector, camera, vector3df(0.8f, 1.8f, 0.8f), vector3df(0.f, -0.01f, 0.f), vector3df(0.f, 1.2f, 0.f));
+	camera->addAnimator(animator);
+	animator->drop();
+	update();
+}
+
+SceneManager::~SceneManager()
+{
+	metaSelector->drop();
+	for (auto selector: chunkSelectors)
+		selector->drop();
+}
+
+void SceneManager::update()
+{
+	/* Update triangle selectors for chunks.
+	   In general, we need 2x2x2 chunks for collision detection.
+	   For axis x, if our x coordinate is less than 50% of current chunk,
+	   we test for chunk [x - 1] and [x], otherwise we test [x] and [x + 1].
+	   The same applies for axis y and z. */
+
+	/* Flag indicating whether a required selector was already existed. */
+	bool flag[2][2][2] = { { { false, false }, { false, false } }, { { false, false }, { false, false } } };
+
+	/* Calculating base coordinates */
+	vector3df position = camera->getPosition();
+	f32 fx = position.X / CHUNK_SIZE;
+	f32 fy = position.Y / CHUNK_SIZE;
+	f32 fz = position.Z / CHUNK_SIZE;
+
+	int basex = (int) floor(fx);
+	int basey = (int) floor(fy);
+	int basez = (int) floor(fz);
+
+	basex = (fx - basex < .5f) ? basex - 1 : basex;
+	basey = (fy - basey < .5f) ? basey - 1 : basey;
+	basez = (fz - basez < .5f) ? basez - 1 : basez;
+
+	/* Remove triangle selectors which are out of range. */
+	for (auto it = chunkSelectors.begin(); it != chunkSelectors.end(); )
+	{
+		ChunkTriangleSelector *selector = (*it);
+		Chunk *chunk = selector->getChunk();
+		int x = chunk->x() - basex, y = chunk->y() - basey, z = chunk->z() - basez;
+		if (x < 0 || x > 1 || y < 0 || y > 1 || z < 0 || z > 1)
+		{
+			/* This one should be removed. */
+			it = chunkSelectors.erase(it);
+			metaSelector->removeTriangleSelector(selector);
+			selector->drop();
+		}
+		else
+		{
+			/* This one should be kept. Mark it in the flags array. */
+			flag[x][y][z] = true;
+			it++;
+		}
+	}
+
+	/* Add missing triangle selectors */
+	for (int x = 0; x <= 1; x++)
+		for (int y = 0; y <= 1; y++)
+			for (int z = 0; z <= 1; z++)
+				if (!flag[x][y][z])
+				{
+					Chunk *chunk = world->getChunk(x + basex, y + basey, z + basez);
+					ChunkTriangleSelector *selector = new ChunkTriangleSelector(chunk);
+					chunkSelectors.push_back(selector);
+					metaSelector->addTriangleSelector(selector);
+				}
+}

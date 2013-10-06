@@ -1,0 +1,50 @@
+#pragma once
+
+struct BlockData;
+class Chunk;
+class Block
+{
+public:
+	Block(): chunk(nullptr), in_x(0), in_y(0), in_z(0), data(nullptr) {}
+	Block(Chunk *chunk, int in_x, int in_y, int in_z);
+	Block(const Block &block): chunk(block.chunk), in_x(block.in_x), in_y(block.in_y), in_z(block.in_z), data(block.data) {}
+
+	inline Block &operator = (const Block &block)
+	{
+		chunk = block.chunk;
+		in_x = block.in_x;
+		in_y = block.in_y;
+		in_z = block.in_z;
+		data = block.data;
+		return *this;
+	}
+
+	inline bool isValid() const { return chunk != nullptr; }
+	inline void invalidate()
+	{
+		chunk = nullptr;
+		in_x = in_y = in_z = 0;
+		data = nullptr;
+	}
+
+	int x() const;
+	int y() const;
+	int z() const;
+	Block neighbour(int deltaX, int deltaY, int deltaZ) const;
+	Block neighbour(Direction direction) const;
+
+	aabbox3df getBoundingBox() const;
+
+	u16 getType() const;
+	void setType(u16 type);
+	u8 getParam1() const;
+	u8 getParam2() const;
+	void setParam1(u8 param1);
+	void setParam2(u8 param2);
+	void setParam(u8 param1, u8 param2);
+
+private:
+	Chunk *chunk;
+	int in_x, in_y, in_z;
+	BlockData *data;
+};

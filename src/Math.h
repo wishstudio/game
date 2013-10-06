@@ -1,0 +1,150 @@
+#pragma once
+
+#include <limits>
+
+template<class T>
+inline const T &min(const T &a, const T &b)
+{
+	return a < b? a: b;
+}
+
+template<class T>
+inline const T &max(const T &a, const T &b)
+{
+	return a > b? a: b;
+}
+
+template<class T>
+inline const T &abs(const T &a)
+{
+	return a >= 0? a: -a;
+}
+
+template<class T>
+inline const T &bound(const T &a, const T &b, const T &c)
+{
+	return min(max(a, b), c);
+}
+
+template<class T>
+inline int sgn(const T &a)
+{
+	if (a > 0)
+		return 1;
+	else if (a < 0)
+		return -1;
+	else
+		return 0;
+}
+
+template<class T>
+inline T mod(const T &a, const T &b)
+{
+	T ret = a % b;
+	if (ret < 0)
+		ret += b;
+	return ret;
+}
+
+inline void translateBox(aabbox3df &box, int offsetX, int offsetY, int offsetZ)
+{
+	box.MinEdge.X += offsetX;
+	box.MinEdge.Y += offsetY;
+	box.MinEdge.Z += offsetZ;
+
+	box.MaxEdge.X += offsetX;
+	box.MaxEdge.Y += offsetY;
+	box.MaxEdge.Z += offsetZ;
+}
+
+inline bool rayIntersectsWithBox(const line3df &ray, const aabbox3df &box)
+{
+	/* MinX <= Xt + x0 <= MaxX
+	   MinY <= Yt + y0 <= MaxY
+	   MinZ <= Zt + z0 <= MinZ */
+	f32 x0 = ray.start.X, X = ray.end.X - ray.start.X;
+	f32 y0 = ray.start.Y, Y = ray.end.Y - ray.start.Y;
+	f32 z0 = ray.start.Z, Z = ray.end.Z - ray.start.Z;
+
+	/* Note the following formulas (derived from above)
+	   Xt >= MinX - x0
+	   Xt <= MaxX - x0
+	   Yt >= MinY - y0
+	   Yt <= MaxY - y0
+	   Zt >= MinZ - z0
+	   Zt <= MaxZ - z0
+	   It is obvious the range of t can be determined.
+	 */
+	f32 tMin = 0, tMax = std::numeric_limits<f32>::infinity();
+	if (iszero(X)) /* 0 >= MinX - x0 */ /* 0 <= MaxX - x0 */
+	{
+		if (box.MinEdge.X - x0 > ROUNDING_ERROR_f32 || box.MaxEdge.X < -ROUNDING_ERROR_f32)
+			return false;
+	}
+	else if (X > 0)
+	{
+		tMin = max(tMin, (box.MinEdge.X - x0) / X);
+		tMax = min(tMax, (box.MaxEdge.X - x0) / X);
+	}
+	else
+	{
+		tMin = max(tMin, (box.MaxEdge.X - x0) / X);
+		tMax = min(tMax, (box.MinEdge.X - x0) / X);
+	}
+
+	if (iszero(Y))
+	{
+		if (box.MinEdge.Y - y0 > ROUNDING_ERROR_f32 || box.MaxEdge.Y < -ROUNDING_ERROR_f32)
+			return false;
+	}
+	else if (Y > 0)
+	{
+		tMin = max(tMin, (box.MinEdge.Y - y0) / Y);
+		tMax = min(tMax, (box.MaxEdge.Y - y0) / Y);
+	}
+	else
+	{
+		tMin = max(tMin, (box.MaxEdge.Y - y0) / Y);
+		tMax = min(tMax, (box.MinEdge.Y - y0) / Y);
+	}
+
+	if (iszero(Z))
+	{
+		if (box.MinEdge.Z - z0 > ROUNDING_ERROR_f32 || box.MaxEdge.Z < -ROUNDING_ERROR_f32)
+			return false;
+	}
+	else if (Z > 0)
+	{
+		tMin = max(tMin, (box.MinEdge.Z - z0) / Z);
+		tMax = min(tMax, (box.MaxEdge.Z - z0) / Z);
+	}
+	else
+	{
+		tMin = max(tMin, (box.MaxEdge.Z - z0) / Z);
+		tMax = min(tMax, (box.MinEdge.Z - z0) / Z);
+	}
+	return tMin <= tMax;
+}
+
+enum Direction
+{
+	DIRECTION_X = 0,
+	DIRECTION_Y = 1,
+	DIRECTION_Z = 2,
+	DIRECTION_MX = 3,
+	DIRECTION_MY = 4,
+	DIRECTION_MZ = 5,
+	DIRECTION_COUNT = 6
+};
+
+static const int offsetX[DIRECTION_COUNT] = { 1, 0, 0, -1,  0,  0 };
+static const int offsetY[DIRECTION_COUNT] = { 0, 1, 0,  0, -1,  0 };
+static const int offsetZ[DIRECTION_COUNT] = { 0, 0, 1,  0,  0, -1 };
+
+inline Direction oppositeDirection(Direction direction)
+{
+	if ((int) direction < 3)
+		return (Direction) ((int) direction + 3);
+	else
+		return (Direction) ((int) direction - 3);
+}
