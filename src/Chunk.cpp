@@ -25,7 +25,7 @@ Chunk::Chunk(int chunk_x, int chunk_y, int chunk_z)
 
 	dirty = true;
 	triangleSelectorDirty = true;
-	bufferValid = false;
+	bufferDirty = true;
 	setPosition(vector3df(chunk_x * CHUNK_SIZE, chunk_y * CHUNK_SIZE, chunk_z * CHUNK_SIZE));
 
 	boundingBox.reset(vector3df(0, 0, 0));
@@ -106,6 +106,7 @@ void Chunk::setDirty(int x, int y, int z)
 {
 	dirty = true;
 	triangleSelectorDirty = true;
+	bufferDirty = true;
 	if (y + 1 == CHUNK_SIZE)
 		world->getChunk(chunk_x, chunk_y + 1, chunk_z)->invalidateMeshBuffer();
 	if (x + 1 == CHUNK_SIZE)
@@ -122,7 +123,7 @@ void Chunk::setDirty(int x, int y, int z)
 
 void Chunk::invalidateMeshBuffer()
 {
-	bufferValid = false;
+	bufferDirty = true;
 }
 
 void Chunk::OnRegisterSceneNode()
@@ -138,14 +139,12 @@ void Chunk::render()
 	if (dirty)
 	{
 		save();
-		createMeshBuffer();
 		dirty = false;
-		bufferValid = true;
 	}
-	else if (!bufferValid)
+	if (bufferDirty)
 	{
 		createMeshBuffer();
-		bufferValid = true;
+		bufferDirty = false;
 	}
 	driver->setMaterial(material);
 	driver->setTransform(ETS_WORLD, AbsoluteTransformation);

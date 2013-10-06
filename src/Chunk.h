@@ -40,7 +40,7 @@ private:
 	void createMeshBuffer();
 
 	int chunk_x, chunk_y, chunk_z;
-	bool dirty, triangleSelectorDirty, bufferValid;
+	bool dirty, triangleSelectorDirty, bufferDirty;
 	BlockData blocks[CHUNK_SIZE][CHUNK_SIZE][CHUNK_SIZE];
 	SMeshBuffer buffer;
 	SMaterial material;
