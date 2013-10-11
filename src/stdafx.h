@@ -2,6 +2,7 @@
 
 #include <sqlite3.h>
 #include <irrlicht.h>
+#include <unordered_map>
 
 using namespace irr;
 using namespace core;
@@ -13,9 +14,13 @@ using namespace video;
 #include "Hash.h"
 #include "Math.h"
 
+class BlockType;
 class World;
+class TileManager;
 extern ISceneManager *smgr;
 extern IVideoDriver *driver;
 extern ICameraSceneNode *camera;
 extern sqlite3 *db;
+extern BlockType *blockType;
+extern TileManager *tileManager;
 extern World *world;

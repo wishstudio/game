@@ -1,5 +1,7 @@
 #pragma once
 
+#include "TriangleCollector.h"
+
 static const int CHUNK_SIZE = 16;
 
 class Serializer;
@@ -41,8 +43,8 @@ private:
 
 	int chunk_x, chunk_y, chunk_z;
 	bool dirty, triangleSelectorDirty, bufferDirty;
+	TriangleCollector collector;
 	BlockData blocks[CHUNK_SIZE][CHUNK_SIZE][CHUNK_SIZE];
-	SMeshBuffer buffer;
 	SMaterial material;
 	aabbox3df boundingBox;
 

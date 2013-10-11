@@ -1,8 +1,10 @@
 #include "stdafx.h"
 
+#include "BlockType.h"
 #include "Chunk.h"
 #include "EventReceiver.h"
 #include "SceneManager.h"
+#include "TileManager.h"
 #include "World.h"
 
 #ifdef _IRR_WINDOWS_
@@ -54,6 +56,9 @@ int main()
 			for (int k = 0; k < CHUNK_COUNT; k++)
 				world->getChunk(i - CHUNK_COUNT / 2, -j, k - CHUNK_COUNT / 2);
 	SceneManager *sceneManager = new SceneManager();
+	tileManager = new TileManager();
+	blockType = new BlockType();
+	blockType->registerCube(1, "stonepile.png");
 	
 	bool lastLeftMouseDown = false, lastRightMouseDown = false;
 	while (device->run())

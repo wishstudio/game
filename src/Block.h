@@ -30,6 +30,9 @@ public:
 	int x() const;
 	int y() const;
 	int z() const;
+	inline int innerX() const { return in_x; }
+	inline int innerY() const { return in_y; }
+	inline int innerZ() const { return in_z; }
 	Block neighbour(int deltaX, int deltaY, int deltaZ) const;
 	Block neighbour(Direction direction) const;
 

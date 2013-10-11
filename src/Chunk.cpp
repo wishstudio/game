@@ -1,5 +1,6 @@
 #include "stdafx.h"
 
+#include "BlockType.h"
 #include "Chunk.h"
 #include "Serialization.h"
 #include "World.h"
@@ -33,7 +34,6 @@ Chunk::Chunk(int chunk_x, int chunk_y, int chunk_z)
 
 	material.Wireframe = false;
 	material.Lighting = false;
-	material.setTexture(0, driver->getTexture("resources/stonepile.png"));
 	load();
 }
 
@@ -146,9 +146,14 @@ void Chunk::render()
 		createMeshBuffer();
 		bufferDirty = false;
 	}
-	driver->setMaterial(material);
 	driver->setTransform(ETS_WORLD, AbsoluteTransformation);
-	driver->drawMeshBuffer(&buffer);
+	for (u32 i = 0; i < collector.getBufferCount(); i++)
+	{
+		SMeshBuffer *buffer = collector.getBuffer(i);
+		material.setTexture(0, collector.getBufferTexture(i));
+		driver->setMaterial(material);
+		driver->drawMeshBuffer(buffer);
+	}
 }
 
 void Chunk::createMeshBuffer()
@@ -160,107 +165,20 @@ void Chunk::createMeshBuffer()
 	//Chunk *cmy = mapManager->getChunk(chunk_x, chunk_y - 1, chunk_z);
 	//Chunk *cmx = mapManager->getChunk(chunk_x - 1, chunk_y, chunk_z);
 	//Chunk *cmz = mapManager->getChunk(chunk_x, chunk_y, chunk_z - 1);
-	buffer.setHardwareMappingHint(EHM_DYNAMIC, EBT_VERTEX_AND_INDEX);
-	buffer.Vertices.clear();
-	buffer.Indices.clear();
-
+	
+	collector.clear();
 	for (int x = 0; x < CHUNK_SIZE; x++)
 		for (int y = 0; y < CHUNK_SIZE; y++)
 			for (int z = 0; z < CHUNK_SIZE; z++)
 			{
-				if (blocks[x][y][z].type == 0)
-					continue;
-
-				const vector3df p[8] = {
-					vector3df(x + 0.f, y + 1.f, z + 0.f),
-					vector3df(x + 0.f, y + 1.f, z + 1.f),
-					vector3df(x + 1.f, y + 1.f, z + 0.f),
-					vector3df(x + 1.f, y + 1.f, z + 1.f),
-					vector3df(x + 0.f, y + 0.f, z + 0.f),
-					vector3df(x + 0.f, y + 0.f, z + 1.f),
-					vector3df(x + 1.f, y + 0.f, z + 0.f),
-					vector3df(x + 1.f, y + 0.f, z + 1.f),
-				};
-				const vector3df nx(1, 0, 0);
-				const vector3df nmx(-1, 0, 0);
-				const vector3df ny(0, 1, 0);
-				const vector3df nmy(0, -1, 0);
-				const vector3df nz(0, 0, 1);
-				const vector3df nmz(0, 0, -1);
-
-				const SColor w(255, 255, 255, 255);
-
-				const vector2df tex1(0, 1), tex2(0, 0), tex3(1, 1), tex4(1, 0);
-				int s = buffer.Vertices.size();
-				int count = 0;
-
-				if (!(y + 1 < CHUNK_SIZE && blocks[x][y + 1][z].type > 0))
-				{
-					buffer.Vertices.push_back(S3DVertex(p[0], ny, w, tex1));
-					buffer.Vertices.push_back(S3DVertex(p[1], ny, w, tex2));
-					buffer.Vertices.push_back(S3DVertex(p[2], ny, w, tex3));
-					buffer.Vertices.push_back(S3DVertex(p[3], ny, w, tex4));
-					count++;
-				}
-				
-				if (!(x + 1 < CHUNK_SIZE && blocks[x + 1][y][z].type > 0))
-				{
-					buffer.Vertices.push_back(S3DVertex(p[6], nx, w, tex1));
-					buffer.Vertices.push_back(S3DVertex(p[2], nx, w, tex2));
-					buffer.Vertices.push_back(S3DVertex(p[7], nx, w, tex3));
-					buffer.Vertices.push_back(S3DVertex(p[3], nx, w, tex4));
-					count++;
-				}
-				
-				if (!(z + 1 < CHUNK_SIZE && blocks[x][y][z + 1].type > 0))
-				{
-					buffer.Vertices.push_back(S3DVertex(p[7], nz, w, tex1));
-					buffer.Vertices.push_back(S3DVertex(p[3], nz, w, tex2));
-					buffer.Vertices.push_back(S3DVertex(p[5], nz, w, tex3));
-					buffer.Vertices.push_back(S3DVertex(p[1], nz, w, tex4));
-					count++;
-				}
-				
-				if (!(y > 0 && blocks[x][y - 1][z].type > 0))
-				{
-					buffer.Vertices.push_back(S3DVertex(p[5], nmy, w, tex1));
-					buffer.Vertices.push_back(S3DVertex(p[4], nmy, w, tex2));
-					buffer.Vertices.push_back(S3DVertex(p[7], nmy, w, tex3));
-					buffer.Vertices.push_back(S3DVertex(p[6], nmy, w, tex4));
-					count++;
-				}
-				
-				if (!(x > 0 && blocks[x - 1][y][z].type > 0))
-				{
-					buffer.Vertices.push_back(S3DVertex(p[5], nmx, w, tex1));
-					buffer.Vertices.push_back(S3DVertex(p[1], nmx, w, tex2));
-					buffer.Vertices.push_back(S3DVertex(p[4], nmx, w, tex3));
-					buffer.Vertices.push_back(S3DVertex(p[0], nmx, w, tex4));
-					count++;
-				}
-				
-				if (!(z > 0 && blocks[x][y][z - 1].type > 0))
-				{
-					buffer.Vertices.push_back(S3DVertex(p[4], nmz, w, tex1));
-					buffer.Vertices.push_back(S3DVertex(p[0], nmz, w, tex2));
-					buffer.Vertices.push_back(S3DVertex(p[6], nmz, w, tex3));
-					buffer.Vertices.push_back(S3DVertex(p[2], nmz, w, tex4));
-					count++;
-				}
-				
-				for (int i = 0; i < count; i++)
-				{
-					buffer.Indices.push_back(s + 0);
-					buffer.Indices.push_back(s + 1);
-					buffer.Indices.push_back(s + 2);
-					
-					buffer.Indices.push_back(s + 2);
-					buffer.Indices.push_back(s + 1);
-					buffer.Indices.push_back(s + 3);
-
-					s += 4;
-				}
+				bool xCovered = x + 1 < CHUNK_SIZE && blockType->isCube(blocks[x + 1][y][z].type);
+				bool yCovered = y + 1 < CHUNK_SIZE && blockType->isCube(blocks[x][y + 1][z].type);
+				bool zCovered = z + 1 < CHUNK_SIZE && blockType->isCube(blocks[x][y][z + 1].type);
+				bool mxCovered = x > 0 && blockType->isCube(blocks[x - 1][y][z].type);
+				bool myCovered = y > 0 && blockType->isCube(blocks[x][y - 1][z].type);
+				bool mzCovered = z > 0 && blockType->isCube(blocks[x][y][z - 1].type);
+				Block block(this, x, y, z);
+				blockType->drawBlock(&collector, block, xCovered, mxCovered, yCovered, myCovered, zCovered, mzCovered);
 			}
-	buffer.setDirty();
-	buffer.recalculateBoundingBox();
+	collector.finalize();
 }

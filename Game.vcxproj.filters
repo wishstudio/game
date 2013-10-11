@@ -41,6 +41,15 @@
     <ClInclude Include="src\World.h">
       <Filter>Header</Filter>
     </ClInclude>
+    <ClInclude Include="src\TileManager.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="src\BlockType.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="src\TriangleCollector.h">
+      <Filter>Header</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Block.cpp">
@@ -71,6 +80,15 @@
       <Filter>Source</Filter>
     </ClCompile>
     <ClCompile Include="src\World.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TileManager.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="src\BlockType.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TriangleCollector.cpp">
       <Filter>Source</Filter>
     </ClCompile>
   </ItemGroup>

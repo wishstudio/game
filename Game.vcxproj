@@ -12,6 +12,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Block.h" />
+    <ClInclude Include="src\BlockType.h" />
     <ClInclude Include="src\Chunk.h" />
     <ClInclude Include="src\ChunkTriangleSelector.h" />
     <ClInclude Include="src\EventReceiver.h" />
@@ -20,10 +21,13 @@
     <ClInclude Include="src\SceneManager.h" />
     <ClInclude Include="src\Serialization.h" />
     <ClInclude Include="src\stdafx.h" />
+    <ClInclude Include="src\TileManager.h" />
+    <ClInclude Include="src\TriangleCollector.h" />
     <ClInclude Include="src\World.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Block.cpp" />
+    <ClCompile Include="src\BlockType.cpp" />
     <ClCompile Include="src\Chunk.cpp" />
     <ClCompile Include="src\ChunkTriangleSelector.cpp" />
     <ClCompile Include="src\Deserializer.cpp" />
@@ -35,6 +39,8 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="src\TileManager.cpp" />
+    <ClCompile Include="src\TriangleCollector.cpp" />
     <ClCompile Include="src\World.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
