@@ -14,6 +14,7 @@ public:
 
 	void registerCube(u16 id, stringw tilePath);
 	bool isCube(u16 type) const;
+	aabbox3df getBoundingBox(const Block &block) const;
 	void drawBlock(
 		TriangleCollector *collector,
 		const Block &block,

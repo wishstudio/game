@@ -119,15 +119,12 @@ bool World::getCameraIntersection(const line3df &ray, CameraIntersectionInfo **i
 			block = block.neighbour(0, 0, stepZ);
         }
 		/* Test current one */
-		if (block.getType() != 0)
+		aabbox3df box = block.getBoundingBox();
+		translateBox(box, x, y, z);
+		if (rayIntersectsWithBox(ray, box))
 		{
-			aabbox3df box = block.getBoundingBox();
-			translateBox(box, x, y, z);
-			if (rayIntersectsWithBox(ray, box))
-			{
-				*info = new CameraIntersectionInfo(block, direction);
-				return true;
-			}
+			*info = new CameraIntersectionInfo(block, direction);
+			return true;
 		}
     }
 	return false;

@@ -25,6 +25,14 @@ bool BlockType::isCube(u16 type) const
 	return blockTypeSpec[type].type == Type_Cube;
 }
 
+aabbox3df BlockType::getBoundingBox(const Block &block) const
+{
+	if (blockTypeSpec[block.getType()].type == Type_Cube)
+		return aabbox3df(0, 0, 0, 1, 1, 1);
+	else
+		return aabbox3df(0, 0, 0, 0, 0, 0);
+}
+
 void BlockType::drawBlock(
 	TriangleCollector *collector,
 	const Block &block,

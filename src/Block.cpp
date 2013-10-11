@@ -1,6 +1,7 @@
 #include "stdafx.h"
 
 #include "Block.h"
+#include "BlockType.h"
 #include "Chunk.h"
 #include "World.h"
 
@@ -46,7 +47,7 @@ Block Block::neighbour(Direction direction) const
 
 aabbox3df Block::getBoundingBox() const
 {
-	return aabbox3df(0, 0, 0, 1, 1, 1);
+	return blockType->getBoundingBox(*this);
 }
 
 u16 Block::getType() const
