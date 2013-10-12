@@ -2,6 +2,7 @@
 
 #include "BlockType.h"
 #include "Chunk.h"
+#include "Noise.h"
 #include "Serialization.h"
 #include "World.h"
 
@@ -94,12 +95,18 @@ void Chunk::save()
 void Chunk::generate()
 {
 	memset(blocks, 0, sizeof blocks);
-	if (chunk_y >= 0)
-		return;
+	Noise noise(1, 3, 20, 0.8);
+	noise.setSize2D(CHUNK_SIZE, CHUNK_SIZE);
+	noise.setSpread2D(180, 180);
+	noise.generatePerlin2D(chunk_x * CHUNK_SIZE, chunk_z * CHUNK_SIZE);
 	for (int x = 0; x < CHUNK_SIZE; x++)
-		for (int y = 0; y < CHUNK_SIZE; y++)
-			for (int z = 0; z < CHUNK_SIZE; z++)
+		for (int z = 0; z < CHUNK_SIZE; z++)
+		{
+			int height = noise.getNoise2D(x, z) - chunk_y * CHUNK_SIZE - 30;
+			height = min(height, CHUNK_SIZE - 1);
+			for (int y = 0; y <= height; y++)
 				blocks[x][y][z].type = 1;
+		}
 }
 
 void Chunk::setDirty(int x, int y, int z)

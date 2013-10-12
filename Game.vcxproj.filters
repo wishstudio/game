@@ -50,6 +50,9 @@
     <ClInclude Include="src\TriangleCollector.h">
       <Filter>Header</Filter>
     </ClInclude>
+    <ClInclude Include="src\Noise.h">
+      <Filter>Header</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Block.cpp">
@@ -89,6 +92,9 @@
       <Filter>Source</Filter>
     </ClCompile>
     <ClCompile Include="src\TriangleCollector.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Noise.cpp">
       <Filter>Source</Filter>
     </ClCompile>
   </ItemGroup>

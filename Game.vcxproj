@@ -18,6 +18,7 @@
     <ClInclude Include="src\EventReceiver.h" />
     <ClInclude Include="src\Hash.h" />
     <ClInclude Include="src\Math.h" />
+    <ClInclude Include="src\Noise.h" />
     <ClInclude Include="src\SceneManager.h" />
     <ClInclude Include="src\Serialization.h" />
     <ClInclude Include="src\stdafx.h" />
@@ -33,6 +34,7 @@
     <ClCompile Include="src\Deserializer.cpp" />
     <ClCompile Include="src\EventReceiver.cpp" />
     <ClCompile Include="src\Main.cpp" />
+    <ClCompile Include="src\Noise.cpp" />
     <ClCompile Include="src\SceneManager.cpp" />
     <ClCompile Include="src\Serializer.cpp" />
     <ClCompile Include="src\stdafx.cpp">
