@@ -120,8 +120,8 @@ void Noise::generateOctave2D(int seed, float x, float y, float stepX, float step
 				v -= 1.0;
 				cy++;
 				p00 = p01;
-				p10 = p11;
 				p01 = noise2D(seed, cx, cy + 1);
+				p10 = p11;
 				p11 = noise2D(seed, cx + 1, cy + 1);
 			}
 		}
@@ -137,6 +137,64 @@ void Noise::generateOctave2D(int seed, float x, float y, float stepX, float step
 
 void Noise::generateOctave3D(int seed, float x, float y, float z, float stepX, float stepY, float stepZ)
 {
+	/* Calculate interpolated noise */
+	int x0 = (int) floor(x), y0 = (int) floor(y), z0 = (int) floor(z);
+	int index = 0;
+	int cx = x0;
+	float u = x - floor(x);
+	for (int i = 0; i < sx; i++)
+	{
+		float v = y - floor(y);
+		int cy = y0;
+
+		for (int j = 0; j < sy; j++)
+		{
+			float w = z - floor(z);
+			int cz = z0;
+
+			float p000 = noise3D(seed, cx, cy, cz);
+			float p001 = noise3D(seed, cx, cy, cz + 1);
+			float p010 = noise3D(seed, cx, cy + 1, cz);
+			float p011 = noise3D(seed, cx, cy + 1, cz + 1);
+			float p100 = noise3D(seed, cx + 1, cy, cz);
+			float p101 = noise3D(seed, cx + 1, cy, cz + 1);
+			float p110 = noise3D(seed, cx + 1, cy + 1, cz);
+			float p111 = noise3D(seed, cx + 1, cy + 1, cz + 1);
+
+			for (int k = 0; k < sz; k++)
+			{
+				current[index++] = trilinearInterpolation(p000, p001, p010, p011, p100, p101, p110, p111, u, v, w);
+				w += stepZ;
+				while (w >= 1.0)
+				{
+					w -= 1.0;
+					cz++;
+					p000 = p001;
+					p001 = noise3D(seed, cx, cy, cz + 1);
+					p010 = p011;
+					p011 = noise3D(seed, cx, cy + 1, cz + 1);
+					p100 = p101;
+					p101 = noise3D(seed, cx + 1, cy, cz + 1);
+					p110 = p111;
+					p111 = noise3D(seed, cx + 1, cy + 1, cz + 1);
+				}
+			}
+
+			v += stepY;
+			while (v >= 1.0)
+			{
+				v -= 1.0;
+				cy++;
+			}
+		}
+
+		u += stepX;
+		while (u >= 1.0)
+		{
+			u -= 1.0;
+			cx++;
+		}
+	}
 }
 
 void Noise::generatePerlin2D(int x, int y)
@@ -146,8 +204,7 @@ void Noise::generatePerlin2D(int x, int y)
 	float frequency = 1, amplitude = 1;
 	for (int oct = 0; oct < octaveCount; oct++)
 	{
-		/* Apply current octave */
-		/* Step = 1 / T = 1 / (1 / f) = f */
+		/* Calculate and apply current octave */
 		generateOctave2D(seed + oct, x * frequency / spreadX, y * frequency / spreadY, frequency / spreadX, frequency / spreadY);
 
 		int index = 0;
@@ -166,4 +223,25 @@ void Noise::generatePerlin2D(int x, int y)
 
 void Noise::generatePerlin3D(int x, int y, int z)
 {
+	/* Calculate perlin octaves */
+	memset(result, 0, sizeof(float) * sx * sy);
+	float frequency = 1, amplitude = 1;
+	for (int oct = 0; oct < octaveCount; oct++)
+	{
+		/* Calculate and apply current octave */
+		generateOctave3D(seed + oct, x * frequency / spreadX, y * frequency / spreadY, z * frequency / spreadZ,
+			frequency / spreadX, frequency / spreadY, frequency / spreadZ);
+		int index = 0;
+		for (int i = 0; i < sx; i++)
+			for (int j = 0; j < sy; j++)
+				for (int k = 0; k < sz; k++)
+				{
+					result[index] += scale * amplitude * current[index];
+					index++;
+				}
+
+		/* Update octave parameters */
+		frequency *= 2;
+		amplitude *= persistence;
+	}
 }
