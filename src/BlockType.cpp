@@ -33,6 +33,13 @@ aabbox3df BlockType::getBoundingBox(const Block &block) const
 		return aabbox3df(0, 0, 0, 0, 0, 0);
 }
 
+ITexture* BlockType::getTexture(u16 id) const {
+	if (blockTypeSpec[id].type != 0)
+		return blockTypeSpec[id].tile.texture;
+	else
+		return nullptr;
+}
+
 void BlockType::drawBlock(
 	TriangleCollector *collector,
 	const Block &block,

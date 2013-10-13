@@ -7,3 +7,5 @@ sqlite3 *db;
 BlockType *blockType;
 TileManager *tileManager;
 World *world;
+EventReceiver *eventReceiver;
+

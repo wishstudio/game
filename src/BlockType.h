@@ -26,6 +26,8 @@ public:
 		bool mzCovered
 	) const;
 
+	ITexture* getTexture(u16 id) const;
+
 private:
 	struct BlockTypeSpec
 	{

@@ -6,6 +6,7 @@
 #include "SceneManager.h"
 #include "TileManager.h"
 #include "World.h"
+#include "ShortcutItemUI.h"
 
 #ifdef _IRR_WINDOWS_
 #pragma comment(lib, "Irrlicht.lib")
@@ -16,12 +17,13 @@
 int main()
 {
 	/* Create video device */
-	EventReceiver eventReceiver;
+	eventReceiver = new EventReceiver();
 
-	IrrlichtDevice *device = createDevice(EDT_DIRECT3D9, dimension2d<u32>(1024, 768), 16, false, false, false, &eventReceiver);
+	IrrlichtDevice *device = createDevice(EDT_DIRECT3D9, dimension2d<u32>(1024, 768), 16, false, false, false, eventReceiver);
 	if (!device)
 		return 1;
-
+	
+	ShortcutItemUI shortcutIUI;
 	driver = device->getVideoDriver();
 	smgr = device->getSceneManager();
 	IFileSystem *fs = device->getFileSystem();
@@ -59,21 +61,25 @@ int main()
 	tileManager = new TileManager();
 	blockType = new BlockType();
 	blockType->registerCube(1, "stonepile.png");
+	blockType->registerCube(2, "magickaland.png");
+	blockType->registerCube(3, "dirtroad.png");
+
+	u16 handItem = 1;
 	
 	bool lastLeftMouseDown = false, lastRightMouseDown = false;
 	while (device->run())
 	{
 		if (device->isWindowActive())
 		{
-			driver->beginScene(true, true, SColor(255, 100, 101, 140));
+			driver->beginScene(true, true, SColor(255, 127, 200, 251));
 
 			bool leftMousePressed = false, rightMousePressed = false;
-			if (eventReceiver.isLeftButtonDown() && lastLeftMouseDown == false)
+			if (eventReceiver->isLeftButtonDown() && lastLeftMouseDown == false)
 				leftMousePressed = true;
-			lastLeftMouseDown = eventReceiver.isLeftButtonDown();
-			if (eventReceiver.isRightButtonDown() && lastRightMouseDown == false)
+			lastLeftMouseDown = eventReceiver->isLeftButtonDown();
+			if (eventReceiver->isRightButtonDown() && lastRightMouseDown == false)
 				rightMousePressed = true;
-			lastRightMouseDown = eventReceiver.isRightButtonDown();
+			lastRightMouseDown = eventReceiver->isRightButtonDown();
 
 			sceneManager->update();
 			World::CameraIntersectionInfo *info;
@@ -91,12 +97,15 @@ int main()
 				driver->draw3DBox(box, SColor(255, 255, 0, 0));
 				if (leftMousePressed)
 					info->block.setType(0);
-				if (rightMousePressed)
-					info->block.neighbour(oppositeDirection(info->direction)).setType(1);
+				if (rightMousePressed) {
+					handItem = shortcutIUI.getCurrentItem();
+					info->block.neighbour(oppositeDirection(info->direction)).setType(handItem);
+				}
 			}
 
 			smgr->drawAll();
 
+			shortcutIUI.show();
 			driver->draw2DLine(vector2d<s32>(driver->getScreenSize().Width / 2 - 10, driver->getScreenSize().Height / 2),
 			vector2d<s32>(driver->getScreenSize().Width / 2 + 10, driver->getScreenSize().Height / 2), SColor(255, 255, 255, 255));
 			driver->draw2DLine(vector2d<s32>(driver->getScreenSize().Width / 2, driver->getScreenSize().Height / 2 - 10),
