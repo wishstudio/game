@@ -95,18 +95,27 @@ void Chunk::save()
 void Chunk::generate()
 {
 	memset(blocks, 0, sizeof blocks);
-	Noise noise(1, 3, 20, 0.8);
-	noise.setSize2D(CHUNK_SIZE, CHUNK_SIZE);
-	noise.setSpread2D(180, 180);
-	noise.generatePerlin2D(chunk_x * CHUNK_SIZE, chunk_z * CHUNK_SIZE);
+	Noise heightmap(1, 4, 20, 0.6);
+	heightmap.setSize2D(CHUNK_SIZE, CHUNK_SIZE);
+	heightmap.setSpread2D(180, 180);
+	heightmap.generatePerlin2D(chunk_x * CHUNK_SIZE, chunk_z * CHUNK_SIZE);
+
+	Noise noise(1, 4, 1, 0.4);
+	noise.setSize3D(CHUNK_SIZE, CHUNK_SIZE, CHUNK_SIZE);
+	noise.setSpread3D(5, 5, 5);
+	noise.generatePerlin3D(chunk_x * CHUNK_SIZE, chunk_y * CHUNK_SIZE, chunk_z * CHUNK_SIZE);
 	for (int x = 0; x < CHUNK_SIZE; x++)
-		for (int z = 0; z < CHUNK_SIZE; z++)
-		{
-			int height = noise.getNoise2D(x, z) - chunk_y * CHUNK_SIZE - 30;
-			height = min(height, CHUNK_SIZE - 1);
-			for (int y = 0; y <= height; y++)
-				blocks[x][y][z].type = 1;
-		}
+		for (int y = 0; y < CHUNK_SIZE; y++)
+			for (int z = 0; z < CHUNK_SIZE; z++)
+			{
+				int yy = chunk_y * CHUNK_SIZE + y;
+				int h = heightmap.getNoise2D(x, z);
+				if (yy < h)
+				{
+					float density = noise.getNoise3D(x, y, z);
+					blocks[x][y][z].type = density > -0.4;
+				}
+			}
 }
 
 void Chunk::setDirty(int x, int y, int z)

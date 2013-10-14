@@ -41,7 +41,7 @@ int main()
 	keyMap[4].KeyCode = KEY_SPACE;
 
 	camera = smgr->addCameraSceneNodeFPS(nullptr, 80.f, 0.005f, -1, keyMap, 5, true, 0.005f);
-	camera->setPosition(vector3df(2, 3, 2));
+	camera->setPosition(vector3df(0, 20, 0));
 	camera->setTarget(vector3df(0, 0, 0));
 	device->getCursorControl()->setVisible(false);
 

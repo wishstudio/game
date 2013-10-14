@@ -224,7 +224,7 @@ void Noise::generatePerlin2D(int x, int y)
 void Noise::generatePerlin3D(int x, int y, int z)
 {
 	/* Calculate perlin octaves */
-	memset(result, 0, sizeof(float) * sx * sy);
+	memset(result, 0, sizeof(float) * sx * sy * sz);
 	float frequency = 1, amplitude = 1;
 	for (int oct = 0; oct < octaveCount; oct++)
 	{
