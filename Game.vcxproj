@@ -21,6 +21,7 @@
     <ClInclude Include="src\Noise.h" />
     <ClInclude Include="src\SceneManager.h" />
     <ClInclude Include="src\Serialization.h" />
+    <ClInclude Include="src\ShortcutItemUI.h" />
     <ClInclude Include="src\stdafx.h" />
     <ClInclude Include="src\TileManager.h" />
     <ClInclude Include="src\TriangleCollector.h" />
@@ -37,6 +38,7 @@
     <ClCompile Include="src\Noise.cpp" />
     <ClCompile Include="src\SceneManager.cpp" />
     <ClCompile Include="src\Serializer.cpp" />
+    <ClCompile Include="src\ShortcutItemUI.cpp" />
     <ClCompile Include="src\stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
