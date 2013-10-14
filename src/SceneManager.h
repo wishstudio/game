@@ -1,6 +1,5 @@
 #pragma once
 
-class ChunkTriangleSelector;
 class SceneManager
 {
 public:
@@ -11,5 +10,5 @@ public:
 
 private:
 	IMetaTriangleSelector *metaSelector;
-	list<ChunkTriangleSelector *> chunkSelectors;
+	list<ITriangleSelector *> chunkSelectors;
 };

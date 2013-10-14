@@ -26,3 +26,5 @@ extern BlockType *blockType;
 extern TileManager *tileManager;
 extern World *world;
 extern EventReceiver *eventReceiver;
+
+static const int CHUNK_SIZE = 16;

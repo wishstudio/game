@@ -1,7 +1,6 @@
 #include "stdafx.h"
 
 #include "Chunk.h"
-#include "ChunkTriangleSelector.h"
 #include "SceneManager.h"
 #include "World.h"
 
@@ -18,8 +17,6 @@ SceneManager::SceneManager()
 SceneManager::~SceneManager()
 {
 	metaSelector->drop();
-	for (auto selector: chunkSelectors)
-		selector->drop();
 }
 
 void SceneManager::update()
@@ -50,15 +47,14 @@ void SceneManager::update()
 	/* Remove triangle selectors which are out of range. */
 	for (auto it = chunkSelectors.begin(); it != chunkSelectors.end(); )
 	{
-		ChunkTriangleSelector *selector = (*it);
-		Chunk *chunk = selector->getChunk();
+		ITriangleSelector *selector = (*it);
+		Chunk *chunk = (Chunk *) selector;
 		int x = chunk->x() - basex, y = chunk->y() - basey, z = chunk->z() - basez;
 		if (x < 0 || x > 1 || y < 0 || y > 1 || z < 0 || z > 1)
 		{
 			/* This one should be removed. */
 			it = chunkSelectors.erase(it);
 			metaSelector->removeTriangleSelector(selector);
-			selector->drop();
 		}
 		else
 		{
@@ -75,8 +71,7 @@ void SceneManager::update()
 				if (!flag[x][y][z])
 				{
 					Chunk *chunk = world->getChunk(x + basex, y + basey, z + basez);
-					ChunkTriangleSelector *selector = new ChunkTriangleSelector(chunk);
-					chunkSelectors.push_back(selector);
-					metaSelector->addTriangleSelector(selector);
+					chunkSelectors.push_back(chunk);
+					metaSelector->addTriangleSelector(chunk);
 				}
 }

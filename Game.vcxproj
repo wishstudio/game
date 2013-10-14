@@ -14,7 +14,6 @@
     <ClInclude Include="src\Block.h" />
     <ClInclude Include="src\BlockType.h" />
     <ClInclude Include="src\Chunk.h" />
-    <ClInclude Include="src\ChunkTriangleSelector.h" />
     <ClInclude Include="src\EventReceiver.h" />
     <ClInclude Include="src\Hash.h" />
     <ClInclude Include="src\Math.h" />
@@ -31,7 +30,6 @@
     <ClCompile Include="src\Block.cpp" />
     <ClCompile Include="src\BlockType.cpp" />
     <ClCompile Include="src\Chunk.cpp" />
-    <ClCompile Include="src\ChunkTriangleSelector.cpp" />
     <ClCompile Include="src\Deserializer.cpp" />
     <ClCompile Include="src\EventReceiver.cpp" />
     <ClCompile Include="src\Main.cpp" />

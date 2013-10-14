@@ -17,9 +17,6 @@
     <ClInclude Include="src\Chunk.h">
       <Filter>Header</Filter>
     </ClInclude>
-    <ClInclude Include="src\ChunkTriangleSelector.h">
-      <Filter>Header</Filter>
-    </ClInclude>
     <ClInclude Include="src\EventReceiver.h">
       <Filter>Header</Filter>
     </ClInclude>
@@ -62,9 +59,6 @@
       <Filter>Source</Filter>
     </ClCompile>
     <ClCompile Include="src\Chunk.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="src\ChunkTriangleSelector.cpp">
       <Filter>Source</Filter>
     </ClCompile>
     <ClCompile Include="src\Deserializer.cpp">

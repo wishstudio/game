@@ -150,7 +150,7 @@ void Chunk::OnRegisterSceneNode()
 	ISceneNode::OnRegisterSceneNode();
 }
 
-void Chunk::render()
+void Chunk::update()
 {
 	if (dirty)
 	{
@@ -162,6 +162,11 @@ void Chunk::render()
 		createMeshBuffer();
 		bufferDirty = false;
 	}
+}
+
+void Chunk::render()
+{
+	update();
 	driver->setTransform(ETS_WORLD, AbsoluteTransformation);
 	for (u32 i = 0; i < collector.getBufferCount(); i++)
 	{
@@ -197,4 +202,99 @@ void Chunk::createMeshBuffer()
 				blockType->drawBlock(&collector, block, xCovered, mxCovered, yCovered, myCovered, zCovered, mzCovered);
 			}
 	collector.finalize();
+}
+
+s32 Chunk::getTriangleCount() const
+{
+	((Chunk *) this)->update();
+	return collector.getTriangleCount();
+}
+
+/* Gets all triangles */
+void Chunk::getTriangles(
+	triangle3df *triangles,
+	s32 arraySize,
+	s32 &outTriangleCount,
+	const matrix4 *transform) const
+{
+	((Chunk *) this)->update();
+
+	matrix4 mat;
+	if (transform)
+		mat = *transform;
+	mat *= getAbsoluteTransformation();
+
+	outTriangleCount = min(arraySize, getTriangleCount());
+	for (auto it = collector.begin(); it != collector.end(); it++)
+	{
+		u32 i = it - collector.begin();
+		mat.transformVect(triangles[i].pointA, it->pointA);
+		mat.transformVect(triangles[i].pointB, it->pointB);
+		mat.transformVect(triangles[i].pointC, it->pointC);
+	}
+}
+
+/* Gets all triangles which have or may have contact within a specific bounding box */
+void Chunk::getTriangles(
+	triangle3df *triangles,
+	s32 arraySize,
+	s32 &outTriangleCount,
+	const aabbox3df &box,
+	const matrix4 *transform) const
+{
+	((Chunk *) this)->update();
+
+	matrix4 mat(matrix4::EM4CONST_NOTHING);
+	aabbox3df tBox(box);
+	getAbsoluteTransformation().getInverse(mat);
+	mat.transformBoxEx(tBox);
+
+	if (transform)
+		mat = *transform;
+	else
+		mat.makeIdentity();
+	mat *= getAbsoluteTransformation();
+
+	s32 triangleCount = 0;
+
+	int x_min = bound<int>(0, floor(tBox.MinEdge.X), CHUNK_SIZE - 1);
+	int y_min = bound<int>(0, floor(tBox.MinEdge.Y), CHUNK_SIZE - 1);
+	int z_min = bound<int>(0, floor(tBox.MinEdge.Z), CHUNK_SIZE - 1);
+	int x_max = bound<int>(0, ceil(tBox.MaxEdge.X), CHUNK_SIZE - 1);
+	int y_max = bound<int>(0, ceil(tBox.MaxEdge.Y), CHUNK_SIZE - 1);
+	int z_max = bound<int>(0, ceil(tBox.MaxEdge.Z), CHUNK_SIZE - 1);
+	for (int x = x_min; x <= x_max; x++)
+		for (int y = y_min; y <= y_max; y++)
+			for (int z = z_min; z <= z_max; z++)
+			{
+				for (auto it = collector.blockBegin(x, y, z); it != collector.blockEnd(x, y, z); it++)
+				{
+					mat.transformVect(triangles[triangleCount].pointA, it->pointA);
+					mat.transformVect(triangles[triangleCount].pointB, it->pointB);
+					mat.transformVect(triangles[triangleCount].pointC, it->pointC);
+					triangleCount++;
+					if (triangleCount == arraySize)
+						goto done;
+				}
+			}
+
+done:
+	outTriangleCount = triangleCount;
+}
+
+/* Gets all triangles which have or may have contact with a 3d line */
+void Chunk::getTriangles(
+	triangle3df *triangles,
+	s32 arraySize,
+	s32 &outTriangleCount,
+	const line3df &line,
+	const matrix4 *transform) const
+{
+	((Chunk *) this)->update();
+
+	aabbox3df box(line.start);
+	box.addInternalPoint(line.end);
+
+	/* TODO: Could be optimized for line a little bit more. */
+	getTriangles(triangles, arraySize, outTriangleCount, box, transform);
 }

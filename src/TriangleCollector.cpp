@@ -35,11 +35,13 @@ void TriangleCollector::clear()
 	buffers.clear();
 	textures.clear();
 	textureMap.clear();
-	x = y = z = -1;
+	triangles.clear();
+	x = y = z = 0;
 }
 
 void TriangleCollector::finalize()
 {
+	endIndex[x][y][z] = triangles.size();
 	for (u32 i = 0; i < buffers.size(); i++)
 	{
 		buffers[i]->setDirty();
@@ -49,9 +51,11 @@ void TriangleCollector::finalize()
 
 void TriangleCollector::setCurrentBlock(const Block &block)
 {
+	endIndex[x][y][z] = triangles.size();
 	x = block.innerX();
 	y = block.innerY();
 	z = block.innerZ();
+	beginIndex[x][y][z] = triangles.size();
 }
 
 void TriangleCollector::addQuad(
@@ -91,11 +95,19 @@ void TriangleCollector::addQuad(
 		tile.u2, tile.v2
 	));
 
-	buffer->Indices.push_back(s + 0);
-	buffer->Indices.push_back(s + 1);
-	buffer->Indices.push_back(s + 2);
+	addTriangleIndex(buffer, s, s + 1, s + 2);
+	addTriangleIndex(buffer, s + 2, s + 1, s + 3);
+}
 
-	buffer->Indices.push_back(s + 2);
-	buffer->Indices.push_back(s + 1);
-	buffer->Indices.push_back(s + 3);
+void TriangleCollector::addTriangleIndex(SMeshBuffer *buffer, u32 i1, u32 i2, u32 i3)
+{
+	buffer->Indices.push_back(i1);
+	buffer->Indices.push_back(i2);
+	buffer->Indices.push_back(i3);
+
+	triangles.push_back(triangle3df(
+		buffer->Vertices[i1].Pos,
+		buffer->Vertices[i2].Pos,
+		buffer->Vertices[i3].Pos
+	));
 }

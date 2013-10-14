@@ -25,11 +25,27 @@ public:
 		const vector3df &normal
 	);
 
+	/* Collision detection utilities */
+	inline u32 getTriangleCount() const { return triangles.size(); }
+	inline std::vector<triangle3df>::const_iterator begin() const { return triangles.cbegin(); }
+	inline std::vector<triangle3df>::const_iterator end() const { return triangles.cend(); }
+	inline std::vector<triangle3df>::const_iterator blockBegin(int x, int y, int z) const
+	{
+		return triangles.cbegin() + beginIndex[x][y][z];
+	}
+	inline std::vector<triangle3df>::const_iterator blockEnd(int x, int y, int z) const
+	{
+		return triangles.cbegin() + endIndex[x][y][z];
+	}
+
 private:
 	SMeshBuffer *getBuffer(ITexture *texture);
+	void addTriangleIndex(SMeshBuffer *buffer, u32 i1, u32 i2, u32 i3);
 
 	array<SMeshBuffer *> buffers;
 	array<ITexture *> textures;
 	std::unordered_map<ITexture *, SMeshBuffer *> textureMap;
 	int x, y, z;
+	std::vector<triangle3df> triangles;
+	int beginIndex[CHUNK_SIZE][CHUNK_SIZE][CHUNK_SIZE], endIndex[CHUNK_SIZE][CHUNK_SIZE][CHUNK_SIZE];
 };
