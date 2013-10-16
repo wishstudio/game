@@ -17,15 +17,27 @@ struct BlockData
 class Chunk: public ISceneNode, public ITriangleSelector
 {
 public:
+	enum class Status: int { Unloaded, DataLoading, DataLoaded, BufferLoading, FullLoaded };
+	/* Unloaded: Data is invalid.
+	 * DataLoading: Data is being loading from disk or generating.
+	 * DataLoaded: Data is loaded, vertex buffer is invalid.
+	 * BufferLoading: Data is 
+	 * FullLoaded: Both data and vertex buffer is loaded.
+	 */
 	Chunk(int chunk_x, int chunk_y, int chunk_z);
 	virtual ~Chunk();
 
 	static void initDatabase();
 
+	volatile Status getStatus() const { return status; }
+
 	int x() const { return chunk_x; }
 	int y() const { return chunk_y; }
 	int z() const { return chunk_z; }
 	void setDirty(int x, int y, int z);
+
+	void loadAll();
+	void loadData();
 
 	/* ISceneNode */
 	virtual void OnRegisterSceneNode() override;
@@ -60,20 +72,19 @@ public:
 	) const override;
 
 private:
-	void load();
 	void save();
 	void generate();
 	void update();
 	void invalidateMeshBuffer();
 	void createMeshBuffer();
-
+	
+	volatile Status status;
 	int chunk_x, chunk_y, chunk_z;
-	bool dirty, triangleSelectorDirty, bufferDirty;
+	bool dirty, bufferDirty;
 	TriangleCollector collector;
 	BlockData blocks[CHUNK_SIZE][CHUNK_SIZE][CHUNK_SIZE];
 	SMaterial material;
 	aabbox3df boundingBox;
 
 	friend class Block;
-	friend class ChunkTriangleSelector;
 };

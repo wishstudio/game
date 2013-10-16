@@ -52,11 +52,6 @@ int main()
 
 	/* Initialize game logic */
 	world = new World();
-	const int CHUNK_COUNT = 3;
-	for (int i = 0; i < CHUNK_COUNT; i++)
-		for (int j = 0; j < CHUNK_COUNT; j++)
-			for (int k = 0; k < CHUNK_COUNT; k++)
-				world->getChunk(i - CHUNK_COUNT / 2, -j, k - CHUNK_COUNT / 2);
 	SceneManager *sceneManager = new SceneManager();
 	tileManager = new TileManager();
 	blockType = new BlockType();
@@ -124,7 +119,7 @@ int main()
 			s += "FPS: ";
 			s += fps;
 			s += ", ";
-			s += world->getLoadedCounkCount();
+			s += world->getLoadedChunkCount();
 			s += " chunks loaded";
 			device->setWindowCaption(s.c_str());
 

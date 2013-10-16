@@ -6,17 +6,15 @@
 
 World::World()
 {
+	loadedChunkCount = 0;
+	start();
 }
 
 World::~World()
 {
 	for (Chunk *chunk: chunks)
 		chunk->drop();
-}
-
-u32 World::getLoadedCounkCount() const
-{
-	return chunks.size();
+	stop();
 }
 
 Block World::getBlock(int x, int y, int z)
@@ -26,12 +24,20 @@ Block World::getBlock(int x, int y, int z)
 
 Chunk *World::getChunk(int chunk_x, int chunk_y, int chunk_z)
 {
+	Chunk *chunk;
 	auto it = chunks.find(chunk_x, chunk_y, chunk_z);
 	if (it != chunks.end())
-		return *it;
-	Chunk *chunk = new Chunk(chunk_x, chunk_y, chunk_z);
-	chunks.insert(chunk_x, chunk_y, chunk_z, chunk);
-	return chunk;
+		chunk = *it;
+	else
+	{
+		chunk = new Chunk(chunk_x, chunk_y, chunk_z);
+		chunks.insert(chunk_x, chunk_y, chunk_z, chunk);
+		dataLoadQueue.push(chunk);
+	}
+	/* Wait until chunk data is loaded */
+	for (;;)
+		if (chunk->getStatus() >= Chunk::Status::DataLoaded)
+			return chunk;
 }
 
 Chunk *World::getChunkForBlock(int x, int y, int z)
@@ -43,6 +49,41 @@ Chunk *World::getChunkForBlock(int x, int y, int z)
 	int chunk_y = (y < 0)? ((y - (CHUNK_SIZE - 1)) / CHUNK_SIZE): (y / CHUNK_SIZE);
 	int chunk_z = (z < 0)? ((z - (CHUNK_SIZE - 1)) / CHUNK_SIZE): (z / CHUNK_SIZE);
 	return getChunk(chunk_x, chunk_y, chunk_z);
+}
+
+void World::run()
+{
+	while (!shouldStop())
+	{
+		Chunk *chunk = fullLoadQueue.pop();
+		if (chunk)
+		{
+			chunk->loadAll();
+			loadedChunkCount++;
+			continue;
+		}
+
+		chunk = dataLoadQueue.pop();
+		if (chunk)
+		{
+			chunk->loadData();
+			loadedChunkCount++;
+			continue;
+		}
+	}
+}
+
+void World::preloadChunk(int chunk_x, int chunk_y, int chunk_z, bool dataOnly)
+{
+	auto it = chunks.find(chunk_x, chunk_y, chunk_z);
+	if (it != chunks.end()) /* Already preloaded */
+		return;
+	Chunk *chunk = new Chunk(chunk_x, chunk_y, chunk_z);
+	chunks.insert(chunk_x, chunk_y, chunk_z, chunk);
+	if (dataOnly)
+		dataLoadQueue.push(chunk);
+	else
+		fullLoadQueue.push(chunk);
 }
 
 bool World::getCameraIntersection(const line3df &ray, CameraIntersectionInfo **info)

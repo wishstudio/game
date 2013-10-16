@@ -53,6 +53,12 @@
     <ClInclude Include="src\ShortcutItemUI.h">
       <Filter>Header</Filter>
     </ClInclude>
+    <ClInclude Include="src\Thread.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="src\SingleSafeQueue.h">
+      <Filter>Header</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Block.cpp">
@@ -95,6 +101,9 @@
       <Filter>Source</Filter>
     </ClCompile>
     <ClCompile Include="src\ShortcutItemUI.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Thread.cpp">
       <Filter>Source</Filter>
     </ClCompile>
   </ItemGroup>

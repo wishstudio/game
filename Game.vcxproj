@@ -18,10 +18,12 @@
     <ClInclude Include="src\Hash.h" />
     <ClInclude Include="src\Math.h" />
     <ClInclude Include="src\Noise.h" />
+    <ClInclude Include="src\SingleSafeQueue.h" />
     <ClInclude Include="src\SceneManager.h" />
     <ClInclude Include="src\Serialization.h" />
     <ClInclude Include="src\ShortcutItemUI.h" />
     <ClInclude Include="src\stdafx.h" />
+    <ClInclude Include="src\Thread.h" />
     <ClInclude Include="src\TileManager.h" />
     <ClInclude Include="src\TriangleCollector.h" />
     <ClInclude Include="src\World.h" />
@@ -41,6 +43,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="src\Thread.cpp" />
     <ClCompile Include="src\TileManager.cpp" />
     <ClCompile Include="src\TriangleCollector.cpp" />
     <ClCompile Include="src\World.cpp" />
@@ -83,7 +86,6 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
-      <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <PrecompiledHeader>Use</PrecompiledHeader>
@@ -94,7 +96,6 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
-      <WarningLevel>Level3</WarningLevel>
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>

@@ -21,6 +21,12 @@ SceneManager::~SceneManager()
 
 void SceneManager::update()
 {
+	updateTriangleSelectors();
+	updateChunks();
+}
+
+void SceneManager::updateTriangleSelectors()
+{
 	/* Update triangle selectors for chunks.
 	   In general, we need 2x2x2 chunks for collision detection.
 	   For axis x, if our x coordinate is less than 50% of current chunk,
@@ -74,4 +80,16 @@ void SceneManager::update()
 					chunkSelectors.push_back(chunk);
 					metaSelector->addTriangleSelector(chunk);
 				}
+}
+
+void SceneManager::updateChunks()
+{
+	vector3df position = camera->getPosition();
+	int chunk_x = (int) floor(position.X / CHUNK_SIZE);
+	int chunk_y = (int) floor(position.Y / CHUNK_SIZE);
+	int chunk_z = (int) floor(position.Z / CHUNK_SIZE);
+	for (int x = chunk_x - 5; x <= chunk_x + 5; x++)
+		for (int y = chunk_y - 5; y <= chunk_y + 5; y++)
+			for (int z = chunk_z - 5; z <= chunk_z + 5; z++)
+				world->preloadChunk(x, y, z, true);
 }

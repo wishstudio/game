@@ -1,5 +1,9 @@
 #pragma once
 
+#define NOMINMAX
+#include <Windows.h>
+#undef NOMINMAX
+
 #include <sqlite3.h>
 #include <irrlicht.h>
 #include <unordered_map>
@@ -13,6 +17,8 @@ using namespace video;
 
 #include "Hash.h"
 #include "Math.h"
+#include "SingleSafeQueue.h"
+#include "Thread.h"
 
 class BlockType;
 class World;

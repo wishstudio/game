@@ -21,12 +21,13 @@ Deserializer &operator >> (Deserializer &deserializer, BlockData &data)
 Chunk::Chunk(int chunk_x, int chunk_y, int chunk_z)
 	: ISceneNode(smgr->getRootSceneNode(), smgr)
 {
+	status = Status::Unloaded;
+
 	this->chunk_x = chunk_x;
 	this->chunk_y = chunk_y;
 	this->chunk_z = chunk_z;
 
 	dirty = true;
-	triangleSelectorDirty = true;
 	bufferDirty = true;
 	setPosition(vector3df(chunk_x * CHUNK_SIZE, chunk_y * CHUNK_SIZE, chunk_z * CHUNK_SIZE));
 
@@ -35,7 +36,6 @@ Chunk::Chunk(int chunk_x, int chunk_y, int chunk_z)
 
 	material.Wireframe = false;
 	material.Lighting = false;
-	load();
 }
 
 Chunk::~Chunk()
@@ -47,8 +47,17 @@ void Chunk::initDatabase()
 	sqlite3_exec(db, "CREATE TABLE IF NOT EXISTS chunks (x INTEGER NOT NULL, y INTEGER NOT NULL, z INTEGER NOT NULL, data BLOB NOT NULL, PRIMARY KEY (x, y, z))", 0, 0, 0);
 }
 
-void Chunk::load()
+void Chunk::loadAll()
 {
+	loadData();
+	createMeshBuffer();
+}
+
+void Chunk::loadData()
+{
+	if (status >= Status::DataLoaded)
+		return;
+	status = Status::DataLoading;
 	sqlite3_stmt *stmt;
 	sqlite3_prepare_v2(db, "SELECT data FROM chunks WHERE x = ? AND y = ? AND z = ?", -1, &stmt, nullptr);
 	sqlite3_bind_int(stmt, 1, chunk_x);
@@ -73,6 +82,7 @@ void Chunk::load()
 		sqlite3_finalize(stmt);
 		dirty = false;
 	}
+	status = Status::DataLoaded;
 }
 
 void Chunk::save()
@@ -90,6 +100,7 @@ void Chunk::save()
 	sqlite3_bind_blob(stmt, 4, serializer.getData(), serializer.getLength(), free);
 	sqlite3_step(stmt);
 	sqlite3_finalize(stmt);
+	dirty = false;
 }
 
 void Chunk::generate()
@@ -121,8 +132,7 @@ void Chunk::generate()
 void Chunk::setDirty(int x, int y, int z)
 {
 	dirty = true;
-	triangleSelectorDirty = true;
-	bufferDirty = true;
+	invalidateMeshBuffer();
 	if (y + 1 == CHUNK_SIZE)
 		world->getChunk(chunk_x, chunk_y + 1, chunk_z)->invalidateMeshBuffer();
 	if (x + 1 == CHUNK_SIZE)
@@ -139,12 +149,13 @@ void Chunk::setDirty(int x, int y, int z)
 
 void Chunk::invalidateMeshBuffer()
 {
+	status = Status::DataLoaded;
 	bufferDirty = true;
 }
 
 void Chunk::OnRegisterSceneNode()
 {
-	if (IsVisible)
+	if (IsVisible && status == Status::FullLoaded)
 		SceneManager->registerNodeForRendering(this);
 
 	ISceneNode::OnRegisterSceneNode();
@@ -153,15 +164,9 @@ void Chunk::OnRegisterSceneNode()
 void Chunk::update()
 {
 	if (dirty)
-	{
 		save();
-		dirty = false;
-	}
 	if (bufferDirty)
-	{
 		createMeshBuffer();
-		bufferDirty = false;
-	}
 }
 
 void Chunk::render()
@@ -179,6 +184,9 @@ void Chunk::render()
 
 void Chunk::createMeshBuffer()
 {
+	if (status >= Status::FullLoaded)
+		return;
+	status = Status::BufferLoading;
 	//Chunk *cy = mapManager->getChunk(chunk_x, chunk_y + 1, chunk_z);
 	//Chunk *cx = mapManager->getChunk(chunk_x + 1, chunk_y, chunk_z);
 	//Chunk *cz = mapManager->getChunk(chunk_x, chunk_y, chunk_z + 1);
@@ -202,6 +210,8 @@ void Chunk::createMeshBuffer()
 				blockType->drawBlock(&collector, block, xCovered, mxCovered, yCovered, myCovered, zCovered, mzCovered);
 			}
 	collector.finalize();
+	bufferDirty = false;
+	status = Status::FullLoaded;
 }
 
 s32 Chunk::getTriangleCount() const

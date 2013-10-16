@@ -9,6 +9,9 @@ public:
 	void update();
 
 private:
+	void updateTriangleSelectors();
+	void updateChunks();
+
 	IMetaTriangleSelector *metaSelector;
 	list<ITriangleSelector *> chunkSelectors;
 };

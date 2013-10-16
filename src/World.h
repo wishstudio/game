@@ -3,7 +3,7 @@
 #include "Block.h"
 
 class Chunk;
-class World
+class World: public Thread
 {
 public:
 	struct CameraIntersectionInfo
@@ -17,13 +17,19 @@ public:
 	World();
 	virtual ~World();
 
-	u32 getLoadedCounkCount() const;
-
+	volatile u32 getLoadedChunkCount() const { return loadedChunkCount; }
+	
+	void preloadChunk(int chunk_x, int chunk_y, int chunk_z, bool dataOnly);
 	Block getBlock(int x, int y, int z);
 	Chunk *getChunk(int chunk_x, int chunk_y, int chunk_z);
 	Chunk *getChunkForBlock(int x, int y, int z);
 	bool getCameraIntersection(const line3df &ray, CameraIntersectionInfo **info);
 
+protected:
+	virtual void run() override;
+
 private:
+	SingleSafeQueue<Chunk *> dataLoadQueue, fullLoadQueue;
 	Hash<int, int, int, Chunk *> chunks;
+	volatile u32 loadedChunkCount;
 };
