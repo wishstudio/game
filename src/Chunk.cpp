@@ -21,7 +21,7 @@ Deserializer &operator >> (Deserializer &deserializer, BlockData &data)
 Chunk::Chunk(int chunk_x, int chunk_y, int chunk_z)
 	: ISceneNode(smgr->getRootSceneNode(), smgr)
 {
-	status = Status::Unloaded;
+	status = Status::DataLoading;
 
 	this->chunk_x = chunk_x;
 	this->chunk_y = chunk_y;
@@ -47,17 +47,10 @@ void Chunk::initDatabase()
 	sqlite3_exec(db, "CREATE TABLE IF NOT EXISTS chunks (x INTEGER NOT NULL, y INTEGER NOT NULL, z INTEGER NOT NULL, data BLOB NOT NULL, PRIMARY KEY (x, y, z))", 0, 0, 0);
 }
 
-void Chunk::loadAll()
-{
-	loadData();
-	createMeshBuffer();
-}
-
 void Chunk::loadData()
 {
 	if (status >= Status::DataLoaded)
 		return;
-	status = Status::DataLoading;
 	sqlite3_stmt *stmt;
 	sqlite3_prepare_v2(db, "SELECT data FROM chunks WHERE x = ? AND y = ? AND z = ?", -1, &stmt, nullptr);
 	sqlite3_bind_int(stmt, 1, chunk_x);
@@ -133,7 +126,7 @@ void Chunk::setDirty(int x, int y, int z)
 {
 	dirty = true;
 	invalidateMeshBuffer();
-	if (y + 1 == CHUNK_SIZE)
+	/*if (y + 1 == CHUNK_SIZE)
 		world->getChunk(chunk_x, chunk_y + 1, chunk_z)->invalidateMeshBuffer();
 	if (x + 1 == CHUNK_SIZE)
 		world->getChunk(chunk_x + 1, chunk_y, chunk_z)->invalidateMeshBuffer();
@@ -144,7 +137,7 @@ void Chunk::setDirty(int x, int y, int z)
 	if (x == 0)
 		world->getChunk(chunk_x - 1, chunk_y, chunk_z)->invalidateMeshBuffer();
 	if (z == 0)
-		world->getChunk(chunk_x, chunk_y, chunk_z - 1)->invalidateMeshBuffer();
+		world->getChunk(chunk_x, chunk_y, chunk_z - 1)->invalidateMeshBuffer();*/
 }
 
 void Chunk::invalidateMeshBuffer()
@@ -155,8 +148,25 @@ void Chunk::invalidateMeshBuffer()
 
 void Chunk::OnRegisterSceneNode()
 {
-	if (IsVisible && status == Status::FullLoaded)
-		SceneManager->registerNodeForRendering(this);
+	if (IsVisible && status >= Status::DataLoaded)
+	{
+		vector3df position = camera->getPosition();
+		int x = (int) floor(position.X / CHUNK_SIZE);
+		int y = (int) floor(position.Y / CHUNK_SIZE);
+		int z = (int) floor(position.Z / CHUNK_SIZE);
+		int dist = abs(chunk_x - x) + abs(chunk_y - y) + abs(chunk_z - z);
+
+		if (dist <= 5)
+		{
+			if (status == Status::DataLoaded)
+			{
+				status = Status::BufferLoading;
+				world->preloadChunkBuffer(this);
+			}
+			if (status == Status::FullLoaded)
+				SceneManager->registerNodeForRendering(this);
+		}
+	}
 
 	ISceneNode::OnRegisterSceneNode();
 }
@@ -166,12 +176,11 @@ void Chunk::update()
 	if (dirty)
 		save();
 	if (bufferDirty)
-		createMeshBuffer();
+		loadBuffer();
 }
 
 void Chunk::render()
 {
-	update();
 	driver->setTransform(ETS_WORLD, AbsoluteTransformation);
 	for (u32 i = 0; i < collector.getBufferCount(); i++)
 	{
@@ -182,30 +191,49 @@ void Chunk::render()
 	}
 }
 
-void Chunk::createMeshBuffer()
+void Chunk::loadBuffer()
 {
 	if (status >= Status::FullLoaded)
 		return;
-	status = Status::BufferLoading;
-	//Chunk *cy = mapManager->getChunk(chunk_x, chunk_y + 1, chunk_z);
-	//Chunk *cx = mapManager->getChunk(chunk_x + 1, chunk_y, chunk_z);
-	//Chunk *cz = mapManager->getChunk(chunk_x, chunk_y, chunk_z + 1);
 	
-	//Chunk *cmy = mapManager->getChunk(chunk_x, chunk_y - 1, chunk_z);
-	//Chunk *cmx = mapManager->getChunk(chunk_x - 1, chunk_y, chunk_z);
-	//Chunk *cmz = mapManager->getChunk(chunk_x, chunk_y, chunk_z - 1);
+	Chunk *cx = world->preloadChunk(chunk_x + 1, chunk_y, chunk_z);
+	if (cx->getStatus() < Status::DataLoaded)
+		return;
+	Chunk *cy = world->preloadChunk(chunk_x, chunk_y + 1, chunk_z);
+	if (cy->getStatus() < Status::DataLoaded)
+		return;
+	Chunk *cz = world->preloadChunk(chunk_x, chunk_y, chunk_z + 1);
+	if (cz->getStatus() < Status::DataLoaded)
+		return;
+	
+	Chunk *cmx = world->preloadChunk(chunk_x - 1, chunk_y, chunk_z);
+	if (cmx->getStatus() < Status::DataLoaded)
+		return;
+	Chunk *cmy = world->preloadChunk(chunk_x, chunk_y - 1, chunk_z);
+	if (cmy->getStatus() < Status::DataLoaded)
+		return;
+	Chunk *cmz = world->preloadChunk(chunk_x, chunk_y, chunk_z - 1);
+	if (cmz->getStatus() < Status::DataLoaded)
+		return;
 	
 	collector.clear();
 	for (int x = 0; x < CHUNK_SIZE; x++)
 		for (int y = 0; y < CHUNK_SIZE; y++)
 			for (int z = 0; z < CHUNK_SIZE; z++)
 			{
-				bool xCovered = x + 1 < CHUNK_SIZE && blockType->isCube(blocks[x + 1][y][z].type);
-				bool yCovered = y + 1 < CHUNK_SIZE && blockType->isCube(blocks[x][y + 1][z].type);
-				bool zCovered = z + 1 < CHUNK_SIZE && blockType->isCube(blocks[x][y][z + 1].type);
-				bool mxCovered = x > 0 && blockType->isCube(blocks[x - 1][y][z].type);
-				bool myCovered = y > 0 && blockType->isCube(blocks[x][y - 1][z].type);
-				bool mzCovered = z > 0 && blockType->isCube(blocks[x][y][z - 1].type);
+				bool xCovered = blockType->isCube(x + 1 < CHUNK_SIZE?
+					blocks[x + 1][y][z].type: cx->blocks[0][y][z].type);
+				bool yCovered = blockType->isCube(y + 1 < CHUNK_SIZE?
+					blocks[x][y + 1][z].type: cy->blocks[x][0][z].type);
+				bool zCovered = blockType->isCube(z + 1 < CHUNK_SIZE?
+					blocks[x][y][z + 1].type: cz->blocks[x][y][0].type);
+
+				bool mxCovered = blockType->isCube(x > 0?
+					blocks[x - 1][y][z].type: cmx->blocks[CHUNK_SIZE - 1][y][z].type);
+				bool myCovered = blockType->isCube(y > 0?
+					blocks[x][y - 1][z].type: cmy->blocks[x][CHUNK_SIZE - 1][z].type);
+				bool mzCovered = blockType->isCube(z > 0?
+					blocks[x][y][z - 1].type: cmz->blocks[x][y][CHUNK_SIZE - 1].type);
 				Block block(this, x, y, z);
 				blockType->drawBlock(&collector, block, xCovered, mxCovered, yCovered, myCovered, zCovered, mzCovered);
 			}

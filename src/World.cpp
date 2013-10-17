@@ -24,16 +24,7 @@ Block World::getBlock(int x, int y, int z)
 
 Chunk *World::getChunk(int chunk_x, int chunk_y, int chunk_z)
 {
-	Chunk *chunk;
-	auto it = chunks.find(chunk_x, chunk_y, chunk_z);
-	if (it != chunks.end())
-		chunk = *it;
-	else
-	{
-		chunk = new Chunk(chunk_x, chunk_y, chunk_z);
-		chunks.insert(chunk_x, chunk_y, chunk_z, chunk);
-		dataLoadQueue.push(chunk);
-	}
+	Chunk *chunk = preloadChunk(chunk_x, chunk_y, chunk_z);
 	/* Wait until chunk data is loaded */
 	for (;;)
 		if (chunk->getStatus() >= Chunk::Status::DataLoaded)
@@ -55,35 +46,41 @@ void World::run()
 {
 	while (!shouldStop())
 	{
-		Chunk *chunk = fullLoadQueue.pop();
+		Chunk *chunk = loadQueue.pop();
 		if (chunk)
 		{
-			chunk->loadAll();
-			loadedChunkCount++;
-			continue;
-		}
-
-		chunk = dataLoadQueue.pop();
-		if (chunk)
-		{
-			chunk->loadData();
-			loadedChunkCount++;
+			if (chunk->getStatus() < Chunk::Status::DataLoaded)
+			{
+				chunk->loadData();
+				loadedChunkCount++;
+			}
+			else
+			{
+				chunk->loadBuffer();
+				/* It refused to load (mainly due to neighbour chunks not loaded.
+				   Push it to queue again */
+				if (chunk->getStatus() < Chunk::Status::FullLoaded)
+					loadQueue.push(chunk);
+			}
 			continue;
 		}
 	}
 }
 
-void World::preloadChunk(int chunk_x, int chunk_y, int chunk_z, bool dataOnly)
+Chunk *World::preloadChunk(int chunk_x, int chunk_y, int chunk_z)
 {
 	auto it = chunks.find(chunk_x, chunk_y, chunk_z);
 	if (it != chunks.end()) /* Already preloaded */
-		return;
+		return *it;
 	Chunk *chunk = new Chunk(chunk_x, chunk_y, chunk_z);
 	chunks.insert(chunk_x, chunk_y, chunk_z, chunk);
-	if (dataOnly)
-		dataLoadQueue.push(chunk);
-	else
-		fullLoadQueue.push(chunk);
+	loadQueue.push(chunk);
+	return chunk;
+}
+
+void World::preloadChunkBuffer(Chunk *chunk)
+{
+	loadQueue.push(chunk);
 }
 
 bool World::getCameraIntersection(const line3df &ray, CameraIntersectionInfo **info)

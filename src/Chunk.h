@@ -17,11 +17,10 @@ struct BlockData
 class Chunk: public ISceneNode, public ITriangleSelector
 {
 public:
-	enum class Status: int { Unloaded, DataLoading, DataLoaded, BufferLoading, FullLoaded };
-	/* Unloaded: Data is invalid.
-	 * DataLoading: Data is being loading from disk or generating.
+	enum class Status: int { DataLoading, DataLoaded, BufferLoading, FullLoaded };
+	/* DataLoading: Data is being loading from disk or generating (in the queue).
 	 * DataLoaded: Data is loaded, vertex buffer is invalid.
-	 * BufferLoading: Data is 
+	 * BufferLoading: Data is loaded, vertex buffer is being generated (in the queue).
 	 * FullLoaded: Both data and vertex buffer is loaded.
 	 */
 	Chunk(int chunk_x, int chunk_y, int chunk_z);
@@ -36,8 +35,8 @@ public:
 	int z() const { return chunk_z; }
 	void setDirty(int x, int y, int z);
 
-	void loadAll();
 	void loadData();
+	void loadBuffer();
 
 	/* ISceneNode */
 	virtual void OnRegisterSceneNode() override;
@@ -76,7 +75,6 @@ private:
 	void generate();
 	void update();
 	void invalidateMeshBuffer();
-	void createMeshBuffer();
 	
 	volatile Status status;
 	int chunk_x, chunk_y, chunk_z;

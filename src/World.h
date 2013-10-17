@@ -19,7 +19,8 @@ public:
 
 	volatile u32 getLoadedChunkCount() const { return loadedChunkCount; }
 	
-	void preloadChunk(int chunk_x, int chunk_y, int chunk_z, bool dataOnly);
+	Chunk *preloadChunk(int chunk_x, int chunk_y, int chunk_z);
+	void preloadChunkBuffer(Chunk *chunk);
 	Block getBlock(int x, int y, int z);
 	Chunk *getChunk(int chunk_x, int chunk_y, int chunk_z);
 	Chunk *getChunkForBlock(int x, int y, int z);
@@ -29,7 +30,7 @@ protected:
 	virtual void run() override;
 
 private:
-	SingleSafeQueue<Chunk *> dataLoadQueue, fullLoadQueue;
+	SingleSafeQueue<Chunk *> loadQueue;
 	Hash<int, int, int, Chunk *> chunks;
 	volatile u32 loadedChunkCount;
 };

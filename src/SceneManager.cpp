@@ -89,7 +89,7 @@ void SceneManager::updateChunks()
 	int chunk_y = (int) floor(position.Y / CHUNK_SIZE);
 	int chunk_z = (int) floor(position.Z / CHUNK_SIZE);
 	for (int x = chunk_x - 5; x <= chunk_x + 5; x++)
-		for (int y = chunk_y - 5; y <= chunk_y + 5; y++)
+		for (int y = chunk_y - 3; y <= chunk_y + 3; y++)
 			for (int z = chunk_z - 5; z <= chunk_z + 5; z++)
-				world->preloadChunk(x, y, z, true);
+				world->preloadChunk(x, y, z);
 }
