@@ -37,6 +37,7 @@ public:
 
 	void loadData();
 	void loadBuffer();
+	void save();
 
 	/* ISceneNode */
 	virtual void OnRegisterSceneNode() override;
@@ -71,14 +72,12 @@ public:
 	) const override;
 
 private:
-	void save();
 	void generate();
-	void update();
 	void invalidateMeshBuffer();
 	
 	volatile Status status;
 	int chunk_x, chunk_y, chunk_z;
-	bool dirty, bufferDirty;
+	bool dirty;
 	TriangleCollector collector;
 	BlockData blocks[CHUNK_SIZE][CHUNK_SIZE][CHUNK_SIZE];
 	SMaterial material;

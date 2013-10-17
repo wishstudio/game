@@ -97,6 +97,7 @@ int main()
 					info->block.neighbour(oppositeDirection(info->direction)).setType(handItem);
 				}
 			}
+			world->save();
 
 			smgr->drawAll();
 

@@ -18,7 +18,8 @@ public:
 	virtual ~World();
 
 	volatile u32 getLoadedChunkCount() const { return loadedChunkCount; }
-	
+	void save();
+
 	Chunk *preloadChunk(int chunk_x, int chunk_y, int chunk_z);
 	void preloadChunkBuffer(Chunk *chunk);
 	void ensureChunkBufferLoaded(Chunk *chunk);

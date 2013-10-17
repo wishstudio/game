@@ -79,6 +79,8 @@ void Chunk::loadData()
 
 void Chunk::save()
 {
+	if (!dirty)
+		return;
 	Serializer serializer;
 	for (int i = 0; i < CHUNK_SIZE; i++)
 		for (int j = 0; j < CHUNK_SIZE; j++)
@@ -194,13 +196,6 @@ void Chunk::OnRegisterSceneNode()
 	ISceneNode::OnRegisterSceneNode();
 }
 
-void Chunk::update()
-{
-	if (dirty)
-		save();
-	world->ensureChunkBufferLoaded(this);
-}
-
 void Chunk::render()
 {
 	driver->setTransform(ETS_WORLD, AbsoluteTransformation);
@@ -265,7 +260,7 @@ void Chunk::loadBuffer()
 
 s32 Chunk::getTriangleCount() const
 {
-	((Chunk *) this)->update();
+	world->ensureChunkBufferLoaded((Chunk *) this);
 	return collector.getTriangleCount();
 }
 
@@ -276,7 +271,7 @@ void Chunk::getTriangles(
 	s32 &outTriangleCount,
 	const matrix4 *transform) const
 {
-	((Chunk *) this)->update();
+	world->ensureChunkBufferLoaded((Chunk *) this);
 
 	matrix4 mat;
 	if (transform)
@@ -301,7 +296,7 @@ void Chunk::getTriangles(
 	const aabbox3df &box,
 	const matrix4 *transform) const
 {
-	((Chunk *) this)->update();
+	world->ensureChunkBufferLoaded((Chunk *) this);
 
 	matrix4 mat(matrix4::EM4CONST_NOTHING);
 	aabbox3df tBox(box);
@@ -349,7 +344,7 @@ void Chunk::getTriangles(
 	const line3df &line,
 	const matrix4 *transform) const
 {
-	((Chunk *) this)->update();
+	world->ensureChunkBufferLoaded((Chunk *) this);
 
 	aabbox3df box(line.start);
 	box.addInternalPoint(line.end);

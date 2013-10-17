@@ -17,6 +17,12 @@ World::~World()
 	stop();
 }
 
+void World::save()
+{
+	for (Chunk *chunk: chunks)
+		chunk->save();
+}
+
 Block World::getBlock(int x, int y, int z)
 {
 	return Block(getChunkForBlock(x, y, z), mod(x, CHUNK_SIZE), mod(y, CHUNK_SIZE), mod(z, CHUNK_SIZE));
