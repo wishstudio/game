@@ -79,7 +79,7 @@ void Chunk::loadData()
 
 void Chunk::save()
 {
-	if (!dirty)
+	if (!dirty || status < Status::DataLoaded)
 		return;
 	Serializer serializer;
 	for (int i = 0; i < CHUNK_SIZE; i++)

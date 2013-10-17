@@ -19,8 +19,10 @@ World::~World()
 
 void World::save()
 {
+	sqlite3_exec(db, "BEGIN TRANSACTION", nullptr, nullptr, nullptr);
 	for (Chunk *chunk: chunks)
 		chunk->save();
+	sqlite3_exec(db, "END TRANSACTION", nullptr, nullptr, nullptr);
 }
 
 Block World::getBlock(int x, int y, int z)
