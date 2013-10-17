@@ -9,8 +9,6 @@ ShortcutItemUI::ShortcutItemUI() {
 	wheel = 0;
 	w = 0;
 	h = 0;
-	lastwheelmove = false;
-	wheelmove = false;
 }
 
 void ShortcutItemUI::drawFrame() {
@@ -64,17 +62,9 @@ void ShortcutItemUI::getItemSelected() {
 		handItemId = 8;
 	else if (eventReceiver->isKeyDown(KEY_KEY_9))
 		handItemId = 9;
-	if (eventReceiver->getMouseWheel()) {
-		wheel = eventReceiver->getMouseWheel();
-		wheelmove = true;
-	}
-	else
-		wheelmove = false;
-	if (!lastwheelmove && wheelmove) {
-		handItemId = (handItemId + 9 + wheel) % 10 + 1;
-		eventReceiver->resetWheel();
-	}
-	lastwheelmove = wheelmove;
+	wheel = eventReceiver->getMouseWheel();
+	handItemId = (handItemId + 9 + wheel) % 10 + 1;
+
 }
 
 void ShortcutItemUI::show() {

@@ -18,6 +18,4 @@ private:
 	u32 w;
 	u32 h;
 	int wheel;
-	bool lastwheelmove;
-	bool wheelmove;
 };

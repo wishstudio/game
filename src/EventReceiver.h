@@ -10,8 +10,7 @@ public:
 	virtual bool isLeftButtonDown() const { return leftButtonDown; }
 	virtual bool isRightButtonDown() const { return rightButtonDown; }
 	virtual bool isKeyDown(EKEY_CODE keyCode) const {return keyIsDown[keyCode];}
-	virtual f32 getMouseWheel() const {return mouseWheel;}
-	virtual void resetWheel() {mouseWheel = 0.f;}
+	virtual f32 getMouseWheel();
 
 private:
 	bool leftButtonDown;

@@ -12,8 +12,16 @@ EventReceiver::EventReceiver()
 		keyIsDown[i] = false;
 }
 
+
 EventReceiver::~EventReceiver()
 {
+}
+
+
+f32 EventReceiver::getMouseWheel() {
+	f32 wheel = mouseWheel;
+	mouseWheel = 0;
+	return wheel;
 }
 
 bool EventReceiver::OnEvent(const SEvent &event)
