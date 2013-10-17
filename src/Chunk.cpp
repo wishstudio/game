@@ -28,7 +28,6 @@ Chunk::Chunk(int chunk_x, int chunk_y, int chunk_z)
 	this->chunk_z = chunk_z;
 
 	dirty = true;
-	bufferDirty = true;
 	setPosition(vector3df(chunk_x * CHUNK_SIZE, chunk_y * CHUNK_SIZE, chunk_z * CHUNK_SIZE));
 
 	boundingBox.reset(vector3df(0, 0, 0));
@@ -126,24 +125,48 @@ void Chunk::setDirty(int x, int y, int z)
 {
 	dirty = true;
 	invalidateMeshBuffer();
-	/*if (y + 1 == CHUNK_SIZE)
-		world->getChunk(chunk_x, chunk_y + 1, chunk_z)->invalidateMeshBuffer();
+	if (y + 1 == CHUNK_SIZE)
+	{
+		Chunk *chunk = world->tryGetChunk(chunk_x, chunk_y + 1, chunk_z);
+		if (chunk)
+			chunk->invalidateMeshBuffer();
+	}
 	if (x + 1 == CHUNK_SIZE)
-		world->getChunk(chunk_x + 1, chunk_y, chunk_z)->invalidateMeshBuffer();
+	{
+		Chunk *chunk = world->tryGetChunk(chunk_x + 1, chunk_y, chunk_z);
+		if (chunk)
+			chunk->invalidateMeshBuffer();
+	}
 	if (z + 1 == CHUNK_SIZE)
-		world->getChunk(chunk_x, chunk_y, chunk_z + 1)->invalidateMeshBuffer();
+	{
+		Chunk *chunk = world->tryGetChunk(chunk_x, chunk_y, chunk_z + 1);
+		if (chunk)
+			chunk->invalidateMeshBuffer();
+	}
 	if (y == 0)
-		world->getChunk(chunk_x, chunk_y - 1, chunk_z)->invalidateMeshBuffer();
+	{
+		Chunk *chunk = world->tryGetChunk(chunk_x, chunk_y - 1, chunk_z);
+		if (chunk)
+			chunk->invalidateMeshBuffer();
+	}
 	if (x == 0)
-		world->getChunk(chunk_x - 1, chunk_y, chunk_z)->invalidateMeshBuffer();
+	{
+		Chunk *chunk = world->tryGetChunk(chunk_x - 1, chunk_y, chunk_z);
+		if (chunk)
+			chunk->invalidateMeshBuffer();
+	}
 	if (z == 0)
-		world->getChunk(chunk_x, chunk_y, chunk_z - 1)->invalidateMeshBuffer();*/
+	{
+		Chunk *chunk = world->tryGetChunk(chunk_x, chunk_y, chunk_z - 1);
+		if (chunk)
+			chunk->invalidateMeshBuffer();
+	}
 }
 
 void Chunk::invalidateMeshBuffer()
 {
-	status = Status::DataLoaded;
-	bufferDirty = true;
+	if (status == Status::FullLoaded)
+		status = Status::DataLoaded;
 }
 
 void Chunk::OnRegisterSceneNode()
@@ -175,8 +198,7 @@ void Chunk::update()
 {
 	if (dirty)
 		save();
-	if (bufferDirty)
-		loadBuffer();
+	world->ensureChunkBufferLoaded(this);
 }
 
 void Chunk::render()
@@ -238,7 +260,6 @@ void Chunk::loadBuffer()
 				blockType->drawBlock(&collector, block, xCovered, mxCovered, yCovered, myCovered, zCovered, mzCovered);
 			}
 	collector.finalize();
-	bufferDirty = false;
 	status = Status::FullLoaded;
 }
 

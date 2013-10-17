@@ -67,12 +67,20 @@ void World::run()
 	}
 }
 
-Chunk *World::preloadChunk(int chunk_x, int chunk_y, int chunk_z)
+Chunk *World::tryGetChunk(int chunk_x, int chunk_y, int chunk_z)
 {
 	auto it = chunks.find(chunk_x, chunk_y, chunk_z);
-	if (it != chunks.end()) /* Already preloaded */
+	if (it != chunks.end())
 		return *it;
-	Chunk *chunk = new Chunk(chunk_x, chunk_y, chunk_z);
+	return nullptr;
+}
+
+Chunk *World::preloadChunk(int chunk_x, int chunk_y, int chunk_z)
+{
+	Chunk *chunk = tryGetChunk(chunk_x, chunk_y, chunk_z);
+	if (chunk) /* Already preloaded */
+		return chunk;
+	chunk = new Chunk(chunk_x, chunk_y, chunk_z);
 	chunks.insert(chunk_x, chunk_y, chunk_z, chunk);
 	loadQueue.push(chunk);
 	return chunk;
@@ -80,7 +88,17 @@ Chunk *World::preloadChunk(int chunk_x, int chunk_y, int chunk_z)
 
 void World::preloadChunkBuffer(Chunk *chunk)
 {
+	//assert(chunk->getStatus() == Chunk::Status::BufferLoading);
 	loadQueue.push(chunk);
+}
+
+void World::ensureChunkBufferLoaded(Chunk *chunk)
+{
+	if (chunk->getStatus() <= Chunk::Status::DataLoaded)
+		loadQueue.push(chunk);
+	for (;;)
+		if (chunk->getStatus() == Chunk::Status::FullLoaded)
+			return;
 }
 
 bool World::getCameraIntersection(const line3df &ray, CameraIntersectionInfo **info)
