@@ -122,6 +122,9 @@ int main()
 			s += ", ";
 			s += world->getLoadedChunkCount();
 			s += " chunks loaded";
+			s += ", ";
+			s += world->getLoadedChunkCount() * CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE;
+			s += " blocks loaded";
 			device->setWindowCaption(s.c_str());
 
 			driver->endScene();
