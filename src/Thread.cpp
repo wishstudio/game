@@ -36,5 +36,16 @@ void Thread::start()
 void Thread::stop()
 {
 	stopFlag = true;
+	resume();
 	WaitForSingleObject(threadHandle, INFINITE);
+}
+
+void Thread::suspend()
+{
+	SuspendThread(threadHandle);
+}
+
+void Thread::resume()
+{
+	ResumeThread(threadHandle);
 }

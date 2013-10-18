@@ -20,13 +20,16 @@ public:
 	volatile u32 getLoadedChunkCount() const { return loadedChunkCount; }
 	void save();
 
-	Chunk *preloadChunk(int chunk_x, int chunk_y, int chunk_z);
-	void preloadChunkBuffer(Chunk *chunk);
-	void ensureChunkBufferLoaded(Chunk *chunk);
 	Block getBlock(int x, int y, int z);
 	Chunk *tryGetChunk(int chunk_x, int chunk_y, int chunk_z);
 	Chunk *getChunk(int chunk_x, int chunk_y, int chunk_z);
 	Chunk *getChunkForBlock(int x, int y, int z);
+
+	Chunk *preloadChunk(int chunk_x, int chunk_y, int chunk_z);
+	void preloadChunkBuffer(Chunk *chunk);
+	void ensureChunkBufferLoaded(Chunk *chunk);
+	void ensureChunkDataLoaded(Chunk *chunk);
+
 	bool getCameraIntersection(const line3df &ray, CameraIntersectionInfo **info);
 
 protected:

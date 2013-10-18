@@ -8,6 +8,8 @@ public:
 
 	void start();
 	void stop();
+	void suspend();
+	void resume();
 
 protected:
 	virtual void run() = 0;

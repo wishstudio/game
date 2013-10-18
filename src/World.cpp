@@ -33,10 +33,8 @@ Block World::getBlock(int x, int y, int z)
 Chunk *World::getChunk(int chunk_x, int chunk_y, int chunk_z)
 {
 	Chunk *chunk = preloadChunk(chunk_x, chunk_y, chunk_z);
-	/* Wait until chunk data is loaded */
-	for (;;)
-		if (chunk->getStatus() >= Chunk::Status::DataLoaded)
-			return chunk;
+	ensureChunkDataLoaded(chunk);
+	return chunk;
 }
 
 Chunk *World::getChunkForBlock(int x, int y, int z)
@@ -48,31 +46,6 @@ Chunk *World::getChunkForBlock(int x, int y, int z)
 	int chunk_y = (y < 0)? ((y - (CHUNK_SIZE - 1)) / CHUNK_SIZE): (y / CHUNK_SIZE);
 	int chunk_z = (z < 0)? ((z - (CHUNK_SIZE - 1)) / CHUNK_SIZE): (z / CHUNK_SIZE);
 	return getChunk(chunk_x, chunk_y, chunk_z);
-}
-
-void World::run()
-{
-	while (!shouldStop())
-	{
-		Chunk *chunk = loadQueue.pop();
-		if (chunk)
-		{
-			if (chunk->getStatus() < Chunk::Status::DataLoaded)
-			{
-				chunk->loadData();
-				loadedChunkCount++;
-			}
-			else
-			{
-				chunk->loadBuffer();
-				/* It refused to load (mainly due to neighbour chunks not loaded.
-				   Push it to queue again */
-				if (chunk->getStatus() < Chunk::Status::FullLoaded)
-					loadQueue.push(chunk);
-			}
-			continue;
-		}
-	}
 }
 
 Chunk *World::tryGetChunk(int chunk_x, int chunk_y, int chunk_z)
@@ -91,6 +64,7 @@ Chunk *World::preloadChunk(int chunk_x, int chunk_y, int chunk_z)
 	chunk = new Chunk(chunk_x, chunk_y, chunk_z);
 	chunks.insert(chunk_x, chunk_y, chunk_z, chunk);
 	loadQueue.push(chunk);
+	resume();
 	return chunk;
 }
 
@@ -98,15 +72,60 @@ void World::preloadChunkBuffer(Chunk *chunk)
 {
 	//assert(chunk->getStatus() == Chunk::Status::BufferLoading);
 	loadQueue.push(chunk);
+	resume();
+}
+
+void World::ensureChunkDataLoaded(Chunk *chunk)
+{
+	for (;;)
+		if (chunk->getStatus() >= Chunk::Status::DataLoaded)
+			return;
 }
 
 void World::ensureChunkBufferLoaded(Chunk *chunk)
 {
 	if (chunk->getStatus() <= Chunk::Status::DataLoaded)
+	{
 		loadQueue.push(chunk);
+		resume();
+	}
 	for (;;)
 		if (chunk->getStatus() == Chunk::Status::FullLoaded)
 			return;
+}
+
+void World::run()
+{
+	std::chrono::high_resolution_clock clock;
+	auto lastTime = clock.now();
+	while (!shouldStop())
+	{
+		Chunk *chunk = loadQueue.pop();
+		if (chunk)
+		{
+			if (chunk->getStatus() < Chunk::Status::DataLoaded)
+			{
+				chunk->loadData();
+				loadedChunkCount++;
+			}
+			else if (chunk->getStatus() < Chunk::Status::FullLoaded)
+			{
+				chunk->loadBuffer();
+				/* It refused to load (mainly due to neighbour chunks not loaded.
+				   Push it to queue again */
+				if (chunk->getStatus() < Chunk::Status::FullLoaded)
+					loadQueue.push(chunk);
+			}
+			lastTime = clock.now();
+			continue;
+		}
+		/* Are we waiting for more than 50ms? */
+		if (std::chrono::duration_cast<std::chrono::milliseconds>(clock.now() - lastTime).count() < 50)
+			continue;
+		/* Suspend */
+		suspend();
+		lastTime = clock.now();
+	}
 }
 
 bool World::getCameraIntersection(const line3df &ray, CameraIntersectionInfo **info)

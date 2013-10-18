@@ -6,6 +6,8 @@
 
 #include <sqlite3.h>
 #include <irrlicht.h>
+
+#include <chrono>
 #include <unordered_map>
 
 using namespace irr;
