@@ -137,9 +137,9 @@ enum Direction
 	DIRECTION_COUNT = 6
 };
 
-static const int offsetX[DIRECTION_COUNT] = { 1, 0, 0, -1,  0,  0 };
-static const int offsetY[DIRECTION_COUNT] = { 0, 1, 0,  0, -1,  0 };
-static const int offsetZ[DIRECTION_COUNT] = { 0, 0, 1,  0,  0, -1 };
+static const int dirX[DIRECTION_COUNT] = { 1, 0, 0, -1,  0,  0 };
+static const int dirY[DIRECTION_COUNT] = { 0, 1, 0,  0, -1,  0 };
+static const int dirZ[DIRECTION_COUNT] = { 0, 0, 1,  0,  0, -1 };
 
 inline Direction oppositeDirection(Direction direction)
 {

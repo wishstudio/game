@@ -30,11 +30,28 @@ Block World::getBlock(int x, int y, int z)
 	return Block(getChunkForBlock(x, y, z), mod(x, CHUNK_SIZE), mod(y, CHUNK_SIZE), mod(z, CHUNK_SIZE));
 }
 
+Block World::tryGetBlock(int x, int y, int z)
+{
+	Chunk *chunk = tryGetChunkForBlock(x, y, z);
+	if (chunk == nullptr)
+		return Block();
+	else
+		return Block(chunk, mod(x, CHUNK_SIZE), mod(y, CHUNK_SIZE), mod(z, CHUNK_SIZE));
+}
+
 Chunk *World::getChunk(int chunk_x, int chunk_y, int chunk_z)
 {
 	Chunk *chunk = preloadChunk(chunk_x, chunk_y, chunk_z);
 	ensureChunkDataLoaded(chunk);
 	return chunk;
+}
+
+Chunk *World::tryGetChunk(int chunk_x, int chunk_y, int chunk_z)
+{
+	auto it = chunks.find(chunk_x, chunk_y, chunk_z);
+	if (it != chunks.end())
+		return *it;
+	return nullptr;
 }
 
 Chunk *World::getChunkForBlock(int x, int y, int z)
@@ -48,12 +65,12 @@ Chunk *World::getChunkForBlock(int x, int y, int z)
 	return getChunk(chunk_x, chunk_y, chunk_z);
 }
 
-Chunk *World::tryGetChunk(int chunk_x, int chunk_y, int chunk_z)
+Chunk *World::tryGetChunkForBlock(int x, int y, int z)
 {
-	auto it = chunks.find(chunk_x, chunk_y, chunk_z);
-	if (it != chunks.end())
-		return *it;
-	return nullptr;
+	int chunk_x = (x < 0)? ((x - (CHUNK_SIZE - 1)) / CHUNK_SIZE): (x / CHUNK_SIZE);
+	int chunk_y = (y < 0)? ((y - (CHUNK_SIZE - 1)) / CHUNK_SIZE): (y / CHUNK_SIZE);
+	int chunk_z = (z < 0)? ((z - (CHUNK_SIZE - 1)) / CHUNK_SIZE): (z / CHUNK_SIZE);
+	return tryGetChunk(chunk_x, chunk_y, chunk_z);
 }
 
 Chunk *World::preloadChunk(int chunk_x, int chunk_y, int chunk_z)
@@ -224,7 +241,7 @@ bool World::getCameraIntersection(const line3df &ray, CameraIntersectionInfo **i
 			x += stepX;
             tMaxX += tDeltaX;
 			direction = directionX;
-			block = block.neighbour(stepX, 0, 0);
+			block = block.getNeighbour(stepX, 0, 0);
         }
         else if (tMaxY < tMaxZ)
         {
@@ -232,7 +249,7 @@ bool World::getCameraIntersection(const line3df &ray, CameraIntersectionInfo **i
             y += stepY;
             tMaxY += tDeltaY;
 			direction = directionY;
-			block = block.neighbour(0, stepY, 0);
+			block = block.getNeighbour(0, stepY, 0);
         }
         else
         {
@@ -240,7 +257,7 @@ bool World::getCameraIntersection(const line3df &ray, CameraIntersectionInfo **i
             z += stepZ;
             tMaxZ += tDeltaZ;
 			direction = directionZ;
-			block = block.neighbour(0, 0, stepZ);
+			block = block.getNeighbour(0, 0, stepZ);
         }
 		/* Test current one */
 		aabbox3df box = block.getBoundingBox();

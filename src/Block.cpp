@@ -29,7 +29,7 @@ int Block::z() const
 	return in_z + chunk->chunk_z * CHUNK_SIZE;
 }
 
-Block Block::neighbour(int deltaX, int deltaY, int deltaZ) const
+Block Block::getNeighbour(int deltaX, int deltaY, int deltaZ) const
 {
 	int X = in_x + deltaX;
 	int Y = in_y + deltaY;
@@ -40,9 +40,25 @@ Block Block::neighbour(int deltaX, int deltaY, int deltaZ) const
 		return world->getBlock(x() + deltaX, y() + deltaY, z() + deltaZ);
 }
 
-Block Block::neighbour(Direction direction) const
+Block Block::getNeighbour(Direction direction) const
 {
-	return neighbour(offsetX[direction], offsetY[direction], offsetZ[direction]);
+	return getNeighbour(dirX[direction], dirY[direction], dirZ[direction]);
+}
+
+Block Block::tryGetNeighbour(int deltaX, int deltaY, int deltaZ) const
+{
+	int X = in_x + deltaX;
+	int Y = in_y + deltaY;
+	int Z = in_z + deltaZ;
+	if (X >= 0 && X < CHUNK_SIZE && Y >= 0 && Y < CHUNK_SIZE && Z >= 0 && Z < CHUNK_SIZE)
+		return Block(chunk, X, Y, Z);
+	else
+		return world->tryGetBlock(x() + deltaX, y() + deltaY, z() + deltaZ);
+}
+
+Block Block::tryGetNeighbour(Direction direction) const
+{
+	return tryGetNeighbour(dirX[direction], dirY[direction], dirZ[direction]);
 }
 
 aabbox3df Block::getBoundingBox() const

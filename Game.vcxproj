@@ -18,6 +18,7 @@
     <ClInclude Include="src\Hash.h" />
     <ClInclude Include="src\Math.h" />
     <ClInclude Include="src\Noise.h" />
+    <ClInclude Include="src\Queue.h" />
     <ClInclude Include="src\SingleSafeQueue.h" />
     <ClInclude Include="src\SceneManager.h" />
     <ClInclude Include="src\Serialization.h" />

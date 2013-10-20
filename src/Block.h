@@ -33,9 +33,12 @@ public:
 	inline int innerX() const { return in_x; }
 	inline int innerY() const { return in_y; }
 	inline int innerZ() const { return in_z; }
-	Block neighbour(int deltaX, int deltaY, int deltaZ) const;
-	Block neighbour(Direction direction) const;
+	Block getNeighbour(int deltaX, int deltaY, int deltaZ) const;
+	Block getNeighbour(Direction direction) const;
+	Block tryGetNeighbour(int deltaX, int deltaY, int deltaZ) const;
+	Block tryGetNeighbour(Direction direction) const;
 
+	Chunk *getChunk() const { return chunk; }
 	aabbox3df getBoundingBox() const;
 
 	u16 getType() const;
@@ -50,4 +53,6 @@ private:
 	Chunk *chunk;
 	int in_x, in_y, in_z;
 	BlockData *data;
+
+	friend class Chunk;
 };

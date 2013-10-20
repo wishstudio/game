@@ -21,9 +21,11 @@ public:
 	void save();
 
 	Block getBlock(int x, int y, int z);
-	Chunk *tryGetChunk(int chunk_x, int chunk_y, int chunk_z);
+	Block tryGetBlock(int x, int y, int z);
 	Chunk *getChunk(int chunk_x, int chunk_y, int chunk_z);
+	Chunk *tryGetChunk(int chunk_x, int chunk_y, int chunk_z);
 	Chunk *getChunkForBlock(int x, int y, int z);
+	Chunk *tryGetChunkForBlock(int x, int y, int z);
 
 	Chunk *preloadChunk(int chunk_x, int chunk_y, int chunk_z);
 	void preloadChunkLight(Chunk *chunk);

@@ -94,7 +94,7 @@ int main()
 					info->block.setType(0);
 				if (rightMousePressed) {
 					handItem = shortcutIUI.getCurrentItem();
-					info->block.neighbour(oppositeDirection(info->direction)).setType(handItem);
+					info->block.getNeighbour(oppositeDirection(info->direction)).setType(handItem);
 				}
 			}
 			world->save();

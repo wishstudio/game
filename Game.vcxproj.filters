@@ -59,6 +59,9 @@
     <ClInclude Include="src\SingleSafeQueue.h">
       <Filter>Header</Filter>
     </ClInclude>
+    <ClInclude Include="src\Queue.h">
+      <Filter>Header</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Block.cpp">

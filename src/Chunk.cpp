@@ -180,6 +180,11 @@ void Chunk::loadLight()
 {
 	if (status >= Status::LightLoaded)
 		return;
+	/* Clear sunlight */
+	for (int x = 0; x < CHUNK_SIZE; x++)
+		for (int y = 0; y < CHUNK_SIZE; y++)
+			for (int z = 0; z < CHUNK_SIZE; z++)
+				blocks[x][y][z].sunlight = 0;
 	/* Propagate sunlight */
 	if (chunk_y > 5)
 	{
@@ -221,6 +226,55 @@ void Chunk::loadLight()
 					blocks[x][y][z].sunlight = 0;
 
 	status = Status::LightLoaded;
+
+	/* Indirect illumination */
+	Queue<Block> queue;
+	for (int x = 0; x < CHUNK_SIZE; x++)
+		for (int y = 0; y < CHUNK_SIZE; y++)
+			for (int z = 0; z < CHUNK_SIZE; z++)
+				if (blocks[x][y][z].sunlight > 1)
+					queue.push(Block(this, x, y, z));
+	/* Neighbour chunks */
+	/* Order is consistent with Direction enum */
+	int startX[DIRECTION_COUNT] = {              0,              0,              0, CHUNK_SIZE - 1,              0,              0};
+	int   endX[DIRECTION_COUNT] = {              0, CHUNK_SIZE - 1, CHUNK_SIZE - 1, CHUNK_SIZE - 1, CHUNK_SIZE - 1, CHUNK_SIZE - 1};
+	int startY[DIRECTION_COUNT] = {              0,              0,              0,              0, CHUNK_SIZE - 1,              0};
+	int   endY[DIRECTION_COUNT] = { CHUNK_SIZE - 1,              0, CHUNK_SIZE - 1, CHUNK_SIZE - 1, CHUNK_SIZE - 1, CHUNK_SIZE - 1};
+	int startZ[DIRECTION_COUNT] = {              0,              0,              0,              0,              0, CHUNK_SIZE - 1};
+	int   endZ[DIRECTION_COUNT] = { CHUNK_SIZE - 1, CHUNK_SIZE - 1,              0, CHUNK_SIZE - 1, CHUNK_SIZE - 1, CHUNK_SIZE - 1};
+	for (int i = 0; i < DIRECTION_COUNT; i++)
+	{
+		Chunk *chunk = world->tryGetChunk(chunk_x + dirX[i], chunk_y + dirY[i], chunk_z + dirZ[i]);
+		if (chunk && chunk->getStatus() >= Status::LightLoaded)
+		{
+			for (int x = startX[i]; x <= endX[i]; x++)
+				for (int y = startY[i]; y <= endY[i]; y++)
+					for (int z = startZ[i]; z <= endZ[i]; z++)
+						if (chunk->blocks[x][y][z].sunlight > 1)
+							queue.push(Block(chunk, x, y, z));
+		}
+	}
+
+	/* Calculate illumination */
+	while (!queue.empty())
+	{
+		Block block = queue.pop();
+		u8 light = block.data->sunlight - 1;
+		for (int i = 0; i < DIRECTION_COUNT; i++)
+		{
+			Block dest = block.tryGetNeighbour((Direction) i);
+			/* Ensure destination chunk has been lighted */
+			if (dest.isValid() &&
+				dest.getChunk()->getStatus() >= Status::LightLoaded &&
+				blockType->isLightTransparent(dest.getType()) &&
+				light > dest.data->sunlight)
+			{
+				dest.data->sunlight = light;
+				if (light > 1)
+					queue.push(dest);
+			}
+		}
+	}
 }
 
 void Chunk::loadBuffer()

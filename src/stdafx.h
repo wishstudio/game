@@ -19,6 +19,7 @@ using namespace video;
 
 #include "Hash.h"
 #include "Math.h"
+#include "Queue.h"
 #include "SingleSafeQueue.h"
 #include "Thread.h"
 
