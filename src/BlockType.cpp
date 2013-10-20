@@ -47,7 +47,7 @@ ITexture* BlockType::getTexture(u16 id) const {
 
 static inline SColor LIGHT_COLOR(u8 light)
 {
-	int c = 255 * light / 15.0;
+	int c = 255 * (light + 1) / 16.0;
 	return SColor(255, c, c, c);
 }
 
