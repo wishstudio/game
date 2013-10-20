@@ -126,43 +126,14 @@ void Chunk::generate()
 void Chunk::setDirty(int x, int y, int z)
 {
 	dirty = true;
-	invalidateLight();
-	if (y + 1 == CHUNK_SIZE)
-	{
-		Chunk *chunk = world->tryGetChunk(chunk_x, chunk_y + 1, chunk_z);
-		if (chunk)
-			chunk->invalidateLight();
-	}
-	if (x + 1 == CHUNK_SIZE)
-	{
-		Chunk *chunk = world->tryGetChunk(chunk_x + 1, chunk_y, chunk_z);
-		if (chunk)
-			chunk->invalidateLight();
-	}
-	if (z + 1 == CHUNK_SIZE)
-	{
-		Chunk *chunk = world->tryGetChunk(chunk_x, chunk_y, chunk_z + 1);
-		if (chunk)
-			chunk->invalidateLight();
-	}
-	if (y == 0)
-	{
-		Chunk *chunk = world->tryGetChunk(chunk_x, chunk_y - 1, chunk_z);
-		if (chunk)
-			chunk->invalidateLight();
-	}
-	if (x == 0)
-	{
-		Chunk *chunk = world->tryGetChunk(chunk_x - 1, chunk_y, chunk_z);
-		if (chunk)
-			chunk->invalidateLight();
-	}
-	if (z == 0)
-	{
-		Chunk *chunk = world->tryGetChunk(chunk_x, chunk_y, chunk_z - 1);
-		if (chunk)
-			chunk->invalidateLight();
-	}
+	for (int offsetX = -1; offsetX <= 1; offsetX++)
+		for (int offsetY = -1; offsetY <= 1; offsetY++)
+			for (int offsetZ = -1; offsetZ <= 1; offsetZ++)
+			{
+				Chunk *chunk = world->tryGetChunk(chunk_x + offsetX, chunk_y + offsetY, chunk_z + offsetZ);
+				if (chunk)
+					chunk->invalidateLight();
+			}
 }
 
 void Chunk::invalidateLight()
