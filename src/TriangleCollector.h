@@ -22,7 +22,8 @@ public:
 		const vector3df &topRight,
 		const vector3df &bottomLeft,
 		const vector3df &bottomRight,
-		const vector3df &normal
+		const vector3df &normal,
+		const SColor &color
 	);
 
 	/* Collision detection utilities */

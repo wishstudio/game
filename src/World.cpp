@@ -68,11 +68,31 @@ Chunk *World::preloadChunk(int chunk_x, int chunk_y, int chunk_z)
 	return chunk;
 }
 
+void World::preloadChunkLight(Chunk *chunk)
+{
+	if (chunk->getStatus() == Chunk::Status::DataLoaded)
+	{
+		chunk->setStatus(Chunk::Status::LightLoading);
+		loadQueue.push(chunk);
+		resume();
+	}
+}
+
 void World::preloadChunkBuffer(Chunk *chunk)
 {
-	//assert(chunk->getStatus() == Chunk::Status::BufferLoading);
-	loadQueue.push(chunk);
-	resume();
+	Chunk::Status status = chunk->getStatus();
+	if (status == Chunk::Status::DataLoaded)
+	{
+		chunk->setStatus(Chunk::Status::LightLoading);
+		loadQueue.push(chunk);
+		resume();
+	}
+	else if (status == Chunk::Status::LightLoaded)
+	{
+		chunk->setStatus(Chunk::Status::BufferLoading);
+		loadQueue.push(chunk);
+		resume();
+	}
 }
 
 void World::ensureChunkDataLoaded(Chunk *chunk)
@@ -84,14 +104,24 @@ void World::ensureChunkDataLoaded(Chunk *chunk)
 
 void World::ensureChunkBufferLoaded(Chunk *chunk)
 {
-	if (chunk->getStatus() <= Chunk::Status::DataLoaded)
-	{
-		loadQueue.push(chunk);
-		resume();
-	}
 	for (;;)
-		if (chunk->getStatus() == Chunk::Status::FullLoaded)
+	{
+		Chunk::Status status = chunk->getStatus();
+		if (status == Chunk::Status::FullLoaded)
 			return;
+		if (status == Chunk::Status::DataLoaded)
+		{
+			chunk->setStatus(Chunk::Status::LightLoading);
+			loadQueue.push(chunk);
+			resume();
+		}
+		if (status == Chunk::Status::LightLoaded)
+		{
+			chunk->setStatus(Chunk::Status::BufferLoading);
+			loadQueue.push(chunk);
+			resume();
+		}
+	}
 }
 
 void World::run()
@@ -107,12 +137,23 @@ void World::run()
 			{
 				chunk->loadData();
 				loadedChunkCount++;
+				chunk->setStatus(Chunk::Status::LightLoading);
+				chunk->loadLight();
+				/* It refused to load light, push it to queue again */
+				if (chunk->getStatus() < Chunk::Status::LightLoaded)
+					loadQueue.push(chunk);
+			}
+			else if (chunk->getStatus() < Chunk::Status::LightLoaded)
+			{
+				chunk->loadLight();
+				/* It refused to load light, push it to queue again */
+				if (chunk->getStatus() < Chunk::Status::LightLoaded)
+					loadQueue.push(chunk);
 			}
 			else if (chunk->getStatus() < Chunk::Status::FullLoaded)
 			{
 				chunk->loadBuffer();
-				/* It refused to load (mainly due to neighbour chunks not loaded.
-				   Push it to queue again */
+				/* It refused to load buffer, push it to queue again */
 				if (chunk->getStatus() < Chunk::Status::FullLoaded)
 					loadQueue.push(chunk);
 			}

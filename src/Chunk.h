@@ -9,6 +9,7 @@ struct BlockData
 {
 	u16 type;
 	u8 param1, param2;
+	u8 sunlight;
 
 	friend Serializer &operator << (Serializer &serializer, const BlockData &data);
 	friend Deserializer &operator >> (Deserializer &deserializer, BlockData &data);
@@ -17,11 +18,13 @@ struct BlockData
 class Chunk: public ISceneNode, public ITriangleSelector
 {
 public:
-	enum class Status: int { DataLoading, DataLoaded, BufferLoading, FullLoaded };
+	enum class Status: int { DataLoading, DataLoaded, LightLoading, LightLoaded, BufferLoading, FullLoaded };
 	/* DataLoading: Data is being loading from disk or generating (in the queue).
-	 * DataLoaded: Data is loaded, vertex buffer is invalid.
-	 * BufferLoading: Data is loaded, vertex buffer is being generated (in the queue).
-	 * FullLoaded: Both data and vertex buffer is loaded.
+	 * DataLoaded: Data is loaded.
+	 * LightLoading: Light is being generated (in the queue).
+	 * LightLoaded: Light is loaded.
+	 * BufferLoading: Vertex buffer is being generated (in the queue).
+	 * FullLoaded: All things are loaded.
 	 */
 	Chunk(int chunk_x, int chunk_y, int chunk_z);
 	virtual ~Chunk();
@@ -29,6 +32,7 @@ public:
 	static void initDatabase();
 
 	volatile Status getStatus() const { return status; }
+	void setStatus(Status _status) { status = _status; }
 
 	int x() const { return chunk_x; }
 	int y() const { return chunk_y; }
@@ -36,6 +40,7 @@ public:
 	void setDirty(int x, int y, int z);
 
 	void loadData();
+	void loadLight();
 	void loadBuffer();
 	void save();
 
@@ -73,7 +78,7 @@ public:
 
 private:
 	void generate();
-	void invalidateMeshBuffer();
+	void invalidateLight();
 	
 	volatile Status status;
 	int chunk_x, chunk_y, chunk_z;

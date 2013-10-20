@@ -26,6 +26,7 @@ public:
 	Chunk *getChunkForBlock(int x, int y, int z);
 
 	Chunk *preloadChunk(int chunk_x, int chunk_y, int chunk_z);
+	void preloadChunkLight(Chunk *chunk);
 	void preloadChunkBuffer(Chunk *chunk);
 	void ensureChunkBufferLoaded(Chunk *chunk);
 	void ensureChunkDataLoaded(Chunk *chunk);

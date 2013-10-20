@@ -52,12 +52,12 @@ int main()
 
 	/* Initialize game logic */
 	world = new World();
-	SceneManager *sceneManager = new SceneManager();
 	tileManager = new TileManager();
 	blockType = new BlockType();
 	blockType->registerCube(1, "stonepile.png");
 	blockType->registerCube(2, "magickaland.png");
 	blockType->registerCube(3, "dirtroad.png");
+	SceneManager *sceneManager = new SceneManager();
 
 	u16 handItem = 1;
 	

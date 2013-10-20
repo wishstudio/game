@@ -126,48 +126,48 @@ void Chunk::generate()
 void Chunk::setDirty(int x, int y, int z)
 {
 	dirty = true;
-	invalidateMeshBuffer();
+	invalidateLight();
 	if (y + 1 == CHUNK_SIZE)
 	{
 		Chunk *chunk = world->tryGetChunk(chunk_x, chunk_y + 1, chunk_z);
 		if (chunk)
-			chunk->invalidateMeshBuffer();
+			chunk->invalidateLight();
 	}
 	if (x + 1 == CHUNK_SIZE)
 	{
 		Chunk *chunk = world->tryGetChunk(chunk_x + 1, chunk_y, chunk_z);
 		if (chunk)
-			chunk->invalidateMeshBuffer();
+			chunk->invalidateLight();
 	}
 	if (z + 1 == CHUNK_SIZE)
 	{
 		Chunk *chunk = world->tryGetChunk(chunk_x, chunk_y, chunk_z + 1);
 		if (chunk)
-			chunk->invalidateMeshBuffer();
+			chunk->invalidateLight();
 	}
 	if (y == 0)
 	{
 		Chunk *chunk = world->tryGetChunk(chunk_x, chunk_y - 1, chunk_z);
 		if (chunk)
-			chunk->invalidateMeshBuffer();
+			chunk->invalidateLight();
 	}
 	if (x == 0)
 	{
 		Chunk *chunk = world->tryGetChunk(chunk_x - 1, chunk_y, chunk_z);
 		if (chunk)
-			chunk->invalidateMeshBuffer();
+			chunk->invalidateLight();
 	}
 	if (z == 0)
 	{
 		Chunk *chunk = world->tryGetChunk(chunk_x, chunk_y, chunk_z - 1);
 		if (chunk)
-			chunk->invalidateMeshBuffer();
+			chunk->invalidateLight();
 	}
 }
 
-void Chunk::invalidateMeshBuffer()
+void Chunk::invalidateLight()
 {
-	if (status == Status::FullLoaded)
+	if (status >= Status::LightLoaded)
 		status = Status::DataLoaded;
 }
 
@@ -183,13 +183,10 @@ void Chunk::OnRegisterSceneNode()
 
 		if (dist <= 5)
 		{
-			if (status == Status::DataLoaded)
-			{
-				status = Status::BufferLoading;
-				world->preloadChunkBuffer(this);
-			}
 			if (status == Status::FullLoaded)
 				SceneManager->registerNodeForRendering(this);
+			else
+				world->preloadChunkBuffer(this);
 		}
 	}
 
@@ -208,30 +205,77 @@ void Chunk::render()
 	}
 }
 
+void Chunk::loadLight()
+{
+	if (status >= Status::LightLoaded)
+		return;
+	/* Propagate sunlight */
+	if (chunk_y > 5)
+	{
+		/* Above chunk not exist */
+		for (int x = 0; x < CHUNK_SIZE; x++)
+			for (int z = 0; z < CHUNK_SIZE; z++)
+				blocks[x][CHUNK_SIZE - 1][z].sunlight =
+					blockType->isLightTransparent(blocks[x][CHUNK_SIZE - 1][z].type)? 15: 0;
+	}
+	else
+	{
+		/* Propagate from above chunk */
+		Chunk *chunk = world->tryGetChunk(chunk_x, chunk_y + 1, chunk_z);
+		if (chunk == nullptr) /* Above chunk not exist, wait */
+		{
+			world->preloadChunk(chunk_x, chunk_y + 1, chunk_z);
+			return;
+		}
+		if (chunk->getStatus() < Status::LightLoaded) /* Above chunk not ready, wait */
+		{
+			world->preloadChunkLight(chunk);
+			return;
+		}
+		for (int x = 0; x < CHUNK_SIZE; x++)
+			for (int z = 0; z < CHUNK_SIZE; z++)
+				if (blockType->isLightTransparent(blocks[x][CHUNK_SIZE - 1][z].type)
+					&& chunk->blocks[x][0][z].sunlight == 15)
+					blocks[x][CHUNK_SIZE - 1][z].sunlight = 15;
+				else
+					blocks[x][CHUNK_SIZE - 1][z].sunlight = 0;
+	}
+	/* Propagate top -> down */
+	for (int x = 0; x < CHUNK_SIZE; x++)
+		for (int z = 0; z < CHUNK_SIZE; z++)
+			for (int y = CHUNK_SIZE - 2; y >= 0; y--)
+				if (blockType->isLightTransparent(blocks[x][y][z].type))
+					blocks[x][y][z].sunlight = blocks[x][y + 1][z].sunlight;
+				else
+					blocks[x][y][z].sunlight = 0;
+
+	status = Status::LightLoaded;
+}
+
 void Chunk::loadBuffer()
 {
 	if (status >= Status::FullLoaded)
 		return;
+
+	for (int offsetX = -1; offsetX <= 1; offsetX++)
+		for (int offsetY = -1; offsetY <= 1; offsetY++)
+			for (int offsetZ = -1; offsetZ <= 1; offsetZ++)
+			{
+				Chunk *chunk = world->preloadChunk(chunk_x + offsetX, chunk_y + offsetY, chunk_z + offsetZ);
+				if (chunk->getStatus() < Status::LightLoaded)
+				{
+					world->preloadChunkLight(chunk);
+					return;
+				}
+			}
 	
 	Chunk *cx = world->preloadChunk(chunk_x + 1, chunk_y, chunk_z);
-	if (cx->getStatus() < Status::DataLoaded)
-		return;
 	Chunk *cy = world->preloadChunk(chunk_x, chunk_y + 1, chunk_z);
-	if (cy->getStatus() < Status::DataLoaded)
-		return;
 	Chunk *cz = world->preloadChunk(chunk_x, chunk_y, chunk_z + 1);
-	if (cz->getStatus() < Status::DataLoaded)
-		return;
 	
 	Chunk *cmx = world->preloadChunk(chunk_x - 1, chunk_y, chunk_z);
-	if (cmx->getStatus() < Status::DataLoaded)
-		return;
 	Chunk *cmy = world->preloadChunk(chunk_x, chunk_y - 1, chunk_z);
-	if (cmy->getStatus() < Status::DataLoaded)
-		return;
 	Chunk *cmz = world->preloadChunk(chunk_x, chunk_y, chunk_z - 1);
-	if (cmz->getStatus() < Status::DataLoaded)
-		return;
 	
 	collector.clear();
 	for (int x = 0; x < CHUNK_SIZE; x++)
@@ -251,8 +295,20 @@ void Chunk::loadBuffer()
 					blocks[x][y - 1][z].type: cmy->blocks[x][CHUNK_SIZE - 1][z].type);
 				bool mzCovered = blockType->isCube(z > 0?
 					blocks[x][y][z - 1].type: cmz->blocks[x][y][CHUNK_SIZE - 1].type);
+
+				u8 xLight = x + 1 < CHUNK_SIZE? blocks[x + 1][y][z].sunlight: cx->blocks[0][y][z].sunlight;
+				u8 yLight = y + 1 < CHUNK_SIZE? blocks[x][y + 1][z].sunlight: cy->blocks[x][0][z].sunlight;
+				u8 zLight = z + 1 < CHUNK_SIZE? blocks[x][y][z + 1].sunlight: cz->blocks[x][y][0].sunlight;
+
+				u8 mxLight = x > 0? blocks[x - 1][y][z].sunlight: cmx->blocks[CHUNK_SIZE - 1][y][z].sunlight;
+				u8 myLight = y > 0? blocks[x][y - 1][z].sunlight: cmy->blocks[x][CHUNK_SIZE - 1][z].sunlight;
+				u8 mzLight = z > 0? blocks[x][y][z - 1].sunlight: cmz->blocks[x][y][CHUNK_SIZE - 1].sunlight;
 				Block block(this, x, y, z);
-				blockType->drawBlock(&collector, block, xCovered, mxCovered, yCovered, myCovered, zCovered, mzCovered);
+				blockType->drawBlock(
+					&collector, block,
+					xCovered, mxCovered, yCovered, myCovered, zCovered, mzCovered,
+					xLight, mxLight, yLight, myLight, zLight, mzLight
+				);
 			}
 	collector.finalize();
 	status = Status::FullLoaded;
