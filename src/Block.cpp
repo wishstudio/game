@@ -66,6 +66,11 @@ aabbox3df Block::getBoundingBox() const
 	return blockType->getBoundingBox(*this);
 }
 
+bool Block::isSolid() const
+{
+	return blockType->isSolid(*this);
+}
+
 u16 Block::getType() const
 {
 	return data->type;
@@ -104,4 +109,9 @@ void Block::setParam(u8 param1, u8 param2)
 	data->param1 = param1;
 	data->param2 = param2;
 	chunk->setDirty(in_x, in_y, in_z);
+}
+
+u8 Block::getLight() const
+{
+	return data->sunlight;
 }

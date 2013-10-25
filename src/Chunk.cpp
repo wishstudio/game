@@ -294,47 +294,11 @@ void Chunk::loadBuffer()
 				}
 			}
 	
-	Chunk *cx = world->preloadChunk(chunk_x + 1, chunk_y, chunk_z);
-	Chunk *cy = world->preloadChunk(chunk_x, chunk_y + 1, chunk_z);
-	Chunk *cz = world->preloadChunk(chunk_x, chunk_y, chunk_z + 1);
-	
-	Chunk *cmx = world->preloadChunk(chunk_x - 1, chunk_y, chunk_z);
-	Chunk *cmy = world->preloadChunk(chunk_x, chunk_y - 1, chunk_z);
-	Chunk *cmz = world->preloadChunk(chunk_x, chunk_y, chunk_z - 1);
-	
 	collector.clear();
 	for (int x = 0; x < CHUNK_SIZE; x++)
 		for (int y = 0; y < CHUNK_SIZE; y++)
 			for (int z = 0; z < CHUNK_SIZE; z++)
-			{
-				bool xCovered = blockType->isCube(x + 1 < CHUNK_SIZE?
-					blocks[x + 1][y][z].type: cx->blocks[0][y][z].type);
-				bool yCovered = blockType->isCube(y + 1 < CHUNK_SIZE?
-					blocks[x][y + 1][z].type: cy->blocks[x][0][z].type);
-				bool zCovered = blockType->isCube(z + 1 < CHUNK_SIZE?
-					blocks[x][y][z + 1].type: cz->blocks[x][y][0].type);
-
-				bool mxCovered = blockType->isCube(x > 0?
-					blocks[x - 1][y][z].type: cmx->blocks[CHUNK_SIZE - 1][y][z].type);
-				bool myCovered = blockType->isCube(y > 0?
-					blocks[x][y - 1][z].type: cmy->blocks[x][CHUNK_SIZE - 1][z].type);
-				bool mzCovered = blockType->isCube(z > 0?
-					blocks[x][y][z - 1].type: cmz->blocks[x][y][CHUNK_SIZE - 1].type);
-
-				u8 xLight = x + 1 < CHUNK_SIZE? blocks[x + 1][y][z].sunlight: cx->blocks[0][y][z].sunlight;
-				u8 yLight = y + 1 < CHUNK_SIZE? blocks[x][y + 1][z].sunlight: cy->blocks[x][0][z].sunlight;
-				u8 zLight = z + 1 < CHUNK_SIZE? blocks[x][y][z + 1].sunlight: cz->blocks[x][y][0].sunlight;
-
-				u8 mxLight = x > 0? blocks[x - 1][y][z].sunlight: cmx->blocks[CHUNK_SIZE - 1][y][z].sunlight;
-				u8 myLight = y > 0? blocks[x][y - 1][z].sunlight: cmy->blocks[x][CHUNK_SIZE - 1][z].sunlight;
-				u8 mzLight = z > 0? blocks[x][y][z - 1].sunlight: cmz->blocks[x][y][CHUNK_SIZE - 1].sunlight;
-				Block block(this, x, y, z);
-				blockType->drawBlock(
-					&collector, block,
-					xCovered, mxCovered, yCovered, myCovered, zCovered, mzCovered,
-					xLight, mxLight, yLight, myLight, zLight, mzLight
-				);
-			}
+				blockType->drawBlock(&collector, Block(this, x, y, z));
 	collector.finalize();
 	status = Status::FullLoaded;
 }

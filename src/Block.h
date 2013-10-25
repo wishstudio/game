@@ -40,6 +40,7 @@ public:
 
 	Chunk *getChunk() const { return chunk; }
 	aabbox3df getBoundingBox() const;
+	bool isSolid() const;
 
 	u16 getType() const;
 	void setType(u16 type);
@@ -48,6 +49,7 @@ public:
 	void setParam1(u8 param1);
 	void setParam2(u8 param2);
 	void setParam(u8 param1, u8 param2);
+	u8 getLight() const;
 
 private:
 	Chunk *chunk;
