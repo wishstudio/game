@@ -61,11 +61,14 @@ void TriangleCollector::setCurrentBlock(const Block &block)
 void TriangleCollector::addQuad(
 	const Tile &tile,
 	const vector3df &topLeft,
+	const SColor &topLeftColor,
 	const vector3df &topRight,
+	const SColor &topRightColor,
 	const vector3df &bottomLeft,
+	const SColor &bottomLeftColor,
 	const vector3df &bottomRight,
-	const vector3df &normal,
-	const SColor &color)
+	const SColor &bottomRightColor,
+	const vector3df &normal)
 {
 	SMeshBuffer *buffer = getBuffer(tile.texture);
 
@@ -73,25 +76,25 @@ void TriangleCollector::addQuad(
 	buffer->Vertices.push_back(S3DVertex(
 		topLeft.X + x, topLeft.Y + y, topLeft.Z + z,
 		normal.X, normal.Y, normal.Z,
-		color,
+		topLeftColor,
 		tile.u1, tile.v1
 	));
 	buffer->Vertices.push_back(S3DVertex(
 		topRight.X + x, topRight.Y + y, topRight.Z + z,
 		normal.X, normal.Y, normal.Z,
-		color,
+		topRightColor,
 		tile.u2, tile.v1
 	));
 	buffer->Vertices.push_back(S3DVertex(
 		bottomLeft.X + x, bottomLeft.Y + y, bottomLeft.Z + z,
 		normal.X, normal.Y, normal.Z,
-		color,
+		bottomLeftColor,
 		tile.u1, tile.v2
 	));
 	buffer->Vertices.push_back(S3DVertex(
 		bottomRight.X + x, bottomRight.Y + y, bottomRight.Z + z,
 		normal.X, normal.Y, normal.Z,
-		color,
+		bottomRightColor,
 		tile.u2, tile.v2
 	));
 

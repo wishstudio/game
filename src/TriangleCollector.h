@@ -19,11 +19,14 @@ public:
 	void addQuad(
 		const Tile &tile,
 		const vector3df &topLeft,
+		const SColor &topLeftColor,
 		const vector3df &topRight,
+		const SColor &topRightColor,
 		const vector3df &bottomLeft,
+		const SColor &bottomLeftColor,
 		const vector3df &bottomRight,
-		const vector3df &normal,
-		const SColor &color
+		const SColor &bottomRightColor,
+		const vector3df &normal
 	);
 
 	/* Collision detection utilities */
