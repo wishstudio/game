@@ -2,6 +2,7 @@
 
 #include "Block.h"
 #include "Chunk.h"
+#include "Database.h"
 #include "World.h"
 
 World::World()
@@ -19,10 +20,10 @@ World::~World()
 
 void World::save()
 {
-	sqlite3_exec(db, "BEGIN TRANSACTION", nullptr, nullptr, nullptr);
+	database->beginTransaction();
 	for (Chunk *chunk: chunks)
 		chunk->save();
-	sqlite3_exec(db, "END TRANSACTION", nullptr, nullptr, nullptr);
+	database->commitTransaction();
 }
 
 Block World::getBlock(int x, int y, int z)

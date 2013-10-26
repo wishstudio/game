@@ -3,7 +3,7 @@
 ISceneManager *smgr;
 IVideoDriver *driver;
 ICameraSceneNode *camera;
-sqlite3 *db;
+Database *database;
 BlockType *blockType;
 TileManager *tileManager;
 World *world;

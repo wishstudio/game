@@ -2,6 +2,7 @@
 
 #include "BlockType.h"
 #include "Chunk.h"
+#include "Database.h"
 #include "Noise.h"
 #include "Serialization.h"
 #include "World.h"
@@ -41,38 +42,34 @@ Chunk::~Chunk()
 {
 }
 
-void Chunk::initDatabase()
+Serializer &operator << (Serializer &serializer, const Chunk &data)
 {
-	sqlite3_exec(db, "CREATE TABLE IF NOT EXISTS chunks (x INTEGER NOT NULL, y INTEGER NOT NULL, z INTEGER NOT NULL, data BLOB NOT NULL, PRIMARY KEY (x, y, z))", 0, 0, 0);
+	for (int i = 0; i < CHUNK_SIZE; i++)
+		for (int j = 0; j < CHUNK_SIZE; j++)
+			for (int k = 0; k < CHUNK_SIZE; k++)
+				serializer << data.blocks[i][j][k];
+	return serializer;
+}
+
+Deserializer &operator >> (Deserializer &deserializer, Chunk &data)
+{
+	for (int i = 0; i < CHUNK_SIZE; i++)
+		for (int j = 0; j < CHUNK_SIZE; j++)
+			for (int k = 0; k < CHUNK_SIZE; k++)
+				deserializer >> data.blocks[i][j][k];
+	return deserializer;
 }
 
 void Chunk::loadData()
 {
 	if (status >= Status::DataLoaded)
 		return;
-	sqlite3_stmt *stmt;
-	sqlite3_prepare_v2(db, "SELECT data FROM chunks WHERE x = ? AND y = ? AND z = ?", -1, &stmt, nullptr);
-	sqlite3_bind_int(stmt, 1, chunk_x);
-	sqlite3_bind_int(stmt, 2, chunk_y);
-	sqlite3_bind_int(stmt, 3, chunk_z);
-	if (sqlite3_step(stmt) == SQLITE_DONE)
-	{
-		/* Not found, generate one */
-		sqlite3_finalize(stmt);
-		generate();
-	}
+	if (database->loadChunk(this))
+		dirty = false;
 	else
 	{
-		/* Found, read blob data */
-		const void *data = sqlite3_column_blob(stmt, 0);
-		u32 len = sqlite3_column_bytes(stmt, 0);
-		Deserializer deserializer(data, len);
-		for (int i = 0; i < CHUNK_SIZE; i++)
-			for (int j = 0; j < CHUNK_SIZE; j++)
-				for (int k = 0; k < CHUNK_SIZE; k++)
-					deserializer >> blocks[i][j][k];
-		sqlite3_finalize(stmt);
-		dirty = false;
+		/* Not found in database, generate now */
+		generate();
 	}
 	status = Status::DataLoaded;
 }
@@ -81,19 +78,7 @@ void Chunk::save()
 {
 	if (!dirty || status < Status::DataLoaded)
 		return;
-	Serializer serializer;
-	for (int i = 0; i < CHUNK_SIZE; i++)
-		for (int j = 0; j < CHUNK_SIZE; j++)
-			for (int k = 0; k < CHUNK_SIZE; k++)
-				serializer << blocks[i][j][k];
-	sqlite3_stmt *stmt;
-	sqlite3_prepare_v2(db, "INSERT OR REPLACE INTO chunks (x, y, z, data) VALUES (?, ?, ?, ?)", -1, &stmt, nullptr);
-	sqlite3_bind_int(stmt, 1, chunk_x);
-	sqlite3_bind_int(stmt, 2, chunk_y);
-	sqlite3_bind_int(stmt, 3, chunk_z);
-	sqlite3_bind_blob(stmt, 4, serializer.getData(), serializer.getLength(), free);
-	sqlite3_step(stmt);
-	sqlite3_finalize(stmt);
+	database->saveChunk(this);
 	dirty = false;
 }
 

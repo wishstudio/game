@@ -62,6 +62,9 @@
     <ClInclude Include="src\Queue.h">
       <Filter>Header</Filter>
     </ClInclude>
+    <ClInclude Include="src\Database.h">
+      <Filter>Header</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Block.cpp">
@@ -107,6 +110,9 @@
       <Filter>Source</Filter>
     </ClCompile>
     <ClCompile Include="src\Thread.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Database.cpp">
       <Filter>Source</Filter>
     </ClCompile>
   </ItemGroup>

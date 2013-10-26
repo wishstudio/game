@@ -43,6 +43,9 @@ public:
 	void loadLight();
 	void loadBuffer();
 	void save();
+	
+	friend Serializer &operator << (Serializer &serializer, const Chunk &data);
+	friend Deserializer &operator >> (Deserializer &deserializer, Chunk &data);
 
 	/* ISceneNode */
 	virtual void OnRegisterSceneNode() override;

@@ -4,7 +4,6 @@
 #include <Windows.h>
 #undef NOMINMAX
 
-#include <sqlite3.h>
 #include <irrlicht.h>
 
 #include <chrono>
@@ -23,14 +22,15 @@ using namespace video;
 #include "SingleSafeQueue.h"
 #include "Thread.h"
 
+class Database;
 class BlockType;
-class World;
 class TileManager;
+class World;
 class EventReceiver;
 extern ISceneManager *smgr;
 extern IVideoDriver *driver;
 extern ICameraSceneNode *camera;
-extern sqlite3 *db;
+extern Database *database;
 extern BlockType *blockType;
 extern TileManager *tileManager;
 extern World *world;
