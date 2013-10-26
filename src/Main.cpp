@@ -48,9 +48,6 @@ int main()
 
 	/* Initialize database */
 	database = new Database();
-	//if (sqlite3_open("data", &db) != SQLITE_OK)
-	//	return 1;
-	//Chunk::initDatabase();
 
 	/* Initialize game logic */
 	world = new World();
@@ -139,7 +136,6 @@ int main()
 	delete world;
 	delete database;
 
-	//sqlite3_close(db);
 	device->drop();
 	return 0;
 }
