@@ -9,6 +9,12 @@
       <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
       <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
+    <Filter Include="Header\lz4">
+      <UniqueIdentifier>{4d3dfaeb-f87e-4e23-9ec0-ec2a445d9d51}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\lz4">
+      <UniqueIdentifier>{e1bbc05c-2240-4c95-aaf7-2685ea7a1637}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Block.h">
@@ -65,6 +71,9 @@
     <ClInclude Include="src\Database.h">
       <Filter>Header</Filter>
     </ClInclude>
+    <ClInclude Include="src\lz4\lz4.h">
+      <Filter>Header\lz4</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Block.cpp">
@@ -114,6 +123,9 @@
     </ClCompile>
     <ClCompile Include="src\Database.cpp">
       <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lz4\lz4.c">
+      <Filter>Source\lz4</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -9,8 +9,8 @@ public:
 	Serializer();
 	virtual ~Serializer();
 
-	u32 getLength() const { return len; }
-	void *getData();
+	u32 getData(void **data);
+	u32 getCompressedData(void **data);
 
 	Serializer &operator << (const u8 data);
 	Serializer &operator << (const u16 data);
@@ -33,7 +33,7 @@ private:
 class Deserializer
 {
 public:
-	Deserializer(const void *data, u32 len);
+	Deserializer(const void *data, u32 len, bool isCompressed = false);
 	virtual ~Deserializer();
 
 	Deserializer &operator >> (u8 &data);
@@ -49,6 +49,7 @@ private:
 	char readChar();
 	void readBlock(char *data, u32 len);
 
+	bool ownData;
 	const char *data;
 	u32 p, len;
 };

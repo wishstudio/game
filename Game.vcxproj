@@ -17,6 +17,7 @@
     <ClInclude Include="src\Database.h" />
     <ClInclude Include="src\EventReceiver.h" />
     <ClInclude Include="src\Hash.h" />
+    <ClInclude Include="src\lz4\lz4.h" />
     <ClInclude Include="src\Math.h" />
     <ClInclude Include="src\Noise.h" />
     <ClInclude Include="src\Queue.h" />
@@ -37,6 +38,10 @@
     <ClCompile Include="src\Database.cpp" />
     <ClCompile Include="src\Deserializer.cpp" />
     <ClCompile Include="src\EventReceiver.cpp" />
+    <ClCompile Include="src\lz4\lz4.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="src\Main.cpp" />
     <ClCompile Include="src\Noise.cpp" />
     <ClCompile Include="src\SceneManager.cpp" />

@@ -1,16 +1,35 @@
 #include "stdafx.h"
 
+#include "lz4/lz4.h"
+
 #include "Serialization.h"
 
-Deserializer::Deserializer(const void *data, u32 len)
+Deserializer::Deserializer(const void *data, u32 len, bool isCompressed)
 {
-	this->data = (const char *) data;
-	this->len = len;
-	this->p = 0;
+	if (isCompressed)
+	{
+		u32 rawLen = *(u32 *) data;
+		char *d = (char *) malloc(rawLen);
+		u32 l = LZ4_decompress_safe((const char *) data + 4, d, len - 4, rawLen);
+		/* assert(rawLen == l); */
+		this->data = d;
+		this->len = rawLen;
+		this->p = 0;
+		this->ownData = true;
+	}
+	else
+	{
+		this->data = (const char *) data;
+		this->len = len;
+		this->p = 0;
+		this->ownData = false;
+	}
 }
 
 Deserializer::~Deserializer()
 {
+	if (ownData)
+		free((void *) data);
 }
 
 char Deserializer::readChar()

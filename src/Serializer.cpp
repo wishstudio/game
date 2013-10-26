@@ -1,5 +1,7 @@
 #include "stdafx.h"
 
+#include "lz4/lz4.h"
+
 #include "Serialization.h"
 
 static const int BLOCK_SIZE = 4096;
@@ -29,11 +31,11 @@ Serializer::~Serializer()
 	}
 }
 
-void *Serializer::getData()
+u32 Serializer::getData(void **data)
 {
-	char *data = (char *) malloc(len);
+	*data = malloc(len);
 	SerializerBlock *block = first;
-	char *i = data;
+	char *i = (char *) *data;
 	while (block != current)
 	{
 		memcpy(i, block->data, BLOCK_SIZE);
@@ -41,7 +43,18 @@ void *Serializer::getData()
 		i += BLOCK_SIZE;
 	}
 	memcpy(i, block->data, p);
-	return data;
+	return len;
+}
+
+u32 Serializer::getCompressedData(void **data)
+{
+	void *raw;
+	getData(&raw);
+	*data = malloc(LZ4_compressBound(len) + 4);
+	u32 compressedLen = LZ4_compress((const char *) raw, (char *) *data + 4, len);
+	free(raw);
+	*(u32 *) (*data) = len;
+	return compressedLen + 4;
 }
 
 void Serializer::appendBlock()
