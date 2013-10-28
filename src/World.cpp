@@ -25,6 +25,16 @@ World::~World()
 		thread.join();
 }
 
+void World::lock()
+{
+	worldMutex.lock();
+}
+
+void World::unlock()
+{
+	worldMutex.unlock();
+}
+
 void World::save()
 {
 	database->beginTransaction();
@@ -160,8 +170,6 @@ void World::ensureChunkBufferLoaded(Chunk *chunk)
 
 void World::run()
 {
-	std::chrono::high_resolution_clock clock;
-	auto lastTime = clock.now();
 	while (!shouldStop)
 	{
 		Chunk *chunk;
@@ -169,6 +177,7 @@ void World::run()
 		{
 			if (chunk->getStatus() < Chunk::Status::DataLoaded)
 			{
+				std::lock_guard<std::mutex> lock(worldMutex);
 				chunk->loadData();
 				loadedChunkCount++;
 				chunk->setStatus(Chunk::Status::LightLoading);
@@ -179,6 +188,7 @@ void World::run()
 			}
 			else if (chunk->getStatus() < Chunk::Status::LightLoaded)
 			{
+				std::lock_guard<std::mutex> lock(worldMutex);
 				chunk->loadLight();
 				/* It refused to load light, push it to queue again */
 				if (chunk->getStatus() < Chunk::Status::LightLoaded)
@@ -191,14 +201,15 @@ void World::run()
 				if (chunk->getStatus() < Chunk::Status::FullLoaded)
 					loadQueue.push(chunk);
 			}
-			lastTime = clock.now();
 			continue;
 		}
 		
 		/* No remaining chunks to process, suspend */
 		{
 			std::unique_lock<std::mutex> lock(workerMutex);
-			workerCondition.wait(lock);
+			/* Double check */
+			if (loadQueue.empty())
+				workerCondition.wait(lock);
 			/* We do not need to worry about spurious wakeups */
 		}
 	}

@@ -76,6 +76,7 @@ int main()
 			lastRightMouseDown = eventReceiver->isRightButtonDown();
 
 			sceneManager->update();
+			world->lock();
 			World::CameraIntersectionInfo *info;
 			if (world->getCameraIntersection(line3df(camera->getPosition(), camera->getTarget()), &info))
 			{
@@ -97,6 +98,7 @@ int main()
 				}
 			}
 			world->save();
+			world->unlock();
 
 			smgr->drawAll();
 
