@@ -3,7 +3,7 @@
 #include "Block.h"
 
 class Chunk;
-class World: public Thread
+class World
 {
 public:
 	struct CameraIntersectionInfo
@@ -19,6 +19,7 @@ public:
 
 	u32 getLoadedChunkCount() const volatile { return loadedChunkCount; }
 	void save();
+	void asyncLoadChunk(Chunk *chunk);
 
 	Block getBlock(int x, int y, int z);
 	Block tryGetBlock(int x, int y, int z);
@@ -35,12 +36,16 @@ public:
 
 	bool getCameraIntersection(const line3df &ray, CameraIntersectionInfo **info);
 
-protected:
-	virtual void run() override;
-
 private:
-	Concurrency::concurrent_queue<Chunk *> loadQueue;
+	void run();
+
 	Concurrency::concurrent_unordered_map<std::tuple<int, int, int>, Chunk *> chunks;
 	std::mutex chunksHashMutex;
 	std::atomic<u32> loadedChunkCount;
+
+	Concurrency::concurrent_queue<Chunk *> loadQueue;
+	std::vector<std::thread> workerThreads;
+	std::condition_variable workerCondition;
+	std::mutex workerMutex;
+	std::atomic<bool> shouldStop;
 };

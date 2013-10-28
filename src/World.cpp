@@ -8,14 +8,21 @@
 World::World()
 {
 	loadedChunkCount = 0;
-	start();
+	shouldStop = false;
+	workerThreads.push_back(std::thread(&World::run, this));
 }
 
 World::~World()
 {
 	for (auto it : chunks)
 		it.second->drop();
-	stop();
+	shouldStop = true;
+	{
+		std::lock_guard<std::mutex> lock(workerMutex);
+		workerCondition.notify_all();
+	}
+	for (std::thread &thread : workerThreads)
+		thread.join();
 }
 
 void World::save()
@@ -24,6 +31,13 @@ void World::save()
 	for (auto it : chunks)
 		it.second->save();
 	database->commitTransaction();
+}
+
+void World::asyncLoadChunk(Chunk *chunk)
+{
+	loadQueue.push(chunk);
+	std::lock_guard<std::mutex> lock(workerMutex);
+	workerCondition.notify_all();
 }
 
 Block World::getBlock(int x, int y, int z)
@@ -89,8 +103,7 @@ Chunk *World::preloadChunk(int chunk_x, int chunk_y, int chunk_z)
 
 	chunk = new Chunk(chunk_x, chunk_y, chunk_z);
 	chunks.insert(std::make_pair(std::make_tuple(chunk_x, chunk_y, chunk_z), chunk));
-	loadQueue.push(chunk);
-	resume();
+	asyncLoadChunk(chunk);
 	return chunk;
 }
 
@@ -99,8 +112,7 @@ void World::preloadChunkLight(Chunk *chunk)
 	if (chunk->getStatus() == Chunk::Status::DataLoaded)
 	{
 		chunk->setStatus(Chunk::Status::LightLoading);
-		loadQueue.push(chunk);
-		resume();
+		asyncLoadChunk(chunk);
 	}
 }
 
@@ -110,14 +122,12 @@ void World::preloadChunkBuffer(Chunk *chunk)
 	if (status == Chunk::Status::DataLoaded)
 	{
 		chunk->setStatus(Chunk::Status::LightLoading);
-		loadQueue.push(chunk);
-		resume();
+		asyncLoadChunk(chunk);
 	}
 	else if (status == Chunk::Status::LightLoaded)
 	{
 		chunk->setStatus(Chunk::Status::BufferLoading);
-		loadQueue.push(chunk);
-		resume();
+		asyncLoadChunk(chunk);
 	}
 }
 
@@ -138,14 +148,12 @@ void World::ensureChunkBufferLoaded(Chunk *chunk)
 		if (status == Chunk::Status::DataLoaded)
 		{
 			chunk->setStatus(Chunk::Status::LightLoading);
-			loadQueue.push(chunk);
-			resume();
+			asyncLoadChunk(chunk);
 		}
 		if (status == Chunk::Status::LightLoaded)
 		{
 			chunk->setStatus(Chunk::Status::BufferLoading);
-			loadQueue.push(chunk);
-			resume();
+			asyncLoadChunk(chunk);
 		}
 	}
 }
@@ -154,7 +162,7 @@ void World::run()
 {
 	std::chrono::high_resolution_clock clock;
 	auto lastTime = clock.now();
-	while (!shouldStop())
+	while (!shouldStop)
 	{
 		Chunk *chunk;
 		if (loadQueue.try_pop(chunk))
@@ -186,12 +194,13 @@ void World::run()
 			lastTime = clock.now();
 			continue;
 		}
-		/* Are we waiting for more than 50ms? */
-		if (std::chrono::duration_cast<std::chrono::milliseconds>(clock.now() - lastTime).count() < 50)
-			continue;
-		/* Suspend */
-		suspend();
-		lastTime = clock.now();
+		
+		/* No remaining chunks to process, suspend */
+		{
+			std::unique_lock<std::mutex> lock(workerMutex);
+			workerCondition.wait(lock);
+			/* We do not need to worry about spurious wakeups */
+		}
 	}
 }
 

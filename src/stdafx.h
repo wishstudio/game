@@ -17,13 +17,14 @@ using namespace video;
 #include <chrono>
 #include <concurrent_queue.h>
 #include <concurrent_unordered_map.h>
+#include <condition_variable>
 #include <mutex>
+#include <thread>
 #include <unordered_map>
 
 #include "Hash.h"
 #include "Math.h"
 #include "Queue.h"
-#include "Thread.h"
 
 class Database;
 class BlockType;
