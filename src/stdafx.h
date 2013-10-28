@@ -7,6 +7,7 @@
 #include <irrlicht.h>
 
 #include <chrono>
+#include <concurrent_unordered_map.h>
 #include <unordered_map>
 
 using namespace irr;

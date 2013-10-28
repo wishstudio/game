@@ -13,16 +13,16 @@ World::World()
 
 World::~World()
 {
-	for (Chunk *chunk: chunks)
-		chunk->drop();
+	for (auto it : chunks)
+		it.second->drop();
 	stop();
 }
 
 void World::save()
 {
 	database->beginTransaction();
-	for (Chunk *chunk: chunks)
-		chunk->save();
+	for (auto it : chunks)
+		it.second->save();
 	database->commitTransaction();
 }
 
@@ -49,9 +49,9 @@ Chunk *World::getChunk(int chunk_x, int chunk_y, int chunk_z)
 
 Chunk *World::tryGetChunk(int chunk_x, int chunk_y, int chunk_z)
 {
-	auto it = chunks.find(chunk_x, chunk_y, chunk_z);
+	auto it = chunks.find(std::make_tuple(chunk_x, chunk_y, chunk_z));
 	if (it != chunks.end())
-		return *it;
+		return it->second;
 	return nullptr;
 }
 
@@ -79,8 +79,16 @@ Chunk *World::preloadChunk(int chunk_x, int chunk_y, int chunk_z)
 	Chunk *chunk = tryGetChunk(chunk_x, chunk_y, chunk_z);
 	if (chunk) /* Already preloaded */
 		return chunk;
+
+	/* Lock chunks hash */
+	std::lock_guard<std::mutex> lock(chunksHashMutex);
+	/* Double check */
+	chunk = tryGetChunk(chunk_x, chunk_y, chunk_z);
+	if (chunk)
+		return chunk;
+
 	chunk = new Chunk(chunk_x, chunk_y, chunk_z);
-	chunks.insert(chunk_x, chunk_y, chunk_z, chunk);
+	chunks.insert(std::make_pair(std::make_tuple(chunk_x, chunk_y, chunk_z), chunk));
 	loadQueue.push(chunk);
 	resume();
 	return chunk;

@@ -40,6 +40,7 @@ protected:
 
 private:
 	SingleSafeQueue<Chunk *> loadQueue;
-	Hash<int, int, int, Chunk *> chunks;
+	Concurrency::concurrent_unordered_map<std::tuple<int, int, int>, Chunk *> chunks;
+	std::mutex chunksHashMutex;
 	volatile u32 loadedChunkCount;
 };
