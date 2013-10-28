@@ -156,8 +156,8 @@ void World::run()
 	auto lastTime = clock.now();
 	while (!shouldStop())
 	{
-		Chunk *chunk = loadQueue.pop();
-		if (chunk)
+		Chunk *chunk;
+		if (loadQueue.try_pop(chunk))
 		{
 			if (chunk->getStatus() < Chunk::Status::DataLoaded)
 			{

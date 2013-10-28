@@ -7,7 +7,9 @@
 #include <irrlicht.h>
 
 #include <chrono>
+#include <concurrent_queue.h>
 #include <concurrent_unordered_map.h>
+#include <mutex>
 #include <unordered_map>
 
 using namespace irr;
@@ -20,7 +22,6 @@ using namespace video;
 #include "Hash.h"
 #include "Math.h"
 #include "Queue.h"
-#include "SingleSafeQueue.h"
 #include "Thread.h"
 
 class Database;

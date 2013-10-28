@@ -39,7 +39,7 @@ protected:
 	virtual void run() override;
 
 private:
-	SingleSafeQueue<Chunk *> loadQueue;
+	Concurrency::concurrent_queue<Chunk *> loadQueue;
 	Concurrency::concurrent_unordered_map<std::tuple<int, int, int>, Chunk *> chunks;
 	std::mutex chunksHashMutex;
 	volatile u32 loadedChunkCount;
