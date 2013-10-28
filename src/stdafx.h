@@ -6,19 +6,19 @@
 
 #include <irrlicht.h>
 
-#include <atomic>
-#include <chrono>
-#include <concurrent_queue.h>
-#include <concurrent_unordered_map.h>
-#include <mutex>
-#include <unordered_map>
-
 using namespace irr;
 using namespace core;
 using namespace gui;
 using namespace io;
 using namespace scene;
 using namespace video;
+
+#include <atomic>
+#include <chrono>
+#include <concurrent_queue.h>
+#include <concurrent_unordered_map.h>
+#include <mutex>
+#include <unordered_map>
 
 #include "Hash.h"
 #include "Math.h"
