@@ -17,7 +17,7 @@ public:
 	World();
 	virtual ~World();
 
-	volatile u32 getLoadedChunkCount() const { return loadedChunkCount; }
+	u32 getLoadedChunkCount() const volatile { return loadedChunkCount; }
 	void save();
 
 	Block getBlock(int x, int y, int z);
@@ -42,5 +42,5 @@ private:
 	Concurrency::concurrent_queue<Chunk *> loadQueue;
 	Concurrency::concurrent_unordered_map<std::tuple<int, int, int>, Chunk *> chunks;
 	std::mutex chunksHashMutex;
-	volatile u32 loadedChunkCount;
+	std::atomic<u32> loadedChunkCount;
 };

@@ -6,6 +6,7 @@
 
 #include <irrlicht.h>
 
+#include <atomic>
 #include <chrono>
 #include <concurrent_queue.h>
 #include <concurrent_unordered_map.h>

@@ -31,7 +31,7 @@ public:
 
 	static void initDatabase();
 
-	volatile Status getStatus() const { return status; }
+	Status getStatus() const volatile { return status; }
 	void setStatus(Status _status) { status = _status; }
 
 	int x() const { return chunk_x; }
@@ -83,7 +83,7 @@ private:
 	void generate();
 	void invalidateLight();
 	
-	volatile Status status;
+	std::atomic<Status> status;
 	int chunk_x, chunk_y, chunk_z;
 	bool dirty;
 	TriangleCollector collector;
