@@ -23,6 +23,8 @@ int main()
 	IrrlichtDevice *device = createDevice(EDT_DIRECT3D9, dimension2d<u32>(1024, 768), 16, false, false, false, eventReceiver);
 	if (!device)
 		return 1;
+
+	device->setResizable(true);
 	
 	ShortcutItemUI shortcutIUI;
 	driver = device->getVideoDriver();
