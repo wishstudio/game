@@ -2,6 +2,7 @@
 
 #include "Block.h"
 #include "TriangleCollector.h"
+#include "World.h"
 
 TriangleCollector::TriangleCollector()
 {
@@ -30,8 +31,8 @@ SMeshBuffer *TriangleCollector::getBuffer(ITexture *texture)
 
 void TriangleCollector::clear()
 {
-	for (u32 i = 0; i < buffers.size(); i++)
-		buffers[i]->drop();
+	for (IMeshBuffer *buffer : buffers)
+		world->asyncDeleteBuffer(buffer);
 	buffers.clear();
 	textures.clear();
 	textureMap.clear();
@@ -42,10 +43,10 @@ void TriangleCollector::clear()
 void TriangleCollector::finalize()
 {
 	endIndex[x][y][z] = triangles.size();
-	for (u32 i = 0; i < buffers.size(); i++)
+	for (IMeshBuffer *buffer : buffers)
 	{
-		buffers[i]->setDirty();
-		buffers[i]->recalculateBoundingBox();
+		buffer->setDirty();
+		buffer->recalculateBoundingBox();
 	}
 }
 

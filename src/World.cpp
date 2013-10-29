@@ -35,12 +35,30 @@ void World::unlock()
 	worldMutex.unlock();
 }
 
+void World::update()
+{
+	/* Manually remove hardware-mapped mesh buffers
+	 * (Irrlicht does this in a badly way)
+	 */
+	IMeshBuffer *buffer;
+	while (bufferDeleteQueue.try_pop(buffer))
+	{
+		driver->removeHardwareBuffer(buffer);
+		buffer->drop();
+	}
+}
+
 void World::save()
 {
 	database->beginTransaction();
 	for (auto it : chunks)
 		it.second->save();
 	database->commitTransaction();
+}
+
+void World::asyncDeleteBuffer(IMeshBuffer *buffer)
+{
+	bufferDeleteQueue.push(buffer);
 }
 
 void World::asyncLoadChunk(Chunk *chunk)

@@ -99,6 +99,7 @@ int main()
 					info->block.getNeighbour(oppositeDirection(info->direction)).setType(handItem);
 				}
 			}
+			world->update();
 			world->save();
 			world->unlock();
 
@@ -136,10 +137,9 @@ int main()
 			device->yield();
 	}
 
+	device->drop(); /* Make sure references are released first */
 	delete sceneManager;
 	delete world;
 	delete database;
-
-	device->drop();
 	return 0;
 }

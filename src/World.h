@@ -19,6 +19,9 @@ public:
 
 	void lock();
 	void unlock();
+	void update();
+
+	void asyncDeleteBuffer(IMeshBuffer *buffer);
 
 	u32 getLoadedChunkCount() const volatile { return loadedChunkCount; }
 	void save();
@@ -41,6 +44,8 @@ public:
 
 private:
 	void run();
+
+	Concurrency::concurrent_queue<IMeshBuffer *> bufferDeleteQueue;
 
 	Concurrency::concurrent_unordered_map<std::tuple<int, int, int>, Chunk *> chunks;
 	std::mutex chunksHashMutex;

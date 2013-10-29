@@ -46,8 +46,8 @@ private:
 	SMeshBuffer *getBuffer(ITexture *texture);
 	void addTriangleIndex(SMeshBuffer *buffer, u32 i1, u32 i2, u32 i3);
 
-	array<SMeshBuffer *> buffers;
-	array<ITexture *> textures;
+	std::vector<SMeshBuffer *> buffers;
+	std::vector<ITexture *> textures;
 	std::unordered_map<ITexture *, SMeshBuffer *> textureMap;
 	int x, y, z;
 	std::vector<triangle3df> triangles;

@@ -123,7 +123,9 @@ void Chunk::setDirty(int x, int y, int z)
 
 void Chunk::invalidateLight()
 {
-	if (status >= Status::LightLoaded)
+	if (status == Status::BufferLoading)
+		status = Status::LightLoading;
+	else if (status >= Status::LightLoaded)
 		status = Status::DataLoaded;
 }
 
