@@ -99,21 +99,12 @@ Chunk *World::tryGetChunk(int chunk_x, int chunk_y, int chunk_z)
 
 Chunk *World::getChunkForBlock(int x, int y, int z)
 {
-	/* If we use floats, the chunk coordinates for block (x, y, z) is simply
-	   (floor(x / CHUNK_SIZE), floor(y / CHUNK_SIZE), floor(z / CHUNK_SIZE))
-	   But as ints are used, we have to use such tricks to make it correct. */
-	int chunk_x = (x < 0)? ((x - (CHUNK_SIZE - 1)) / CHUNK_SIZE): (x / CHUNK_SIZE);
-	int chunk_y = (y < 0)? ((y - (CHUNK_SIZE - 1)) / CHUNK_SIZE): (y / CHUNK_SIZE);
-	int chunk_z = (z < 0)? ((z - (CHUNK_SIZE - 1)) / CHUNK_SIZE): (z / CHUNK_SIZE);
-	return getChunk(chunk_x, chunk_y, chunk_z);
+	return getChunk(divide(x, CHUNK_SIZE), divide(y, CHUNK_SIZE), divide(z, CHUNK_SIZE));
 }
 
 Chunk *World::tryGetChunkForBlock(int x, int y, int z)
 {
-	int chunk_x = (x < 0)? ((x - (CHUNK_SIZE - 1)) / CHUNK_SIZE): (x / CHUNK_SIZE);
-	int chunk_y = (y < 0)? ((y - (CHUNK_SIZE - 1)) / CHUNK_SIZE): (y / CHUNK_SIZE);
-	int chunk_z = (z < 0)? ((z - (CHUNK_SIZE - 1)) / CHUNK_SIZE): (z / CHUNK_SIZE);
-	return tryGetChunk(chunk_x, chunk_y, chunk_z);
+	return tryGetChunk(divide(x, CHUNK_SIZE), divide(y, CHUNK_SIZE), divide(z, CHUNK_SIZE));
 }
 
 Chunk *World::preloadChunk(int chunk_x, int chunk_y, int chunk_z)

@@ -46,6 +46,15 @@ inline T mod(const T &a, const T &b)
 	return ret;
 }
 
+template<typename T>
+inline T divide(const T &a, const T &b)
+{
+	if (a < 0)
+		return (a - (b - 1)) / b;
+	else
+		return a / b;
+}
+
 inline void translateBox(aabbox3df &box, int offsetX, int offsetY, int offsetZ)
 {
 	box.MinEdge.X += offsetX;
