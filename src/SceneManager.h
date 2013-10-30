@@ -14,4 +14,5 @@ private:
 
 	IMetaTriangleSelector *metaSelector;
 	list<ITriangleSelector *> chunkSelectors;
+	vector3di lastPosition;
 };
