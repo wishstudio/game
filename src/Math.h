@@ -148,3 +148,13 @@ inline Direction oppositeDirection(Direction direction)
 	else
 		return (Direction) ((int) direction - 3);
 }
+
+static const int CHUNK_SIZE = 16;
+static_assert((CHUNK_SIZE & (CHUNK_SIZE - 1)) == 0, "CHUNK_SIZE must be power of 2.");
+
+inline bool isInChunk(int in_x, int in_y, int in_z)
+{
+	return (in_x & (CHUNK_SIZE - 1)) == in_x &&
+		(in_y & (CHUNK_SIZE - 1)) == in_y &&
+		(in_z & (CHUNK_SIZE - 1)) == in_z;
+}

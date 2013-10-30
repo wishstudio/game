@@ -34,7 +34,7 @@ Block Block::getNeighbour(int deltaX, int deltaY, int deltaZ) const
 	int X = in_x + deltaX;
 	int Y = in_y + deltaY;
 	int Z = in_z + deltaZ;
-	if (X >= 0 && X < CHUNK_SIZE && Y >= 0 && Y < CHUNK_SIZE && Z >= 0 && Z < CHUNK_SIZE)
+	if (isInChunk(X, Y, Z))
 		return Block(chunk, X, Y, Z);
 	else
 		return world->getBlock(x() + deltaX, y() + deltaY, z() + deltaZ);
@@ -50,7 +50,7 @@ Block Block::tryGetNeighbour(int deltaX, int deltaY, int deltaZ) const
 	int X = in_x + deltaX;
 	int Y = in_y + deltaY;
 	int Z = in_z + deltaZ;
-	if (X >= 0 && X < CHUNK_SIZE && Y >= 0 && Y < CHUNK_SIZE && Z >= 0 && Z < CHUNK_SIZE)
+	if (isInChunk(X, Y, Z))
 		return Block(chunk, X, Y, Z);
 	else
 		return world->tryGetBlock(x() + deltaX, y() + deltaY, z() + deltaZ);
