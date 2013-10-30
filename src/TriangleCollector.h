@@ -13,6 +13,7 @@ public:
 	inline SMeshBuffer *getBuffer(u32 i) const { return buffers[i]; }
 	inline ITexture *getBufferTexture(u32 i) const { return textures[i]; }
 	
+	bool isValid() { return buffers.size() > 0; }
 	void clear();
 	void finalize();
 	void setCurrentBlock(const Block &block);

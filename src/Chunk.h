@@ -82,7 +82,8 @@ public:
 private:
 	void generate();
 	void invalidateLight();
-	
+
+	std::mutex bufferMutex;
 	std::atomic<Status> status;
 	int chunk_x, chunk_y, chunk_z;
 	bool dirty;

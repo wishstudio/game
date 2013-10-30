@@ -141,9 +141,10 @@ void Chunk::OnRegisterSceneNode()
 
 		if (dist <= 5)
 		{
-			if (status == Status::FullLoaded)
+			/* If we can show something, show it */
+			if (collector.isValid())
 				SceneManager->registerNodeForRendering(this);
-			else
+			if (status < Status::FullLoaded)
 				world->preloadChunkBuffer(this);
 		}
 	}
@@ -153,6 +154,7 @@ void Chunk::OnRegisterSceneNode()
 
 void Chunk::render()
 {
+	std::lock_guard<std::mutex> lock(bufferMutex);
 	driver->setTransform(ETS_WORLD, AbsoluteTransformation);
 	for (u32 i = 0; i < collector.getBufferCount(); i++)
 	{
@@ -281,6 +283,10 @@ void Chunk::loadBuffer()
 				}
 			}
 	
+	std::lock_guard<std::mutex> lock(bufferMutex);
+	/* Double check */
+	if (status >= Status::FullLoaded)
+		return;
 	collector.clear();
 	for (int x = 0; x < CHUNK_SIZE; x++)
 		for (int y = 0; y < CHUNK_SIZE; y++)
