@@ -20,12 +20,14 @@
     <ClInclude Include="src\lz4\lz4.h" />
     <ClInclude Include="src\Math.h" />
     <ClInclude Include="src\Noise.h" />
+    <ClInclude Include="src\PlayerAnimator.h" />
     <ClInclude Include="src\Queue.h" />
     <ClInclude Include="src\SceneManager.h" />
     <ClInclude Include="src\Serialization.h" />
     <ClInclude Include="src\ShortcutItemUI.h" />
     <ClInclude Include="src\stdafx.h" />
     <ClInclude Include="src\TileManager.h" />
+    <ClInclude Include="src\TimeManager.h" />
     <ClInclude Include="src\TriangleCollector.h" />
     <ClInclude Include="src\World.h" />
   </ItemGroup>
@@ -42,6 +44,7 @@
     </ClCompile>
     <ClCompile Include="src\Main.cpp" />
     <ClCompile Include="src\Noise.cpp" />
+    <ClCompile Include="src\PlayerAnimator.cpp" />
     <ClCompile Include="src\SceneManager.cpp" />
     <ClCompile Include="src\Serializer.cpp" />
     <ClCompile Include="src\ShortcutItemUI.cpp" />
@@ -50,6 +53,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="src\TileManager.cpp" />
+    <ClCompile Include="src\TimeManager.cpp" />
     <ClCompile Include="src\TriangleCollector.cpp" />
     <ClCompile Include="src\World.cpp" />
   </ItemGroup>

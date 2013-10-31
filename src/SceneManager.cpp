@@ -6,22 +6,22 @@
 
 SceneManager::SceneManager()
 {
-	metaSelector = smgr->createMetaTriangleSelector();
-	ISceneNodeAnimator *animator = smgr->createCollisionResponseAnimator(
-		metaSelector, camera, vector3df(0.8f, 1.8f, 0.8f), vector3df(0.f, -0.01f, 0.f), vector3df(0.f, 1.2f, 0.f));
-	camera->addAnimator(animator);
-	animator->drop();
+	//metaSelector = smgr->createMetaTriangleSelector();
+	//ISceneNodeAnimator *animator = smgr->createCollisionResponseAnimator(
+	//	metaSelector, camera, vector3df(0.8f, 1.8f, 0.8f), vector3df(0.f, -0.01f, 0.f), vector3df(0.f, 1.2f, 0.f));
+	//camera->addAnimator(animator);
+	//animator->drop();
 	lastPosition = vector3di(INT_MAX / 2); /* Prevent overflow */
 }
 
 SceneManager::~SceneManager()
 {
-	metaSelector->drop();
+	//metaSelector->drop();
 }
 
 void SceneManager::update()
 {
-	updateTriangleSelectors();
+	//updateTriangleSelectors();
 	updateChunks();
 }
 

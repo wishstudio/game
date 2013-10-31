@@ -20,6 +20,7 @@ public:
 	void lock();
 	void unlock();
 	void update();
+	void tick();
 
 	void asyncDeleteBuffer(IMeshBuffer *buffer);
 

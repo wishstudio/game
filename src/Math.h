@@ -135,6 +135,47 @@ inline bool rayIntersectsWithBox(const line3df &ray, const aabbox3df &box)
 	return tMin <= tMax;
 }
 
+inline bool rayIntersectsWithSphere(const vector3df &point, const vector3df &vec, const vector3df &center, f32 radius, f32 &distance)
+{
+	/*         |
+	 *         |       % % %
+     *         |    %ray      %
+	 *         |   % /'.       %
+	 *         |    /   'Q
+     *         | v %   ,'      %
+     *         |  / %,' c     %
+     *         | /a,'  % % %
+	 *         |/,'  
+	 *  -------+--------------------------
+	 *         |
+	 *         |
+	 */
+	/* Sphere center in point coordinate system */
+	vector3df Q = center - point;
+	/* Distance from sphere center to origin */
+	f32 c = Q.getLength();
+	/* v = Q * vn
+	     = |Q| * 1 * cos(alpha)
+	     = c * cos(alpha)
+	 */
+	vector3df vn(vec);
+	f32 v = Q.dotProduct(vn.normalize());
+	if (v < 0.f)
+		return false;
+	/* d = R^2 - (c^2 - v^2)
+	 *   = R^2 - (c^2 - (c * cos(alpha))^2)
+	 *   = R^2 - c^2 * (1 - cos(alpha)^2)
+	 *   = R^2 - c^2 * sin(alpha)^2
+	 *   = R^2 - (c * sin(alpha))^2
+	 */
+	f32 d = radius * radius - (c * c - v * v);
+	if (d < 0.f)
+		return false;
+
+	distance = v - sqrt(d);
+	return true;
+}
+
 enum Direction
 {
 	DIRECTION_X = 0,

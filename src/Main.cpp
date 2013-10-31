@@ -4,9 +4,11 @@
 #include "Chunk.h"
 #include "Database.h"
 #include "EventReceiver.h"
+#include "PlayerAnimator.h"
 #include "SceneManager.h"
 #include "ShortcutItemUI.h"
 #include "TileManager.h"
+#include "TimeManager.h"
 #include "World.h"
 
 #ifdef _IRR_WINDOWS_
@@ -31,27 +33,16 @@ int main()
 	smgr = device->getSceneManager();
 	IFileSystem *fs = device->getFileSystem();
 
-	SKeyMap keyMap[5];
-	keyMap[0].Action = EKA_MOVE_FORWARD;
-	keyMap[0].KeyCode = KEY_KEY_W;
-	keyMap[1].Action = EKA_MOVE_BACKWARD;
-	keyMap[1].KeyCode = KEY_KEY_S;
-	keyMap[2].Action = EKA_STRAFE_LEFT;
-	keyMap[2].KeyCode = KEY_KEY_A;
-	keyMap[3].Action = EKA_STRAFE_RIGHT;
-	keyMap[3].KeyCode = KEY_KEY_D;
-	keyMap[4].Action = EKA_JUMP_UP;
-	keyMap[4].KeyCode = KEY_SPACE;
-
-	camera = smgr->addCameraSceneNodeFPS(nullptr, 80.f, 0.005f, -1, keyMap, 5, true, 0.005f);
-	camera->setPosition(vector3df(0, 20, 0));
-	camera->setTarget(vector3df(0, 0, 0));
+	camera = smgr->addCameraSceneNodeFPS(nullptr, 80.f, 0.005f, -1, nullptr, 0, true, 0.005f);
+	//camera->setPosition(vector3df(0, 20, 0));
+	//camera->setTarget(vector3df(0, 0, 0));
 	device->getCursorControl()->setVisible(false);
 
 	/* Initialize database */
 	database = new Database();
 
 	/* Initialize game logic */
+	timeManager = new TimeManager();
 	world = new World();
 	tileManager = new TileManager();
 	blockType = new BlockType();
@@ -59,6 +50,7 @@ int main()
 	blockType->registerCube(2, "magickaland.png");
 	blockType->registerCube(3, "dirtroad.png");
 	SceneManager *sceneManager = new SceneManager();
+	PlayerAnimator *playerAnimator = new PlayerAnimator();
 
 	u16 handItem = 1;
 	
@@ -68,6 +60,8 @@ int main()
 		if (device->isWindowActive())
 		{
 			driver->beginScene(true, true, SColor(255, 127, 200, 251));
+
+			timeManager->update();
 
 			bool leftMousePressed = false, rightMousePressed = false;
 			if (eventReceiver->isLeftButtonDown() && lastLeftMouseDown == false)
@@ -99,10 +93,21 @@ int main()
 					info->block.getNeighbour(oppositeDirection(info->direction)).setType(handItem);
 				}
 			}
-			world->update();
-			world->save();
 			world->unlock();
 
+			while (timeManager->tick())
+			{
+				world->lock();
+				world->tick();
+				world->unlock();
+
+				playerAnimator->tick();
+				eventReceiver->tick();
+			}
+			world->update();
+			world->save();
+			
+			playerAnimator->update();
 			smgr->drawAll();
 
 			shortcutIUI.show();
@@ -131,8 +136,6 @@ int main()
 			s += " blocks loaded";
 			device->setWindowCaption(s.c_str());
 
-			eventReceiver->update();
-
 			driver->endScene();
 		}
 		else
@@ -140,8 +143,11 @@ int main()
 	}
 
 	device->drop(); /* Make sure references are released first */
+	delete playerAnimator;
 	delete sceneManager;
 	delete world;
+	delete timeManager;
+
 	delete database;
 	return 0;
 }

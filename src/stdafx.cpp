@@ -6,6 +6,6 @@ ICameraSceneNode *camera;
 Database *database;
 BlockType *blockType;
 TileManager *tileManager;
+TimeManager *timeManager;
 World *world;
 EventReceiver *eventReceiver;
-

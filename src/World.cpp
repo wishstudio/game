@@ -48,6 +48,10 @@ void World::update()
 	}
 }
 
+void World::tick()
+{
+}
+
 void World::save()
 {
 	database->beginTransaction();

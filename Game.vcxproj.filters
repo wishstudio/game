@@ -68,6 +68,12 @@
     <ClInclude Include="src\Hash.h">
       <Filter>Header</Filter>
     </ClInclude>
+    <ClInclude Include="src\PlayerAnimator.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="src\TimeManager.h">
+      <Filter>Header</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Block.cpp">
@@ -117,6 +123,12 @@
     </ClCompile>
     <ClCompile Include="src\lz4\lz4.c">
       <Filter>Source\lz4</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PlayerAnimator.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TimeManager.cpp">
+      <Filter>Source</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
