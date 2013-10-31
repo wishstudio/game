@@ -1,9 +1,6 @@
 #include "stdafx.h"
 #include "ShortcutItemUI.h"
 
-struct BlockTypeSpec;
-
-
 ShortcutItemUI::ShortcutItemUI() {
 	handItemId = 1;
 	wheel = 0;
@@ -28,11 +25,8 @@ void ShortcutItemUI::drawItem(u16 id) {
 	s32 ltx = w / 2 - 206 + id * 42 - 42;
 	s32 lth = h - 137;
 	ITexture *texture = blockType->getTexture(id);
-	if (texture != nullptr) {
-		driver->draw2DImage(blockType->getTexture(id), 
-			rect<s32>(ltx, lth, ltx + 33, lth + 33), 
-			rect<s32>(0, 0, 15, 15));
-	}
+	if (texture != nullptr)
+		driver->draw2DImage(texture, rect<s32>(ltx, lth, ltx + 33, lth + 33), rect<s32>(vector2di(0, 0), texture->getSize()));
 }
 
 void ShortcutItemUI::highLight() {
@@ -42,25 +36,25 @@ void ShortcutItemUI::highLight() {
 }
 
 void ShortcutItemUI::getItemSelected() {
-	if (eventReceiver->isKeyDown(KEY_KEY_0))
+	if (eventReceiver->isKeyPressed(KEY_KEY_0))
 		handItemId = 10;
-	else if (eventReceiver->isKeyDown(KEY_KEY_1))
+	else if (eventReceiver->isKeyPressed(KEY_KEY_1))
 		handItemId = 1;
-	else if (eventReceiver->isKeyDown(KEY_KEY_2))
+	else if (eventReceiver->isKeyPressed(KEY_KEY_2))
 		handItemId = 2;
-	else if (eventReceiver->isKeyDown(KEY_KEY_3))
+	else if (eventReceiver->isKeyPressed(KEY_KEY_3))
 		handItemId = 3;
-	else if (eventReceiver->isKeyDown(KEY_KEY_4))
+	else if (eventReceiver->isKeyPressed(KEY_KEY_4))
 		handItemId = 4;
-	else if (eventReceiver->isKeyDown(KEY_KEY_5))
+	else if (eventReceiver->isKeyPressed(KEY_KEY_5))
 		handItemId = 5;
-	else if (eventReceiver->isKeyDown(KEY_KEY_6))
+	else if (eventReceiver->isKeyPressed(KEY_KEY_6))
 		handItemId = 6;
-	else if (eventReceiver->isKeyDown(KEY_KEY_7))
+	else if (eventReceiver->isKeyPressed(KEY_KEY_7))
 		handItemId = 7;
-	else if (eventReceiver->isKeyDown(KEY_KEY_8))
+	else if (eventReceiver->isKeyPressed(KEY_KEY_8))
 		handItemId = 8;
-	else if (eventReceiver->isKeyDown(KEY_KEY_9))
+	else if (eventReceiver->isKeyPressed(KEY_KEY_9))
 		handItemId = 9;
 	wheel = eventReceiver->getMouseWheel();
 	handItemId = (handItemId + 9 + wheel) % 10 + 1;

@@ -8,8 +8,8 @@ EventReceiver::EventReceiver()
 	leftButtonDown = false;
 	rightButtonDown = false;
 	mouseWheel = 0.f;
-	for (int i = 0; i < KEY_KEY_CODES_COUNT; ++i)
-		keyIsDown[i] = false;
+	memset(keyIsDown, 0, sizeof(keyIsDown));
+	memset(keyIsPressed, 0, sizeof(keyIsPressed));
 }
 
 
@@ -51,6 +51,14 @@ bool EventReceiver::OnEvent(const SEvent &event)
 		}
 	}
 	else if (event.EventType == EET_KEY_INPUT_EVENT)
+	{
+		keyIsPressed[event.KeyInput.Key] = (event.KeyInput.PressedDown && !keyIsDown[event.KeyInput.Key]);
 		keyIsDown[event.KeyInput.Key] = event.KeyInput.PressedDown;
+	}
 	return false;
+}
+
+void EventReceiver::update()
+{
+	memset(keyIsPressed, 0, sizeof keyIsPressed);
 }

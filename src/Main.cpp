@@ -5,9 +5,9 @@
 #include "Database.h"
 #include "EventReceiver.h"
 #include "SceneManager.h"
+#include "ShortcutItemUI.h"
 #include "TileManager.h"
 #include "World.h"
-#include "ShortcutItemUI.h"
 
 #ifdef _IRR_WINDOWS_
 #pragma comment(lib, "Irrlicht.lib")
@@ -130,6 +130,8 @@ int main()
 			s += world->getLoadedChunkCount() * CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE;
 			s += " blocks loaded";
 			device->setWindowCaption(s.c_str());
+
+			eventReceiver->update();
 
 			driver->endScene();
 		}
