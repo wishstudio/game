@@ -55,6 +55,12 @@ inline T divide(const T &a, const T &b)
 		return a / b;
 }
 
+template<typename DestT, typename SrcT>
+inline vector3d<DestT> vector3d_cast(const vector3d<SrcT> &source)
+{
+	return vector3d<DestT>(source.X, source.Y, source.Z);
+}
+
 inline void translateBox(aabbox3df &box, int offsetX, int offsetY, int offsetZ)
 {
 	box.MinEdge.X += offsetX;

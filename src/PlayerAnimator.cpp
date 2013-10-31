@@ -39,16 +39,13 @@ void PlayerAnimator::tick()
 	if (eventReceiver->isKeyDown(KEY_KEY_D))
 		nextVelocity += leftVec * -MOVE_SPEED;
 
-	//nextVelocity += { 0, -1, 0 };
+	nextVelocity += { 0, -1, 0 };
 
 	/* Update next position */
 	const f32 playerRadius = .5f;
-	vector3df moveVector = currentVelocity * seconds<f32>(TICK_DURATION);
-	nextPosition = currentPosition + moveVector;
-	aabbox3df box(nextPosition - playerRadius, nextPosition + playerRadius);
-	box.addInternalBox(aabbox3df(currentPosition - playerRadius, currentPosition + playerRadius));
-	box.MinEdge -= { 1, 1, 1 };
-	box.MaxEdge += { 1, 1, 1 };
+	const vector3df moveVector = currentVelocity * seconds<f32>(TICK_DURATION);
+	aabbox3df box(currentPosition - moveVector.getLength() - playerRadius);
+	box.addInternalPoint(currentPosition + moveVector.getLength() + playerRadius);
 
 	/* Gather relevant triangles for collision detection
 	In general, we need 2x2x2 chunks for collision detection.
@@ -57,9 +54,9 @@ void PlayerAnimator::tick()
 	The same applies for axis y and z. */
 
 	/* Calculating base coordinates */
-	f32 fx = nextPosition.X / CHUNK_SIZE;
-	f32 fy = nextPosition.Y / CHUNK_SIZE;
-	f32 fz = nextPosition.Z / CHUNK_SIZE;
+	f32 fx = currentPosition.X / CHUNK_SIZE;
+	f32 fy = currentPosition.Y / CHUNK_SIZE;
+	f32 fz = currentPosition.Z / CHUNK_SIZE;
 
 	int basex = (int) floor(fx);
 	int basey = (int) floor(fy);
@@ -84,56 +81,78 @@ void PlayerAnimator::tick()
 				count += outCount;
 			}
 
-	/* Find colliding triangle */
-	f32 minDistance = moveVector.getLength(); /* Don't count if colliding distance is larger than move distance */
-	int minTriangleId = -1;
-	vector3df invertedVelocity(currentVelocity);
-	invertedVelocity.invert();
-	for (int i = 0; i < count; i++)
+	/* Collision update loop */
+	vector3df vn(currentVelocity);
+	vn.normalize();
+	f32 remainDistance = moveVector.getLength();
+	while (remainDistance > ROUNDING_ERROR_f32)
 	{
-		if (!triangles[i].isFrontFacing(currentVelocity))
-			continue;
+		/* Find colliding triangle */
+		f32 minDistance = remainDistance; /* Don't count if colliding distance is larger than move distance */
+		vector3df minPlaneIntersection;
 
-		vector3df normal = triangles[i].getNormal().invert().normalize();
-
-		/* Sphere intersection point */
-		vector3df sphereIntersection = currentPosition + normal * playerRadius;
-
-		/* Plane intersection point */
-		vector3df planeIntersection;
-		if (triangles[i].getIntersectionOfPlaneWithLine(sphereIntersection, currentVelocity, planeIntersection))
+		vector3df invertedVelocity(vn);
+		invertedVelocity.invert();
+		for (int i = 0; i < count; i++)
 		{
-			f32 distance;
-			if (triangles[i].isPointInside(planeIntersection))
-			{
-				/* Simple case: plane intersection in on the triangle */
-				distance = (planeIntersection - sphereIntersection).getLength();
-			}
-			else
-			{
-				/* Hard case: reverse intersecting the sphere */
-				vector3df closest = triangles[i].closestPointOnTriangle(planeIntersection);
+			if (!triangles[i].isFrontFacing(vn))
+				continue;
 
-				if (!rayIntersectsWithSphere(closest, invertedVelocity, currentPosition, playerRadius, distance))
-					continue;
-			}
+			vector3df normal = triangles[i].getNormal().invert().normalize();
 
-			if (distance < minDistance)
+			/* Sphere intersection point
+			 * The potential intersection point on the sphere
+			 */
+			vector3df sphereIntersection = nextPosition + normal * playerRadius;
+
+			/* Plane intersection point
+			 * The potential intersection point on the plane the triangle reside on
+			 */
+			vector3df planeIntersection;
+			if (triangles[i].getIntersectionOfPlaneWithLine(sphereIntersection, vn, planeIntersection))
 			{
-				minDistance = distance;
-				minTriangleId = i;
+				f32 distance;
+				if (triangles[i].isPointInside(planeIntersection))
+				{
+					/* Simple case: plane intersection in on the triangle */
+					distance = (planeIntersection - sphereIntersection).getLength();
+				}
+				else
+				{
+					/* Hard case: plane intersection is not on the triangle
+					 * Will intersect at the point nearest to the plane intersection point */
+					planeIntersection = triangles[i].closestPointOnTriangle(planeIntersection);
+
+					/* Reverse intersecting the sphere */
+					if (!rayIntersectsWithSphere(planeIntersection, invertedVelocity, nextPosition, playerRadius, distance))
+						continue;
+				}
+
+				if (distance < minDistance)
+				{
+					minDistance = distance;
+					minPlaneIntersection = planeIntersection;
+				}
 			}
+		}
+		/* Move */
+		nextPosition += vn * minDistance;
+		remainDistance -= minDistance;
+
+		if (remainDistance > ROUNDING_ERROR_f32)
+		{
+			/* Sliding plane
+			 * Origin is the point of plane intersection
+			 * Normal is from the intersection point to the center of the sphere
+			 */
+			vector3df snormal = (nextPosition - minPlaneIntersection).normalize();
+			vector3df remainVector = vn * remainDistance;
+			vector3df slideVector = remainVector + snormal * snormal.dotProduct(-remainVector);
+			remainDistance = slideVector.getLength();
+			vn = slideVector.normalize();
 		}
 	}
 	delete triangles;
-
-	if (minTriangleId == -1) /* No collision */
-		return;
-	
-	/* Simple treat now */
-	vector3df vn(currentVelocity);
-	vn.normalize();
-	nextPosition = currentPosition + vn * minDistance;
 }
 
 void PlayerAnimator::update()
