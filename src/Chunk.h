@@ -52,7 +52,7 @@ public:
 	virtual const aabbox3df &getBoundingBox() const override { return boundingBox; }
 	virtual void render() override;
 	
-	void getTriangles(triangle3df *triangles, s32 arraySize, s32 &outTriangleCount, const aabbox3df &box, const matrix4 &transform) const;
+	void getTriangles(std::vector<triangle3df> &triangles, const aabbox3df &box, const matrix4 &transform) const;
 
 private:
 	void generate();

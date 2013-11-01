@@ -297,12 +297,7 @@ void Chunk::loadBuffer()
 }
 
 /* Gets all triangles which have or may have contact within a specific bounding box */
-void Chunk::getTriangles(
-	triangle3df *triangles,
-	s32 arraySize,
-	s32 &outTriangleCount,
-	const aabbox3df &box,
-	const matrix4 &transform) const
+void Chunk::getTriangles(std::vector<triangle3df> &triangles, const aabbox3df &box, const matrix4 &transform) const
 {
 	world->ensureChunkBufferLoaded((Chunk *) this);
 
@@ -312,8 +307,6 @@ void Chunk::getTriangles(
 	mat.transformBoxEx(tBox);
 
 	mat = transform * getAbsoluteTransformation();
-
-	s32 triangleCount = 0;
 
 	int x_min = bound<int>(0, floor(tBox.MinEdge.X), CHUNK_SIZE - 1);
 	int y_min = bound<int>(0, floor(tBox.MinEdge.Y), CHUNK_SIZE - 1);
@@ -327,15 +320,11 @@ void Chunk::getTriangles(
 			{
 				for (auto it = collector.blockBegin(x, y, z); it != collector.blockEnd(x, y, z); it++)
 				{
-					mat.transformVect(triangles[triangleCount].pointA, it->pointA);
-					mat.transformVect(triangles[triangleCount].pointB, it->pointB);
-					mat.transformVect(triangles[triangleCount].pointC, it->pointC);
-					triangleCount++;
-					if (triangleCount == arraySize)
-						goto done;
+					triangle3df triangle;
+					mat.transformVect(triangle.pointA, it->pointA);
+					mat.transformVect(triangle.pointB, it->pointB);
+					mat.transformVect(triangle.pointC, it->pointC);
+					triangles.push_back(triangle);
 				}
 			}
-
-done:
-	outTriangleCount = triangleCount;
 }

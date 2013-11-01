@@ -80,17 +80,14 @@ void PlayerAnimator::tick()
 	transform.getInverse(invTransform);
 
 	/* Collect triangles */
-	const int ARRAY_SIZE = 65536;
-	auto triangles = new triangle3df[ARRAY_SIZE];
-	int count = 0;
+	std::vector<triangle3df> triangles;
 	for (int x = 0; x <= 1; x++)
 		for (int y = 0; y <= 1; y++)
 			for (int z = 0; z <= 1; z++)
 			{
 				Chunk *chunk = world->getChunk(x + basex, y + basey, z + basez);
 				int outCount;
-				chunk->getTriangles(triangles + count, ARRAY_SIZE - count, outCount, box, transform);
-				count += outCount;
+				chunk->getTriangles(triangles, box, transform);
 			}
 
 	/* Transform vectors to ellipsoid coordinate system */
@@ -111,12 +108,12 @@ void PlayerAnimator::tick()
 
 		vector3df invertedVelocity(vn);
 		invertedVelocity.invert();
-		for (int i = 0; i < count; i++)
+		for (const triangle3df triangle: triangles)
 		{
-			if (!triangles[i].isFrontFacing(vn))
+			if (!triangle.isFrontFacing(vn))
 				continue;
 
-			vector3df normal = triangles[i].getNormal().invert().normalize();
+			vector3df normal = triangle.getNormal().invert().normalize();
 
 			/* Sphere intersection point
 			 * The potential intersection point on the sphere
@@ -127,10 +124,10 @@ void PlayerAnimator::tick()
 			 * The potential intersection point on the plane the triangle reside on
 			 */
 			vector3df planeIntersection;
-			if (triangles[i].getIntersectionOfPlaneWithLine(sphereIntersection, vn, planeIntersection))
+			if (triangle.getIntersectionOfPlaneWithLine(sphereIntersection, vn, planeIntersection))
 			{
 				f32 distance;
-				if (triangles[i].isPointInside(planeIntersection))
+				if (triangle.isPointInside(planeIntersection))
 				{
 					/* Simple case: plane intersection in on the triangle */
 					distance = (planeIntersection - sphereIntersection).getLength();
@@ -139,7 +136,7 @@ void PlayerAnimator::tick()
 				{
 					/* Hard case: plane intersection is not on the triangle
 					 * Will intersect at the point nearest to the plane intersection point */
-					planeIntersection = triangles[i].closestPointOnTriangle(planeIntersection);
+					planeIntersection = triangle.closestPointOnTriangle(planeIntersection);
 
 					/* Reverse intersecting the sphere */
 					if (!rayIntersectsWithSphere(planeIntersection, invertedVelocity, nextPosition, 1, distance))
@@ -175,7 +172,6 @@ void PlayerAnimator::tick()
 		if (remainDistance < veryCloseDistance)
 			break;
 	}
-	delete triangles;
 
 	/* Transform back to world coordinate system */
 	invTransform.transformVect(nextPosition);
