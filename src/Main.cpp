@@ -58,6 +58,10 @@ int main()
 	{
 		if (device->isWindowActive())
 		{
+			/* In case of window size changes */
+			auto renderTargetSize = driver->getCurrentRenderTargetSize();
+			camera->setAspectRatio((f32) renderTargetSize.Width / (f32) renderTargetSize.Height);
+
 			driver->beginScene(true, true, SColor(255, 127, 200, 251));
 
 			timeManager->update();
