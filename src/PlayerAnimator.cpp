@@ -85,7 +85,7 @@ void PlayerAnimator::tick()
 	vector3df vn(currentVelocity);
 	vn.normalize();
 	f32 remainDistance = moveVector.getLength();
-	while (remainDistance > ROUNDING_ERROR_f32)
+	for (int depth = 0; depth < 5; depth++) /* Do sliding at most 5 times */
 	{
 		/* Find colliding triangle */
 		f32 minDistance = remainDistance; /* Don't count if colliding distance is larger than move distance */
@@ -136,21 +136,26 @@ void PlayerAnimator::tick()
 			}
 		}
 		/* Move */
-		nextPosition += vn * minDistance;
-		remainDistance -= minDistance;
+		/* Do not touch the triangle exactly for a tolerance of floating point errors */
+		const f32 veryCloseDistance = 0.0001;
+		nextPosition += vn * (minDistance - veryCloseDistance);
+		remainDistance -= (minDistance - veryCloseDistance);
+		minPlaneIntersection -= vn * veryCloseDistance;
 
-		if (remainDistance > ROUNDING_ERROR_f32)
-		{
-			/* Sliding plane
-			 * Origin is the point of plane intersection
-			 * Normal is from the intersection point to the center of the sphere
-			 */
-			vector3df snormal = (nextPosition - minPlaneIntersection).normalize();
-			vector3df remainVector = vn * remainDistance;
-			vector3df slideVector = remainVector + snormal * snormal.dotProduct(-remainVector);
-			remainDistance = slideVector.getLength();
-			vn = slideVector.normalize();
-		}
+		if (remainDistance < veryCloseDistance)
+			break;
+		
+		/* Sliding plane
+		 * Origin is the point of plane intersection
+		 * Normal is from the intersection point to the center of the sphere
+		 */
+		vector3df snormal = (nextPosition - minPlaneIntersection).normalize();
+		vector3df remainVector = vn * remainDistance;
+		vector3df slideVector = remainVector + snormal * snormal.dotProduct(-remainVector);
+		remainDistance = slideVector.getLength();
+		vn = slideVector.normalize();
+		if (remainDistance < veryCloseDistance)
+			break;
 	}
 	delete triangles;
 }
