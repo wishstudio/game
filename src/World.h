@@ -24,7 +24,7 @@ public:
 
 	void asyncDeleteBuffer(IMeshBuffer *buffer);
 
-	u32 getLoadedChunkCount() const volatile { return loadedChunkCount; }
+	u32 getLoadedChunkCount() const { return chunks.size(); }
 	void save();
 	void asyncLoadChunk(Chunk *chunk);
 
@@ -36,10 +36,6 @@ public:
 	Chunk *tryGetChunkForBlock(int x, int y, int z);
 
 	Chunk *preloadChunk(int chunk_x, int chunk_y, int chunk_z);
-	void preloadChunkLight(Chunk *chunk);
-	void preloadChunkBuffer(Chunk *chunk);
-	void ensureChunkBufferLoaded(Chunk *chunk);
-	void ensureChunkDataLoaded(Chunk *chunk);
 
 	bool getCameraIntersection(const line3df &ray, CameraIntersectionInfo **info);
 
@@ -50,7 +46,6 @@ private:
 
 	Concurrency::concurrent_unordered_map<std::tuple<int, int, int>, Chunk *> chunks;
 	std::mutex chunksHashMutex;
-	std::atomic<u32> loadedChunkCount;
 	std::mutex worldMutex;
 
 	Concurrency::concurrent_queue<Chunk *> loadQueue;

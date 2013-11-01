@@ -14,7 +14,7 @@
 #ifdef _IRR_WINDOWS_
 #pragma comment(lib, "Irrlicht.lib")
 #pragma comment(lib, "sqlite3.lib")
-#pragma comment(linker, "/subsystem:windows /ENTRY:mainCRTStartup")
+//#pragma comment(linker, "/subsystem:windows /ENTRY:mainCRTStartup")
 #endif
 
 int main()
@@ -96,19 +96,15 @@ int main()
 					info->block.getNeighbour(oppositeDirection(info->direction)).setType(handItem);
 				}
 			}
-			world->unlock();
-
 			while (timeManager->tick())
 			{
-				world->lock();
 				world->tick();
-				world->unlock();
-
 				playerAnimator->tick();
 				eventReceiver->tick();
 			}
 			world->update();
 			world->save();
+			world->unlock();
 			
 			playerAnimator->update();
 			smgr->drawAll();

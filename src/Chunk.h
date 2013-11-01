@@ -18,14 +18,8 @@ struct BlockData
 class Chunk: public ISceneNode
 {
 public:
-	enum class Status: int { DataLoading, DataLoaded, LightLoading, LightLoaded, BufferLoading, FullLoaded };
-	/* DataLoading: Data is being loading from disk or generating (in the queue).
-	 * DataLoaded: Data is loaded.
-	 * LightLoading: Light is being generated (in the queue).
-	 * LightLoaded: Light is loaded.
-	 * BufferLoading: Vertex buffer is being generated (in the queue).
-	 * FullLoaded: All things are loaded.
-	 */
+	enum class Status : int { Nothing, Data, Light, Buffer };
+	/* Represents what has been loaded so far */
 	Chunk(int chunk_x, int chunk_y, int chunk_z);
 	virtual ~Chunk();
 
@@ -33,6 +27,11 @@ public:
 
 	Status getStatus() const volatile { return status; }
 	void setStatus(Status _status) { status = _status; }
+	bool isInQueue() const volatile { return inQueue; }
+	void setInQueue(bool _inQueue) { inQueue = _inQueue; }
+
+	bool shouldPreloadBuffer();
+	bool isInViewRange();
 
 	int x() const { return chunk_x; }
 	int y() const { return chunk_y; }
@@ -52,7 +51,7 @@ public:
 	virtual const aabbox3df &getBoundingBox() const override { return boundingBox; }
 	virtual void render() override;
 	
-	void getTriangles(std::vector<triangle3df> &triangles, const aabbox3df &box, const matrix4 &transform) const;
+	void getTriangles(std::vector<triangle3df> &triangles, const aabbox3df &box, const matrix4 &transform);
 
 private:
 	void generate();
@@ -60,6 +59,7 @@ private:
 
 	std::mutex bufferMutex;
 	std::atomic<Status> status;
+	std::atomic<bool> inQueue;
 	int chunk_x, chunk_y, chunk_z;
 	bool dirty;
 	TriangleCollector collector;

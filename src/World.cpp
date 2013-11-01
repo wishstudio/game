@@ -7,7 +7,6 @@
 
 World::World()
 {
-	loadedChunkCount = 0;
 	shouldStop = false;
 	workerThreads.push_back(std::thread(&World::run, this));
 }
@@ -67,6 +66,8 @@ void World::asyncDeleteBuffer(IMeshBuffer *buffer)
 
 void World::asyncLoadChunk(Chunk *chunk)
 {
+	if (chunk->isInQueue())
+		return;
 	loadQueue.push(chunk);
 	std::lock_guard<std::mutex> lock(workerMutex);
 	workerCondition.notify_all();
@@ -89,7 +90,8 @@ Block World::tryGetBlock(int x, int y, int z)
 Chunk *World::getChunk(int chunk_x, int chunk_y, int chunk_z)
 {
 	Chunk *chunk = preloadChunk(chunk_x, chunk_y, chunk_z);
-	ensureChunkDataLoaded(chunk);
+	if (chunk->getStatus() < Chunk::Status::Data)
+		chunk->loadData();
 	return chunk;
 }
 
@@ -130,57 +132,6 @@ Chunk *World::preloadChunk(int chunk_x, int chunk_y, int chunk_z)
 	return chunk;
 }
 
-void World::preloadChunkLight(Chunk *chunk)
-{
-	if (chunk->getStatus() == Chunk::Status::DataLoaded)
-	{
-		chunk->setStatus(Chunk::Status::LightLoading);
-		asyncLoadChunk(chunk);
-	}
-}
-
-void World::preloadChunkBuffer(Chunk *chunk)
-{
-	Chunk::Status status = chunk->getStatus();
-	if (status == Chunk::Status::DataLoaded)
-	{
-		chunk->setStatus(Chunk::Status::LightLoading);
-		asyncLoadChunk(chunk);
-	}
-	else if (status == Chunk::Status::LightLoaded)
-	{
-		chunk->setStatus(Chunk::Status::BufferLoading);
-		asyncLoadChunk(chunk);
-	}
-}
-
-void World::ensureChunkDataLoaded(Chunk *chunk)
-{
-	for (;;)
-		if (chunk->getStatus() >= Chunk::Status::DataLoaded)
-			return;
-}
-
-void World::ensureChunkBufferLoaded(Chunk *chunk)
-{
-	for (;;)
-	{
-		Chunk::Status status = chunk->getStatus();
-		if (status == Chunk::Status::FullLoaded)
-			return;
-		if (status == Chunk::Status::DataLoaded)
-		{
-			chunk->setStatus(Chunk::Status::LightLoading);
-			asyncLoadChunk(chunk);
-		}
-		if (status == Chunk::Status::LightLoaded)
-		{
-			chunk->setStatus(Chunk::Status::BufferLoading);
-			asyncLoadChunk(chunk);
-		}
-	}
-}
-
 void World::run()
 {
 	while (!shouldStop)
@@ -188,31 +139,19 @@ void World::run()
 		Chunk *chunk;
 		if (loadQueue.try_pop(chunk))
 		{
-			if (chunk->getStatus() < Chunk::Status::DataLoaded)
-			{
-				std::lock_guard<std::mutex> lock(worldMutex);
+			chunk->setInQueue(false);
+			Chunk::Status status = chunk->getStatus();
+			std::lock_guard<std::mutex> lock(worldMutex);
+			if (status < Chunk::Status::Data)
 				chunk->loadData();
-				loadedChunkCount++;
-				chunk->setStatus(Chunk::Status::LightLoading);
+			if (status < Chunk::Status::Light)
 				chunk->loadLight();
-				/* It refused to load light, push it to queue again */
-				if (chunk->getStatus() < Chunk::Status::LightLoaded)
-					loadQueue.push(chunk);
-			}
-			else if (chunk->getStatus() < Chunk::Status::LightLoaded)
-			{
-				std::lock_guard<std::mutex> lock(worldMutex);
-				chunk->loadLight();
-				/* It refused to load light, push it to queue again */
-				if (chunk->getStatus() < Chunk::Status::LightLoaded)
-					loadQueue.push(chunk);
-			}
-			else if (chunk->getStatus() < Chunk::Status::FullLoaded)
+			if (!chunk->shouldPreloadBuffer())
+				chunk->setStatus(Chunk::Status::Light);
+			else
 			{
 				chunk->loadBuffer();
-				/* It refused to load buffer, push it to queue again */
-				if (chunk->getStatus() < Chunk::Status::FullLoaded)
-					loadQueue.push(chunk);
+				chunk->setStatus(Chunk::Status::Buffer);
 			}
 			continue;
 		}
