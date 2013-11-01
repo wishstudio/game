@@ -13,7 +13,7 @@ public:
 	inline SMeshBuffer *getBuffer(u32 i) const { return buffers[i]; }
 	inline ITexture *getBufferTexture(u32 i) const { return textures[i]; }
 	
-	bool isValid() { return buffers.size() > 0; }
+	bool isValid() { return valid; }
 	void clear();
 	void finalize();
 	void setCurrentBlock(const Block &block);
@@ -47,6 +47,7 @@ private:
 	SMeshBuffer *getBuffer(ITexture *texture);
 	void addTriangleIndex(SMeshBuffer *buffer, u32 i1, u32 i2, u32 i3);
 
+	bool valid;
 	std::vector<SMeshBuffer *> buffers;
 	std::vector<ITexture *> textures;
 	std::unordered_map<ITexture *, SMeshBuffer *> textureMap;

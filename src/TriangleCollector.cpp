@@ -6,6 +6,7 @@
 
 TriangleCollector::TriangleCollector()
 {
+	valid = false;
 }
 
 TriangleCollector::~TriangleCollector()
@@ -48,6 +49,7 @@ void TriangleCollector::finalize()
 		buffer->setDirty();
 		buffer->recalculateBoundingBox();
 	}
+	valid = true;
 }
 
 void TriangleCollector::setCurrentBlock(const Block &block)
