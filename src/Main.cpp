@@ -33,9 +33,8 @@ int main()
 	smgr = device->getSceneManager();
 	IFileSystem *fs = device->getFileSystem();
 
-	camera = smgr->addCameraSceneNodeFPS(nullptr, 80.f, 0.005f, -1, nullptr, 0, true, 0.005f);
-	//camera->setPosition(vector3df(0, 20, 0));
-	//camera->setTarget(vector3df(0, 0, 0));
+	camera = smgr->addCameraSceneNodeFPS(nullptr, 100.f, 0.f, -1, nullptr, 0);
+	camera->setNearValue(0.2);
 	device->getCursorControl()->setVisible(false);
 
 	/* Initialize database */

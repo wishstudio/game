@@ -19,7 +19,7 @@ PlayerAnimator::~PlayerAnimator()
 void PlayerAnimator::tick()
 {
 	/* Player definition */
-	vector3df playerRadius = { 0.48f, 1.9f, 0.48f };
+	const vector3df playerRadius = { 0.48f, 1.9f, 0.48f };
 
 	/* Update current values */
 	vector3df currentVelocity = nextVelocity;
@@ -183,9 +183,11 @@ void PlayerAnimator::tick()
 
 void PlayerAnimator::update()
 {
+	const vector3df playerCameraOffset(0, 1.7f, 0);
+
 	/* Interpolate camera position for smooth rendering */
 	vector3df position(currentPosition);
 	vector3df diffVec(nextPosition - currentPosition);
 	position += diffVec * (seconds<f32>(timeManager->getRemainingTickDuration()) / seconds<f32>(TICK_DURATION));
-	camera->setPosition(position);
+	camera->setPosition(position + playerCameraOffset);
 }
