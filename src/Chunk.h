@@ -15,7 +15,7 @@ struct BlockData
 	friend Deserializer &operator >> (Deserializer &deserializer, BlockData &data);
 };
 
-class Chunk: public ISceneNode, public ITriangleSelector
+class Chunk: public ISceneNode
 {
 public:
 	enum class Status: int { DataLoading, DataLoaded, LightLoading, LightLoaded, BufferLoading, FullLoaded };
@@ -52,32 +52,7 @@ public:
 	virtual const aabbox3df &getBoundingBox() const override { return boundingBox; }
 	virtual void render() override;
 	
-	/* ITriangleSelector */
-	virtual ISceneNode *getSceneNodeForTriangle(u32 triangleIndex) const override { return (ISceneNode *) this; }
-	virtual ITriangleSelector *getSelector(u32 index) override { return this; }
-	virtual const ITriangleSelector *getSelector(u32 index) const override { return this; }
-	virtual u32 getSelectorCount() const { return 1; }
-	virtual s32 getTriangleCount() const override;
-	virtual void getTriangles(
-		triangle3df *triangles,
-		s32 arraySize,
-		s32 &outTriangleCount,
-		const matrix4 *transform = nullptr
-	) const override;
-	virtual void getTriangles(
-		triangle3df *triangles,
-		s32 arraySize,
-		s32 &outTriangleCount,
-		const aabbox3df &box,
-		const matrix4 *transform = nullptr
-	) const override;
-	virtual void getTriangles(
-		triangle3df *triangles,
-		s32 arraySize,
-		s32 &outTriangleCount,
-		const line3df &line,
-		const matrix4 *transform = nullptr
-	) const override;
+	void getTriangles(triangle3df *triangles, s32 arraySize, s32 &outTriangleCount, const aabbox3df &box, const matrix4 &transform) const;
 
 private:
 	void generate();

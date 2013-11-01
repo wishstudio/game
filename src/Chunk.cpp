@@ -296,43 +296,13 @@ void Chunk::loadBuffer()
 	status = Status::FullLoaded;
 }
 
-s32 Chunk::getTriangleCount() const
-{
-	world->ensureChunkBufferLoaded((Chunk *) this);
-	return collector.getTriangleCount();
-}
-
-/* Gets all triangles */
-void Chunk::getTriangles(
-	triangle3df *triangles,
-	s32 arraySize,
-	s32 &outTriangleCount,
-	const matrix4 *transform) const
-{
-	world->ensureChunkBufferLoaded((Chunk *) this);
-
-	matrix4 mat;
-	if (transform)
-		mat = *transform;
-	mat *= getAbsoluteTransformation();
-
-	outTriangleCount = min(arraySize, getTriangleCount());
-	for (auto it = collector.begin(); it != collector.end(); it++)
-	{
-		u32 i = it - collector.begin();
-		mat.transformVect(triangles[i].pointA, it->pointA);
-		mat.transformVect(triangles[i].pointB, it->pointB);
-		mat.transformVect(triangles[i].pointC, it->pointC);
-	}
-}
-
 /* Gets all triangles which have or may have contact within a specific bounding box */
 void Chunk::getTriangles(
 	triangle3df *triangles,
 	s32 arraySize,
 	s32 &outTriangleCount,
 	const aabbox3df &box,
-	const matrix4 *transform) const
+	const matrix4 &transform) const
 {
 	world->ensureChunkBufferLoaded((Chunk *) this);
 
@@ -341,11 +311,7 @@ void Chunk::getTriangles(
 	getAbsoluteTransformation().getInverse(mat);
 	mat.transformBoxEx(tBox);
 
-	if (transform)
-		mat = *transform;
-	else
-		mat.makeIdentity();
-	mat *= getAbsoluteTransformation();
+	mat = transform * getAbsoluteTransformation();
 
 	s32 triangleCount = 0;
 
@@ -372,21 +338,4 @@ void Chunk::getTriangles(
 
 done:
 	outTriangleCount = triangleCount;
-}
-
-/* Gets all triangles which have or may have contact with a 3d line */
-void Chunk::getTriangles(
-	triangle3df *triangles,
-	s32 arraySize,
-	s32 &outTriangleCount,
-	const line3df &line,
-	const matrix4 *transform) const
-{
-	world->ensureChunkBufferLoaded((Chunk *) this);
-
-	aabbox3df box(line.start);
-	box.addInternalPoint(line.end);
-
-	/* TODO: Could be optimized for line a little bit more. */
-	getTriangles(triangles, arraySize, outTriangleCount, box, transform);
 }

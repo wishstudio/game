@@ -89,7 +89,7 @@ void PlayerAnimator::tick()
 			{
 				Chunk *chunk = world->getChunk(x + basex, y + basey, z + basez);
 				int outCount;
-				chunk->getTriangles(triangles + count, ARRAY_SIZE - count, outCount, box, &transform);
+				chunk->getTriangles(triangles + count, ARRAY_SIZE - count, outCount, box, transform);
 				count += outCount;
 			}
 
