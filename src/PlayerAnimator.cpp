@@ -8,7 +8,7 @@
 
 PlayerAnimator::PlayerAnimator()
 {
-	nextPosition = { 0, 5, 0 };
+	nextPosition = { 0, 10, 0 };
 	nextVelocity = { 0, 0, 0 };
 }
 
@@ -18,6 +18,9 @@ PlayerAnimator::~PlayerAnimator()
 
 void PlayerAnimator::tick()
 {
+	/* Player definition */
+	vector3df playerRadius = { 0.48f, 1.9f, 0.48f };
+
 	/* Update current values */
 	vector3df currentVelocity = nextVelocity;
 	currentPosition = nextPosition;
@@ -33,25 +36,26 @@ void PlayerAnimator::tick()
 	if (eventReceiver->isKeyDown(KEY_KEY_W))
 		nextVelocity += forwardVec * MOVE_SPEED;
 	if (eventReceiver->isKeyDown(KEY_KEY_S))
-		nextVelocity += forwardVec * -MOVE_SPEED;
+		nextVelocity -= forwardVec * MOVE_SPEED;
 	if (eventReceiver->isKeyDown(KEY_KEY_A))
 		nextVelocity += leftVec * MOVE_SPEED;
 	if (eventReceiver->isKeyDown(KEY_KEY_D))
-		nextVelocity += leftVec * -MOVE_SPEED;
+		nextVelocity -= leftVec * MOVE_SPEED;
+	
+	/* Add gravity */
+	nextVelocity += vector3df(0, -100, 0) * seconds<f32>(TICK_DURATION);
 
-	nextVelocity += { 0, -1, 0 };
 
 	/* Update next position */
-	const f32 playerRadius = .5f;
-	const vector3df moveVector = currentVelocity * seconds<f32>(TICK_DURATION);
-	aabbox3df box(currentPosition - moveVector.getLength() - playerRadius);
-	box.addInternalPoint(currentPosition + moveVector.getLength() + playerRadius);
-
 	/* Gather relevant triangles for collision detection
-	In general, we need 2x2x2 chunks for collision detection.
-	For axis x, if our x coordinate is less than 50% of current chunk,
-	we test for chunk [x - 1] and [x], otherwise we test [x] and [x + 1].
-	The same applies for axis y and z. */
+	 * In general, we need 2x2x2 chunks for collision detection.
+	 * For axis x, if our x coordinate is less than 50% of current chunk,
+	 * we test for chunk [x - 1] and [x], otherwise we test [x] and [x + 1].
+	 * The same applies for axis y and z. */
+	vector3df moveVector = currentVelocity * seconds<f32>(TICK_DURATION);
+	aabbox3df box(currentPosition - playerRadius, currentPosition + playerRadius);
+	box.addInternalPoint(currentPosition + moveVector - playerRadius);
+	box.addInternalPoint(currentPosition + moveVector + playerRadius);
 
 	/* Calculating base coordinates */
 	f32 fx = currentPosition.X / CHUNK_SIZE;
@@ -66,23 +70,37 @@ void PlayerAnimator::tick()
 	basey = (fy - basey < .5f) ? basey - 1 : basey;
 	basez = (fz - basez < .5f) ? basez - 1 : basez;
 
+	/* Transform matrix */
+	matrix4 translation = matrix4(matrix4::EM4CONST_IDENTITY).setInverseTranslation(currentPosition);
+	matrix4 scale = matrix4(matrix4::EM4CONST_IDENTITY);
+	scale.setScale({ 1.f / playerRadius.X, 1.f / playerRadius.Y, 1.f / playerRadius.Z });
+
+	matrix4 transform = scale * translation;
+	matrix4 invTransform(matrix4::EM4CONST_NOTHING);
+	transform.getInverse(invTransform);
+
+	/* Collect triangles */
 	const int ARRAY_SIZE = 65536;
 	auto triangles = new triangle3df[ARRAY_SIZE];
 	int count = 0;
-
-	/* Collect triangles */
 	for (int x = 0; x <= 1; x++)
 		for (int y = 0; y <= 1; y++)
 			for (int z = 0; z <= 1; z++)
 			{
 				Chunk *chunk = world->getChunk(x + basex, y + basey, z + basez);
 				int outCount;
-				chunk->getTriangles(triangles + count, ARRAY_SIZE - count, outCount, box);
+				chunk->getTriangles(triangles + count, ARRAY_SIZE - count, outCount, box, &transform);
 				count += outCount;
 			}
 
+	/* Transform vectors to ellipsoid coordinate system */
+	scale.transformVect(moveVector);
+	transform.transformVect(nextPosition);
+	/* From now on, nextPosition is transformed position, currentPosition is not transformed */
+	/* Note the sphere is unit sphere */
+
 	/* Collision update loop */
-	vector3df vn(currentVelocity);
+	vector3df vn(moveVector);
 	vn.normalize();
 	f32 remainDistance = moveVector.getLength();
 	for (int depth = 0; depth < 5; depth++) /* Do sliding at most 5 times */
@@ -103,7 +121,7 @@ void PlayerAnimator::tick()
 			/* Sphere intersection point
 			 * The potential intersection point on the sphere
 			 */
-			vector3df sphereIntersection = nextPosition + normal * playerRadius;
+			vector3df sphereIntersection = nextPosition + normal; /* We have unit sphere */
 
 			/* Plane intersection point
 			 * The potential intersection point on the plane the triangle reside on
@@ -124,7 +142,7 @@ void PlayerAnimator::tick()
 					planeIntersection = triangles[i].closestPointOnTriangle(planeIntersection);
 
 					/* Reverse intersecting the sphere */
-					if (!rayIntersectsWithSphere(planeIntersection, invertedVelocity, nextPosition, playerRadius, distance))
+					if (!rayIntersectsWithSphere(planeIntersection, invertedVelocity, nextPosition, 1, distance))
 						continue;
 				}
 
@@ -158,10 +176,14 @@ void PlayerAnimator::tick()
 			break;
 	}
 	delete triangles;
+
+	/* Transform back to world coordinate system */
+	invTransform.transformVect(nextPosition);
 }
 
 void PlayerAnimator::update()
 {
+	/* Interpolate camera position for smooth rendering */
 	vector3df position(currentPosition);
 	vector3df diffVec(nextPosition - currentPosition);
 	position += diffVec * (seconds<f32>(timeManager->getRemainingTickDuration()) / seconds<f32>(TICK_DURATION));
