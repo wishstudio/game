@@ -12,4 +12,6 @@ public:
 private:
 	vector3df currentPosition, nextPosition;
 	vector3df nextVelocity;
+	vector3df fallingVelocity;
+	bool falling;
 };

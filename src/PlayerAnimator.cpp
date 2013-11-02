@@ -8,8 +8,10 @@
 
 PlayerAnimator::PlayerAnimator()
 {
-	nextPosition = { 0, 10, 0 };
+	nextPosition = { 0, 50, 0 };
 	nextVelocity = { 0, 0, 0 };
+	fallingVelocity = { 0, 0, 0 };
+	falling = true;
 }
 
 PlayerAnimator::~PlayerAnimator()
@@ -26,12 +28,13 @@ void PlayerAnimator::tick()
 	currentPosition = nextPosition;
 
 	/* Update next velocity */
-	const int MOVE_SPEED = 10;
+	const int MOVE_SPEED = 8;
 	nextVelocity = { 0, 0, 0 };
 	vector3df forwardVec(camera->getTarget() - camera->getPosition());
 	forwardVec.Y = 0;
 	forwardVec.normalize();
 	vector3df leftVec = forwardVec.crossProduct({ 0, 1, 0 });
+
 
 	if (eventReceiver->isKeyDown(KEY_KEY_W))
 		nextVelocity += forwardVec * MOVE_SPEED;
@@ -41,9 +44,19 @@ void PlayerAnimator::tick()
 		nextVelocity += leftVec * MOVE_SPEED;
 	if (eventReceiver->isKeyDown(KEY_KEY_D))
 		nextVelocity -= leftVec * MOVE_SPEED;
+	if (!falling)
+		if (eventReceiver->isKeyDown(KEY_SPACE)) {
+			fallingVelocity = vector3df(0, 100 + playerRadius.Y * 80, 0) * seconds<f32>(TICK_DURATION);
+			falling = true;
+		}
+		else
+			fallingVelocity = { 0, 0, 0 };
+
+	falling = true;
 	
+	fallingVelocity += vector3df(0, - 100, 0) * seconds<f32>(TICK_DURATION);
 	/* Add gravity */
-	nextVelocity += vector3df(0, -100, 0) * seconds<f32>(TICK_DURATION);
+	nextVelocity += fallingVelocity;
 
 
 	/* Update next position */
@@ -108,7 +121,7 @@ void PlayerAnimator::tick()
 
 		vector3df invertedVelocity(vn);
 		invertedVelocity.invert();
-		for (const triangle3df triangle: triangles)
+		for (const triangle3df triangle : triangles)
 		{
 			if (!triangle.isFrontFacing(vn))
 				continue;
@@ -159,7 +172,7 @@ void PlayerAnimator::tick()
 
 		if (remainDistance < veryCloseDistance)
 			break;
-		
+
 		/* Sliding plane
 		 * Origin is the point of plane intersection
 		 * Normal is from the intersection point to the center of the sphere
@@ -169,12 +182,19 @@ void PlayerAnimator::tick()
 		vector3df slideVector = remainVector + snormal * snormal.dotProduct(-remainVector);
 		remainDistance = slideVector.getLength();
 		vn = slideVector.normalize();
-		if (remainDistance < veryCloseDistance)
+		if (remainDistance < veryCloseDistance) 
 			break;
 	}
 
 	/* Transform back to world coordinate system */
 	invTransform.transformVect(nextPosition);
+
+	/* Check if standing on the ground*/
+
+	if (world->getBlock((int)floor(nextPosition.X),
+		(int)floor(nextPosition.Y - playerRadius.Y - .5),
+		(int)floor(nextPosition.Z)).isSolid())
+		falling = false;
 }
 
 void PlayerAnimator::update()
