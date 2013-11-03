@@ -19,7 +19,7 @@ void SceneManager::update()
 	int chunk_x = floor(position.X / CHUNK_SIZE);
 	int chunk_y = floor(position.Y / CHUNK_SIZE);
 	int chunk_z = floor(position.Z / CHUNK_SIZE);
-	const int PRELOAD_DISTANCE = 5; /* TODO */
+	const int PRELOAD_DISTANCE = 10; /* TODO */
 	for (int d = 0; d <= PRELOAD_DISTANCE; d++)
 		for (int x = chunk_x - d; x <= chunk_x + d; x++)
 			for (int y = chunk_y - d; y <= chunk_y + d; y++)
