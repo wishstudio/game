@@ -10,8 +10,9 @@ public:
 	void update();
 
 private:
+	static vector3df collideEllipsoidWithWorld(vector3df currentPosition, vector3df moveVector, bool canSlide, bool &collided);
+
 	vector3df currentPosition, nextPosition;
-	vector3df nextVelocity;
-	vector3df fallingVelocity;
-	bool falling;
+	f32 nextVerticalVelocity, nextVerticalDistance;
+	bool nextFalling;
 };

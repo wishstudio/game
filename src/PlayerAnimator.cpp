@@ -6,12 +6,14 @@
 #include "TimeManager.h"
 #include "World.h"
 
+static const vector3df playerRadius = { 0.48f, 1.9f, 0.48f };
+static const f32 veryCloseDistance = 0.0001;
+
 PlayerAnimator::PlayerAnimator()
 {
-	nextPosition = { 0, 50, 0 };
-	nextVelocity = { 0, 0, 0 };
-	fallingVelocity = { 0, 0, 0 };
-	falling = true;
+	nextPosition = { 0, 100, 0 };
+	nextVerticalVelocity = 0;
+	nextFalling = true;
 }
 
 PlayerAnimator::~PlayerAnimator()
@@ -20,71 +22,56 @@ PlayerAnimator::~PlayerAnimator()
 
 void PlayerAnimator::tick()
 {
-	/* Player definition */
-	const vector3df playerRadius = { 0.48f, 1.9f, 0.48f };
-
 	/* Update current values */
-	vector3df currentVelocity = nextVelocity;
+	vector3df currentDistance = { 0, 0, 0 };
+	f32 currentVerticalVelocity = nextVerticalVelocity;
+	f32 currentVerticalDistance = nextVerticalDistance;
 	currentPosition = nextPosition;
+	bool currentFalling = nextFalling;
 
 	/* Update next velocity */
-	const int MOVE_SPEED = 8;
-	nextVelocity = { 0, 0, 0 };
+	const f32 MOVE_SPEED = 6 * seconds<f32>(TICK_DURATION);
 	vector3df forwardVec(camera->getTarget() - camera->getPosition());
 	forwardVec.Y = 0;
 	forwardVec.normalize();
 	vector3df leftVec = forwardVec.crossProduct({ 0, 1, 0 });
 
-
 	if (eventReceiver->isKeyDown(KEY_KEY_W))
-		nextVelocity += forwardVec * MOVE_SPEED;
+		currentDistance += forwardVec * MOVE_SPEED;
 	if (eventReceiver->isKeyDown(KEY_KEY_S))
-		nextVelocity -= forwardVec * MOVE_SPEED;
+		currentDistance -= forwardVec * MOVE_SPEED;
 	if (eventReceiver->isKeyDown(KEY_KEY_A))
-		nextVelocity += leftVec * MOVE_SPEED;
+		currentDistance += leftVec * MOVE_SPEED;
 	if (eventReceiver->isKeyDown(KEY_KEY_D))
-		nextVelocity -= leftVec * MOVE_SPEED;
-	if (!falling)
-		if (eventReceiver->isKeyDown(KEY_SPACE)) {
-			fallingVelocity = vector3df(0, 100 + playerRadius.Y * 80, 0) * seconds<f32>(TICK_DURATION);
-			falling = true;
-		}
+		currentDistance -= leftVec * MOVE_SPEED;
+	if (currentFalling)
+		/* Add gravity */
+		nextVerticalVelocity -= 9.8 * 2 * seconds<f32>(TICK_DURATION);
+	else
+	{
+		if (eventReceiver->isKeyDown(KEY_SPACE))
+			nextVerticalVelocity = 9.8;
 		else
-			fallingVelocity = { 0, 0, 0 };
+			nextVerticalVelocity = 0;
+	}
+	nextVerticalDistance = (currentVerticalVelocity + nextVerticalVelocity) * seconds<f32>(TICK_DURATION) / 2;
 
-	falling = true;
-	
-	fallingVelocity += vector3df(0, - 100, 0) * seconds<f32>(TICK_DURATION);
-	/* Add gravity */
-	nextVelocity += fallingVelocity;
+	/* Collision detection */
+	bool collided;
+	nextPosition = collideEllipsoidWithWorld(nextPosition, currentDistance, true, collided);
+	f32 originalY = nextPosition.Y;
+	nextPosition = collideEllipsoidWithWorld(nextPosition, currentVerticalDistance * vector3df(0, 1, 0), false, collided);
 
+	/* Check if we are stadning on the ground */
+	nextFalling = !(currentVerticalDistance < ROUNDING_ERROR_f32 && collided);
+}
 
-	/* Update next position */
-	/* Gather relevant triangles for collision detection
-	 * In general, we need 2x2x2 chunks for collision detection.
-	 * For axis x, if our x coordinate is less than 50% of current chunk,
-	 * we test for chunk [x - 1] and [x], otherwise we test [x] and [x + 1].
-	 * The same applies for axis y and z. */
-	vector3df moveVector = currentVelocity * seconds<f32>(TICK_DURATION);
-	aabbox3df box(currentPosition - playerRadius, currentPosition + playerRadius);
-	box.addInternalPoint(currentPosition + moveVector - playerRadius);
-	box.addInternalPoint(currentPosition + moveVector + playerRadius);
-
-	/* Calculating base coordinates */
-	f32 fx = currentPosition.X / CHUNK_SIZE;
-	f32 fy = currentPosition.Y / CHUNK_SIZE;
-	f32 fz = currentPosition.Z / CHUNK_SIZE;
-
-	int basex = (int) floor(fx);
-	int basey = (int) floor(fy);
-	int basez = (int) floor(fz);
-
-	basex = (fx - basex < .5f) ? basex - 1 : basex;
-	basey = (fy - basey < .5f) ? basey - 1 : basey;
-	basez = (fz - basez < .5f) ? basez - 1 : basez;
+vector3df PlayerAnimator::collideEllipsoidWithWorld(vector3df position, vector3df moveVector, bool canSlide, bool &collided)
+{
+	collided = false;
 
 	/* Transform matrix */
-	matrix4 translation = matrix4(matrix4::EM4CONST_IDENTITY).setInverseTranslation(currentPosition);
+	matrix4 translation = matrix4(matrix4::EM4CONST_IDENTITY).setInverseTranslation(position);
 	matrix4 scale = matrix4(matrix4::EM4CONST_IDENTITY);
 	scale.setScale({ 1.f / playerRadius.X, 1.f / playerRadius.Y, 1.f / playerRadius.Z });
 
@@ -92,24 +79,46 @@ void PlayerAnimator::tick()
 	matrix4 invTransform(matrix4::EM4CONST_NOTHING);
 	transform.getInverse(invTransform);
 
+	/* Update next position */
+	/* Gather relevant triangles for collision detection
+	* In general, we need 2x2x2 chunks for collision detection.
+	* For axis x, if our x coordinate is less than 50% of current chunk,
+	* we test for chunk [x - 1] and [x], otherwise we test [x] and [x + 1].
+	* The same applies for axis y and z. */
+	aabbox3df box(position - playerRadius, position + playerRadius);
+	box.addInternalPoint(position + moveVector - playerRadius);
+	box.addInternalPoint(position + moveVector + playerRadius);
+
+	/* Calculating base coordinates */
+	f32 fx = position.X / CHUNK_SIZE;
+	f32 fy = position.Y / CHUNK_SIZE;
+	f32 fz = position.Z / CHUNK_SIZE;
+
+	int basex = (int)floor(fx);
+	int basey = (int)floor(fy);
+	int basez = (int)floor(fz);
+
+	basex = (fx - basex < .5f) ? basex - 1 : basex;
+	basey = (fy - basey < .5f) ? basey - 1 : basey;
+	basez = (fz - basez < .5f) ? basez - 1 : basez;
+
 	/* Collect triangles */
 	std::vector<triangle3df> triangles;
 	for (int x = 0; x <= 1; x++)
-		for (int y = 0; y <= 1; y++)
-			for (int z = 0; z <= 1; z++)
-			{
-				Chunk *chunk = world->getChunk(x + basex, y + basey, z + basez);
-				int outCount;
-				chunk->getTriangles(triangles, box, transform);
-			}
+	for (int y = 0; y <= 1; y++)
+	for (int z = 0; z <= 1; z++)
+	{
+		Chunk *chunk = world->getChunk(x + basex, y + basey, z + basez);
+		int outCount;
+		chunk->getTriangles(triangles, box, transform);
+	}
 
 	/* Transform vectors to ellipsoid coordinate system */
 	scale.transformVect(moveVector);
-	transform.transformVect(nextPosition);
+	transform.transformVect(position);
 	/* From now on, nextPosition is transformed position, currentPosition is not transformed */
 	/* Note the sphere is unit sphere */
 
-	/* Collision update loop */
 	vector3df vn(moveVector);
 	vn.normalize();
 	f32 remainDistance = moveVector.getLength();
@@ -131,7 +140,7 @@ void PlayerAnimator::tick()
 			/* Sphere intersection point
 			 * The potential intersection point on the sphere
 			 */
-			vector3df sphereIntersection = nextPosition + normal; /* We have unit sphere */
+			vector3df sphereIntersection = position + normal; /* We have unit sphere */
 
 			/* Plane intersection point
 			 * The potential intersection point on the plane the triangle reside on
@@ -152,12 +161,13 @@ void PlayerAnimator::tick()
 					planeIntersection = triangle.closestPointOnTriangle(planeIntersection);
 
 					/* Reverse intersecting the sphere */
-					if (!rayIntersectsWithSphere(planeIntersection, invertedVelocity, nextPosition, 1, distance))
+					if (!rayIntersectsWithSphere(planeIntersection, invertedVelocity, position, 1, distance))
 						continue;
 				}
 
-				if (distance < minDistance)
+				if (distance <= minDistance)
 				{
+					collided = true;
 					minDistance = distance;
 					minPlaneIntersection = planeIntersection;
 				}
@@ -165,36 +175,32 @@ void PlayerAnimator::tick()
 		}
 		/* Move */
 		/* Do not touch the triangle exactly for a tolerance of floating point errors */
-		const f32 veryCloseDistance = 0.0001;
-		nextPosition += vn * (minDistance - veryCloseDistance);
+		position += vn * (minDistance - veryCloseDistance);
 		remainDistance -= (minDistance - veryCloseDistance);
 		minPlaneIntersection -= vn * veryCloseDistance;
 
 		if (remainDistance < veryCloseDistance)
 			break;
 
+		if (!canSlide)
+			break;
+
 		/* Sliding plane
 		 * Origin is the point of plane intersection
 		 * Normal is from the intersection point to the center of the sphere
 		 */
-		vector3df snormal = (nextPosition - minPlaneIntersection).normalize();
+		vector3df snormal = (position - minPlaneIntersection).normalize();
 		vector3df remainVector = vn * remainDistance;
 		vector3df slideVector = remainVector + snormal * snormal.dotProduct(-remainVector);
 		remainDistance = slideVector.getLength();
 		vn = slideVector.normalize();
-		if (remainDistance < veryCloseDistance) 
+		if (remainDistance < veryCloseDistance)
 			break;
 	}
-
 	/* Transform back to world coordinate system */
-	invTransform.transformVect(nextPosition);
+	invTransform.transformVect(position);
 
-	/* Check if standing on the ground*/
-
-	if (world->getBlock((int)floor(nextPosition.X),
-		(int)floor(nextPosition.Y - playerRadius.Y - .5),
-		(int)floor(nextPosition.Z)).isSolid())
-		falling = false;
+	return position;
 }
 
 void PlayerAnimator::update()
