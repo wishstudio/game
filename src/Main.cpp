@@ -118,13 +118,24 @@ int main()
 			int fps = driver->getFPS();
 			vector3df position = camera->getPosition();
 			stringw s;
-			s = s + "(";
+			s += "POS";
+			s += "(";
 			s += position.X;
 			s += ", ";
 			s += position.Y;
 			s += ", ";
 			s += position.Z;
 			s += ") ";
+			if (info) {
+				s += "PT";
+				s += "(";
+				s += info->block.x();
+				s += ", ";
+				s += info->block.y();
+				s += ", ";
+				s += info->block.z();
+				s += ") ";
+			}
 			s += "FPS: ";
 			s += fps;
 			s += ", ";
