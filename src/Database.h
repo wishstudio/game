@@ -1,6 +1,7 @@
 #pragma once
 
 struct sqlite3;
+struct sqlite3_stmt;
 class Chunk;
 class Database
 {
@@ -13,7 +14,8 @@ public:
 	
 	void beginTransaction();
 	void commitTransaction();
-
+	
 private:
 	sqlite3 *db;
+	sqlite3_stmt *chunkLoadStatement, *chunkSaveStatement;
 };
