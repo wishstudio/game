@@ -50,8 +50,6 @@ int main()
 	blockType->registerCube(3, "dirtroad.png");
 	SceneManager *sceneManager = new SceneManager();
 	PlayerAnimator *playerAnimator = new PlayerAnimator();
-
-	u16 handItem = 1;
 	
 	bool lastLeftMouseDown = false, lastRightMouseDown = false;
 	while (device->run())
@@ -91,10 +89,8 @@ int main()
 				driver->draw3DBox(box, SColor(255, 255, 0, 0));
 				if (leftMousePressed)
 					info->block.setType(0);
-				if (rightMousePressed) {
-					handItem = shortcutIUI.getCurrentItem();
-					info->block.getNeighbour(oppositeDirection(info->direction)).setType(handItem);
-				}
+				if (rightMousePressed)
+					info->block.getNeighbour(oppositeDirection(info->direction)).setType(shortcutIUI.getCurrentItem());
 			}
 			while (timeManager->tick())
 			{
