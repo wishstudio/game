@@ -17,8 +17,6 @@ public:
 	World();
 	virtual ~World();
 
-	void lock();
-	void unlock();
 	void update();
 	void tick();
 
@@ -46,7 +44,6 @@ private:
 
 	Concurrency::concurrent_unordered_map<std::tuple<int, int, int>, Chunk *> chunks;
 	std::mutex chunksHashMutex;
-	std::mutex worldMutex;
 
 	Concurrency::concurrent_queue<Chunk *> loadQueue;
 	std::vector<std::thread> workerThreads;

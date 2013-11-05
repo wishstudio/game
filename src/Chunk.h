@@ -57,7 +57,7 @@ private:
 	void generate();
 	void invalidateLight();
 
-	std::mutex bufferMutex;
+	std::mutex accessMutex;
 	std::atomic<Status> status;
 	std::atomic<bool> inQueue;
 	int chunk_x, chunk_y, chunk_z;

@@ -78,6 +78,7 @@ u16 Block::getType() const
 
 void Block::setType(u16 type)
 {
+	std::lock_guard<std::mutex> lock(chunk->accessMutex);
 	data->type = type;
 	chunk->setDirty(in_x, in_y, in_z);
 }
@@ -94,18 +95,21 @@ u8 Block::getParam2() const
 
 void Block::setParam1(u8 param1)
 {
+	std::lock_guard<std::mutex> lock(chunk->accessMutex);
 	data->param1 = param1;
 	chunk->setDirty(in_x, in_y, in_z);
 }
 
 void Block::setParam2(u8 param2)
 {
+	std::lock_guard<std::mutex> lock(chunk->accessMutex);
 	data->param2 = param2;
 	chunk->setDirty(in_x, in_y, in_z);
 }
 
 void Block::setParam(u8 param1, u8 param2)
 {
+	std::lock_guard<std::mutex> lock(chunk->accessMutex);
 	data->param1 = param1;
 	data->param2 = param2;
 	chunk->setDirty(in_x, in_y, in_z);

@@ -90,14 +90,7 @@ void Chunk::generate()
 void Chunk::setDirty(int x, int y, int z)
 {
 	dirty = true;
-	for (int offsetX = -1; offsetX <= 1; offsetX++)
-		for (int offsetY = -1; offsetY <= 1; offsetY++)
-			for (int offsetZ = -1; offsetZ <= 1; offsetZ++)
-			{
-				Chunk *chunk = world->tryGetChunk(chunk_x + offsetX, chunk_y + offsetY, chunk_z + offsetZ);
-				if (chunk)
-					chunk->invalidateLight();
-			}
+	invalidateLight();
 }
 
 void Chunk::invalidateLight()
@@ -141,7 +134,7 @@ void Chunk::OnRegisterSceneNode()
 
 void Chunk::render()
 {
-	std::lock_guard<std::mutex> lock(bufferMutex);
+	std::lock_guard<std::mutex> lock(accessMutex);
 	driver->setTransform(ETS_WORLD, AbsoluteTransformation);
 	for (u32 i = 0; i < collector.getBufferCount(); i++)
 	{
@@ -165,6 +158,10 @@ void Chunk::loadData()
 	if (status >= Status::Data)
 		return;
 
+	std::lock_guard<std::mutex> lock(accessMutex);
+	if (status >= Status::Data) /* Double check */
+		return;
+
 	if (database->loadChunk(this))
 		dirty = false;
 	else
@@ -179,8 +176,27 @@ void Chunk::loadLight()
 {
 	if (status >= Status::Light)
 		return;
-	if (status < Status::Data)
-		loadData();
+
+	bool atTop = chunk_y > 5;
+	if (!atTop)
+	{
+		Chunk *chunk = world->getChunk(chunk_x, chunk_y + 1, chunk_z);
+		if (chunk->getStatus() < Status::Light)
+			chunk->loadLight();
+	}
+
+	/* Lock surrounding chunks */
+	std::vector<std::unique_lock<std::mutex>> locks;
+	for (int x = -1; x <= 1; x++)
+		for (int y = -1; y <= 1; y++)
+			for (int z = -1; z <= 1; z++)
+			{
+				Chunk *chunk = world->tryGetChunk(chunk_x + x, chunk_y + y, chunk_z + z);
+				if (chunk)
+					locks.push_back(std::unique_lock<std::mutex>(chunk->accessMutex));
+			}
+	if (status >= Status::Light) /* Double check */
+		return;
 
 	/* Clear sunlight */
 	for (int x = 0; x < CHUNK_SIZE; x++)
@@ -188,7 +204,7 @@ void Chunk::loadLight()
 			for (int z = 0; z < CHUNK_SIZE; z++)
 				blocks[x][y][z].sunlight = 0;
 	/* Propagate sunlight */
-	if (chunk_y > 5)
+	if (atTop)
 	{
 		/* Above chunk not exist */
 		for (int x = 0; x < CHUNK_SIZE; x++)
@@ -200,8 +216,6 @@ void Chunk::loadLight()
 	{
 		/* Propagate from above chunk */
 		Chunk *chunk = world->getChunk(chunk_x, chunk_y + 1, chunk_z);
-		if (chunk->getStatus() < Status::Light)
-			chunk->loadLight();
 		for (int x = 0; x < CHUNK_SIZE; x++)
 			for (int z = 0; z < CHUNK_SIZE; z++)
 				if (blockType->isLightTransparent(blocks[x][CHUNK_SIZE - 1][z].type)
@@ -287,7 +301,7 @@ void Chunk::loadBuffer()
 					chunk->loadLight();
 			}
 	
-	std::lock_guard<std::mutex> lock(bufferMutex);
+	std::lock_guard<std::mutex> lock(accessMutex);
 	/* Double check */
 	if (status >= Status::Buffer)
 		return;
@@ -303,8 +317,9 @@ void Chunk::loadBuffer()
 /* Gets all triangles which have or may have contact within a specific bounding box */
 void Chunk::getTriangles(std::vector<triangle3df> &triangles, const aabbox3df &box, const matrix4 &transform)
 {
-	if (status < Status::Buffer)
-		loadBuffer();
+	loadData();
+	loadLight();
+	loadBuffer();
 
 	matrix4 mat(matrix4::EM4CONST_NOTHING);
 	aabbox3df tBox(box);

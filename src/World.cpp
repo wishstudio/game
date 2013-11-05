@@ -8,7 +8,9 @@
 World::World()
 {
 	shouldStop = false;
-	workerThreads.push_back(std::thread(&World::run, this));
+	u32 cnt = std::thread::hardware_concurrency();
+	for (u32 i = 0; i < cnt; i++)
+		workerThreads.push_back(std::thread(&World::run, this));
 }
 
 World::~World()
@@ -22,16 +24,6 @@ World::~World()
 	}
 	for (std::thread &thread : workerThreads)
 		thread.join();
-}
-
-void World::lock()
-{
-	worldMutex.lock();
-}
-
-void World::unlock()
-{
-	worldMutex.unlock();
 }
 
 void World::update()
@@ -141,7 +133,6 @@ void World::run()
 		{
 			chunk->setInQueue(false);
 			Chunk::Status status = chunk->getStatus();
-			std::lock_guard<std::mutex> lock(worldMutex);
 			if (status < Chunk::Status::Data)
 				chunk->loadData();
 			if (status < Chunk::Status::Light)
