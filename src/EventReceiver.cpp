@@ -58,7 +58,7 @@ bool EventReceiver::OnEvent(const SEvent &event)
 	return false;
 }
 
-void EventReceiver::tick()
+void EventReceiver::update()
 {
 	memset(keyIsPressed, 0, sizeof keyIsPressed);
 }

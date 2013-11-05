@@ -95,7 +95,6 @@ int main()
 			{
 				world->tick();
 				playerAnimator->tick();
-				eventReceiver->tick();
 			}
 			world->update();
 			world->save();
@@ -104,6 +103,7 @@ int main()
 			smgr->drawAll();
 
 			shortcutIUI.show();
+			eventReceiver->update();
 			driver->draw2DLine(vector2d<s32>(driver->getScreenSize().Width / 2 - 10, driver->getScreenSize().Height / 2),
 			vector2d<s32>(driver->getScreenSize().Width / 2 + 10, driver->getScreenSize().Height / 2), SColor(255, 255, 255, 255));
 			driver->draw2DLine(vector2d<s32>(driver->getScreenSize().Width / 2, driver->getScreenSize().Height / 2 - 10),

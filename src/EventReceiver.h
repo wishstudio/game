@@ -8,7 +8,7 @@ public:
 
 	virtual bool OnEvent(const SEvent &event) override;
 	
-	void tick();
+	void update();
 	bool isLeftButtonDown() const { return leftButtonDown; }
 	bool isRightButtonDown() const { return rightButtonDown; }
 	bool isKeyDown(EKEY_CODE keyCode) const { return keyIsDown[keyCode]; }
