@@ -20,7 +20,7 @@ public:
 	void update();
 	void tick();
 
-	void asyncDeleteBuffer(IMeshBuffer *buffer);
+	void asyncDeleteTriangleCollector(TriangleCollector *collector);
 
 	u32 getLoadedChunkCount() const { return chunks.size(); }
 	void save();
@@ -40,7 +40,7 @@ public:
 private:
 	void run();
 
-	Concurrency::concurrent_queue<IMeshBuffer *> bufferDeleteQueue;
+	Concurrency::concurrent_queue<TriangleCollector *> triangleCollectorDeleteQueue;
 
 	Concurrency::concurrent_unordered_map<std::tuple<int, int, int>, Chunk *> chunks;
 	std::mutex chunksHashMutex;

@@ -33,7 +33,10 @@ SMeshBuffer *TriangleCollector::getBuffer(ITexture *texture)
 void TriangleCollector::clear()
 {
 	for (IMeshBuffer *buffer : buffers)
-		world->asyncDeleteBuffer(buffer);
+	{
+		driver->removeHardwareBuffer(buffer);
+		buffer->drop();
+	}
 	buffers.clear();
 	textures.clear();
 	textureMap.clear();

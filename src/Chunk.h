@@ -62,7 +62,7 @@ private:
 	std::atomic<bool> inQueue;
 	int chunk_x, chunk_y, chunk_z;
 	bool dirty;
-	TriangleCollector collector;
+	std::atomic<TriangleCollector *> triangleCollector;
 	BlockData blocks[CHUNK_SIZE][CHUNK_SIZE][CHUNK_SIZE];
 	SMaterial material;
 	aabbox3df boundingBox;

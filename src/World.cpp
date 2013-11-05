@@ -31,12 +31,9 @@ void World::update()
 	/* Manually remove hardware-mapped mesh buffers
 	 * (Irrlicht does this in a badly way)
 	 */
-	IMeshBuffer *buffer;
-	while (bufferDeleteQueue.try_pop(buffer))
-	{
-		driver->removeHardwareBuffer(buffer);
-		buffer->drop();
-	}
+	TriangleCollector *collector;
+	while (triangleCollectorDeleteQueue.try_pop(collector))
+		delete collector;
 }
 
 void World::tick()
@@ -51,9 +48,9 @@ void World::save()
 	database->commitTransaction();
 }
 
-void World::asyncDeleteBuffer(IMeshBuffer *buffer)
+void World::asyncDeleteTriangleCollector(TriangleCollector *collector)
 {
-	bufferDeleteQueue.push(buffer);
+	triangleCollectorDeleteQueue.push(collector);
 }
 
 void World::asyncLoadChunk(Chunk *chunk)

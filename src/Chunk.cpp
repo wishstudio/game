@@ -24,6 +24,7 @@ Chunk::Chunk(int chunk_x, int chunk_y, int chunk_z)
 {
 	status = Status::Nothing;
 	inQueue = false;
+	triangleCollector = nullptr;
 
 	this->chunk_x = chunk_x;
 	this->chunk_y = chunk_y;
@@ -122,7 +123,7 @@ void Chunk::OnRegisterSceneNode()
 		if (isInViewRange())
 		{
 			/* If we can show something, show it */
-			if (collector.isValid())
+			if (triangleCollector.load() != nullptr)
 				SceneManager->registerNodeForRendering(this);
 			if (status < Status::Buffer)
 				world->asyncLoadChunk(this);
@@ -134,12 +135,12 @@ void Chunk::OnRegisterSceneNode()
 
 void Chunk::render()
 {
-	std::lock_guard<std::mutex> lock(accessMutex);
+	TriangleCollector *collector = triangleCollector.load();
 	driver->setTransform(ETS_WORLD, AbsoluteTransformation);
-	for (u32 i = 0; i < collector.getBufferCount(); i++)
+	for (u32 i = 0; i < collector->getBufferCount(); i++)
 	{
-		SMeshBuffer *buffer = collector.getBuffer(i);
-		material.setTexture(0, collector.getBufferTexture(i));
+		SMeshBuffer *buffer = collector->getBuffer(i);
+		material.setTexture(0, collector->getBufferTexture(i));
 		driver->setMaterial(material);
 		driver->drawMeshBuffer(buffer);
 	}
@@ -301,16 +302,21 @@ void Chunk::loadBuffer()
 					chunk->loadLight();
 			}
 	
-	std::lock_guard<std::mutex> lock(accessMutex);
 	/* Double check */
 	if (status >= Status::Buffer)
 		return;
-	collector.clear();
+	TriangleCollector *collector = new TriangleCollector();
 	for (int x = 0; x < CHUNK_SIZE; x++)
 		for (int y = 0; y < CHUNK_SIZE; y++)
 			for (int z = 0; z < CHUNK_SIZE; z++)
-				blockType->drawBlock(&collector, Block(this, x, y, z));
-	collector.finalize();
+				blockType->drawBlock(collector, Block(this, x, y, z));
+	collector->finalize();
+	
+	std::lock_guard<std::mutex> lock(accessMutex);
+	TriangleCollector *oldCollector = triangleCollector.exchange(collector);
+	if (oldCollector)
+		world->asyncDeleteTriangleCollector(oldCollector);
+
 	status = Status::Buffer;
 }
 
@@ -320,6 +326,8 @@ void Chunk::getTriangles(std::vector<triangle3df> &triangles, const aabbox3df &b
 	loadData();
 	loadLight();
 	loadBuffer();
+
+	TriangleCollector *collector = triangleCollector.load();
 
 	matrix4 mat(matrix4::EM4CONST_NOTHING);
 	aabbox3df tBox(box);
@@ -338,7 +346,7 @@ void Chunk::getTriangles(std::vector<triangle3df> &triangles, const aabbox3df &b
 		for (int y = y_min; y <= y_max; y++)
 			for (int z = z_min; z <= z_max; z++)
 			{
-				for (auto it = collector.blockBegin(x, y, z); it != collector.blockEnd(x, y, z); it++)
+				for (auto it = collector->blockBegin(x, y, z); it != collector->blockEnd(x, y, z); it++)
 				{
 					triangle3df triangle;
 					mat.transformVect(triangle.pointA, it->pointA);
