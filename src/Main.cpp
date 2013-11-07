@@ -2,10 +2,10 @@
 
 #include "BlockType.h"
 #include "Chunk.h"
+#include "ChunkSceneNode.h"
 #include "Database.h"
 #include "EventReceiver.h"
 #include "PlayerAnimator.h"
-#include "SceneManager.h"
 #include "ShortcutItemUI.h"
 #include "TileManager.h"
 #include "TimeManager.h"
@@ -48,8 +48,8 @@ int main()
 	blockType->registerCube(1, "stonepile.png");
 	blockType->registerCube(2, "magickaland.png");
 	blockType->registerCube(3, "dirtroad.png");
-	SceneManager *sceneManager = new SceneManager();
 	PlayerAnimator *playerAnimator = new PlayerAnimator();
+	chunkSceneNode = new ChunkSceneNode();
 	
 	bool lastLeftMouseDown = false, lastRightMouseDown = false;
 	while (device->run())
@@ -72,7 +72,6 @@ int main()
 				rightMousePressed = true;
 			lastRightMouseDown = eventReceiver->isRightButtonDown();
 
-			sceneManager->update();
 			World::CameraIntersectionInfo *info;
 			if (world->getCameraIntersection(line3df(camera->getPosition(), camera->getTarget()), &info))
 			{
@@ -151,7 +150,6 @@ int main()
 
 	device->drop(); /* Make sure references are released first */
 	delete playerAnimator;
-	delete sceneManager;
 	delete world;
 	delete timeManager;
 

@@ -15,7 +15,7 @@ struct BlockData
 	friend Deserializer &operator >> (Deserializer &deserializer, BlockData &data);
 };
 
-class Chunk: public ISceneNode
+class Chunk
 {
 public:
 	enum class Status : int { Nothing, Data, Light, Buffer };
@@ -42,23 +42,18 @@ public:
 	void loadLight();
 	void loadBuffer();
 	void save();
-	
+	void render();
+
+	void getTriangles(std::vector<triangle3df> &triangles, const aabbox3df &box, const matrix4 &transform);
+
 	friend Serializer &operator << (Serializer &serializer, const Chunk &data);
 	friend Deserializer &operator >> (Deserializer &deserializer, Chunk &data);
-
-	/* ISceneNode */
-	virtual void OnRegisterSceneNode() override;
-	virtual const aabbox3df &getBoundingBox() const override { return boundingBox; }
-	virtual void render() override;
-	
-	void getTriangles(std::vector<triangle3df> &triangles, const aabbox3df &box, const matrix4 &transform);
 
 private:
 	void generate();
 	void invalidateLight();
 
 	const int chunk_x, chunk_y, chunk_z;
-
 	std::mutex accessMutex;
 	std::atomic<Status> status;
 	std::atomic<bool> inQueue;
@@ -67,6 +62,7 @@ private:
 	BlockData blocks[CHUNK_SIZE][CHUNK_SIZE][CHUNK_SIZE];
 	SMaterial material;
 	aabbox3df boundingBox;
+	matrix4 absoluteTransformation;
 
 	friend class Block;
 };

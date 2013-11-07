@@ -20,17 +20,18 @@ Deserializer &operator >> (Deserializer &deserializer, BlockData &data)
 }
 
 Chunk::Chunk(int _chunk_x, int _chunk_y, int _chunk_z)
-	: ISceneNode(smgr->getRootSceneNode(), smgr), chunk_x(_chunk_x), chunk_y(_chunk_y), chunk_z(_chunk_z)
+	: chunk_x(_chunk_x), chunk_y(_chunk_y), chunk_z(_chunk_z)
 {
 	status = Status::Nothing;
 	inQueue = false;
 	triangleCollector = nullptr;
 
 	dirty = true;
-	setPosition(vector3df(chunk_x * CHUNK_SIZE, chunk_y * CHUNK_SIZE, chunk_z * CHUNK_SIZE));
 
 	boundingBox.reset(vector3df(0, 0, 0));
 	boundingBox.addInternalPoint(CHUNK_SIZE, CHUNK_SIZE, CHUNK_SIZE);
+	absoluteTransformation = matrix4(matrix4::EM4CONST_IDENTITY);
+	absoluteTransformation.setTranslation(vector3df(chunk_x * CHUNK_SIZE, chunk_y * CHUNK_SIZE, chunk_z * CHUNK_SIZE));
 
 	material.Wireframe = false;
 	material.Lighting = false;
@@ -114,27 +115,19 @@ bool Chunk::isInViewRange()
 	return dist <= 5;
 }
 
-void Chunk::OnRegisterSceneNode()
-{
-	if (IsVisible)
-	{
-		if (isInViewRange())
-		{
-			/* If we can show something, show it */
-			if (triangleCollector.load() != nullptr)
-				SceneManager->registerNodeForRendering(this);
-			if (status < Status::Buffer)
-				world->asyncLoadChunk(this);
-		}
-	}
-
-	ISceneNode::OnRegisterSceneNode();
-}
-
 void Chunk::render()
 {
+	if (!isInViewRange())
+		return;
+
 	TriangleCollector *collector = triangleCollector.load();
-	driver->setTransform(ETS_WORLD, AbsoluteTransformation);
+	if (collector == nullptr)
+	{
+		if (status < Status::Buffer)
+			world->asyncLoadChunk(this);
+		return;
+	}
+	driver->setTransform(ETS_WORLD, absoluteTransformation);
 	for (u32 i = 0; i < collector->getBufferCount(); i++)
 	{
 		SMeshBuffer *buffer = collector->getBuffer(i);
@@ -329,10 +322,10 @@ void Chunk::getTriangles(std::vector<triangle3df> &triangles, const aabbox3df &b
 
 	matrix4 mat(matrix4::EM4CONST_NOTHING);
 	aabbox3df tBox(box);
-	getAbsoluteTransformation().getInverse(mat);
+	absoluteTransformation.getInverse(mat);
 	mat.transformBoxEx(tBox);
 
-	mat = transform * getAbsoluteTransformation();
+	mat = transform * absoluteTransformation;
 
 	int x_min = bound<int>(0, floor(tBox.MinEdge.X), CHUNK_SIZE - 1);
 	int y_min = bound<int>(0, floor(tBox.MinEdge.Y), CHUNK_SIZE - 1);

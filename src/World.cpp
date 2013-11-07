@@ -2,6 +2,7 @@
 
 #include "Block.h"
 #include "Chunk.h"
+#include "ChunkSceneNode.h"
 #include "Database.h"
 #include "World.h"
 
@@ -16,7 +17,7 @@ World::World()
 World::~World()
 {
 	for (auto it : chunks)
-		it.second->drop();
+		delete it.second;
 	shouldStop = true;
 	{
 		std::lock_guard<std::mutex> lock(workerMutex);

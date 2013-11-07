@@ -3,6 +3,7 @@
 ISceneManager *smgr;
 IVideoDriver *driver;
 ICameraSceneNode *camera;
+ChunkSceneNode *chunkSceneNode;
 Database *database;
 BlockType *blockType;
 TileManager *tileManager;

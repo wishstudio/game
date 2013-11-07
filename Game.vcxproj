@@ -14,6 +14,7 @@
     <ClInclude Include="src\Block.h" />
     <ClInclude Include="src\BlockType.h" />
     <ClInclude Include="src\Chunk.h" />
+    <ClInclude Include="src\ChunkSceneNode.h" />
     <ClInclude Include="src\Database.h" />
     <ClInclude Include="src\EventReceiver.h" />
     <ClInclude Include="src\Hash.h" />
@@ -22,7 +23,6 @@
     <ClInclude Include="src\Noise.h" />
     <ClInclude Include="src\PlayerAnimator.h" />
     <ClInclude Include="src\Queue.h" />
-    <ClInclude Include="src\SceneManager.h" />
     <ClInclude Include="src\Serialization.h" />
     <ClInclude Include="src\ShortcutItemUI.h" />
     <ClInclude Include="src\stdafx.h" />
@@ -35,6 +35,7 @@
     <ClCompile Include="src\Block.cpp" />
     <ClCompile Include="src\BlockType.cpp" />
     <ClCompile Include="src\Chunk.cpp" />
+    <ClCompile Include="src\ChunkSceneNode.cpp" />
     <ClCompile Include="src\Database.cpp" />
     <ClCompile Include="src\Deserializer.cpp" />
     <ClCompile Include="src\EventReceiver.cpp" />
@@ -45,7 +46,6 @@
     <ClCompile Include="src\Main.cpp" />
     <ClCompile Include="src\Noise.cpp" />
     <ClCompile Include="src\PlayerAnimator.cpp" />
-    <ClCompile Include="src\SceneManager.cpp" />
     <ClCompile Include="src\Serializer.cpp" />
     <ClCompile Include="src\ShortcutItemUI.cpp" />
     <ClCompile Include="src\stdafx.cpp">

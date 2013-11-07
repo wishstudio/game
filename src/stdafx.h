@@ -28,6 +28,7 @@ using namespace video;
 #include "Math.h"
 #include "Queue.h"
 
+class ChunkSceneNode;
 class Database;
 class BlockType;
 class TileManager;
@@ -37,6 +38,7 @@ class EventReceiver;
 extern ISceneManager *smgr;
 extern IVideoDriver *driver;
 extern ICameraSceneNode *camera;
+extern ChunkSceneNode *chunkSceneNode;
 extern Database *database;
 extern BlockType *blockType;
 extern TileManager *tileManager;
