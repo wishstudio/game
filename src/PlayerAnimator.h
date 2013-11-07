@@ -15,4 +15,5 @@ private:
 	vector3df currentPosition, nextPosition;
 	f32 nextVerticalVelocity, nextVerticalDistance;
 	bool nextFalling;
+	vector3df forwardVec, leftVec, jumpDistance;
 };

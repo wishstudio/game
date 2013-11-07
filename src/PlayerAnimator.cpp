@@ -31,19 +31,26 @@ void PlayerAnimator::tick()
 
 	/* Update next velocity */
 	const f32 MOVE_SPEED = 6 * seconds<f32>(TICK_DURATION);
-	vector3df forwardVec(camera->getTarget() - camera->getPosition());
-	forwardVec.Y = 0;
-	forwardVec.normalize();
-	vector3df leftVec = forwardVec.crossProduct({ 0, 1, 0 });
+	if (!currentFalling) {
+		forwardVec = (camera->getTarget() - camera->getPosition());
+		forwardVec.Y = 0;
+		forwardVec.normalize();
+		leftVec = forwardVec.crossProduct({ 0, 1, 0 });
 
-	if (eventReceiver->isKeyDown(KEY_KEY_W))
-		currentDistance += forwardVec * MOVE_SPEED;
-	if (eventReceiver->isKeyDown(KEY_KEY_S))
-		currentDistance -= forwardVec * MOVE_SPEED;
-	if (eventReceiver->isKeyDown(KEY_KEY_A))
-		currentDistance += leftVec * MOVE_SPEED;
-	if (eventReceiver->isKeyDown(KEY_KEY_D))
-		currentDistance -= leftVec * MOVE_SPEED;
+		if (eventReceiver->isKeyDown(KEY_KEY_W))
+			currentDistance += forwardVec * MOVE_SPEED;
+		if (eventReceiver->isKeyDown(KEY_KEY_S))
+			currentDistance -= forwardVec * MOVE_SPEED;
+		if (eventReceiver->isKeyDown(KEY_KEY_A))
+			currentDistance += leftVec * MOVE_SPEED;
+		if (eventReceiver->isKeyDown(KEY_KEY_D))
+			currentDistance -= leftVec * MOVE_SPEED;
+	}
+	else {
+		currentDistance = jumpDistance;
+	}
+
+	jumpDistance = currentDistance;
 	if (currentFalling)
 		/* Add gravity */
 		nextVerticalVelocity -= 9.8 * 2 * seconds<f32>(TICK_DURATION);
