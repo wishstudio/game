@@ -43,8 +43,9 @@ void World::tick()
 void World::save()
 {
 	database->beginTransaction();
-	for (auto it : chunks)
-		it.second->save();
+	Chunk *chunk;
+	while (saveQueue.try_pop(chunk))
+		chunk->save();
 	database->commitTransaction();
 }
 
@@ -60,6 +61,11 @@ void World::asyncLoadChunk(Chunk *chunk)
 	loadQueue.push(chunk);
 	std::lock_guard<std::mutex> lock(workerMutex);
 	workerCondition.notify_all();
+}
+
+void World::asyncSaveChunk(Chunk *chunk)
+{
+	saveQueue.push(chunk);
 }
 
 Block World::getBlock(int x, int y, int z)

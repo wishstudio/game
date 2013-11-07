@@ -25,6 +25,7 @@ public:
 	u32 getLoadedChunkCount() const { return chunks.size(); }
 	void save();
 	void asyncLoadChunk(Chunk *chunk);
+	void asyncSaveChunk(Chunk *chunk);
 
 	Block getBlock(int x, int y, int z);
 	Block tryGetBlock(int x, int y, int z);
@@ -46,6 +47,7 @@ private:
 	std::mutex chunksHashMutex;
 
 	Concurrency::concurrent_queue<Chunk *> loadQueue;
+	Concurrency::concurrent_queue<Chunk *> saveQueue;
 	std::vector<std::thread> workerThreads;
 	std::condition_variable workerCondition;
 	std::mutex workerMutex;

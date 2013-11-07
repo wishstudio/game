@@ -57,11 +57,12 @@ private:
 	void generate();
 	void invalidateLight();
 
+	const int chunk_x, chunk_y, chunk_z;
+
 	std::mutex accessMutex;
 	std::atomic<Status> status;
 	std::atomic<bool> inQueue;
-	int chunk_x, chunk_y, chunk_z;
-	bool dirty;
+	std::atomic<bool> dirty;
 	std::atomic<TriangleCollector *> triangleCollector;
 	BlockData blocks[CHUNK_SIZE][CHUNK_SIZE][CHUNK_SIZE];
 	SMaterial material;

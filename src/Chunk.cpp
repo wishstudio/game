@@ -19,16 +19,12 @@ Deserializer &operator >> (Deserializer &deserializer, BlockData &data)
 	return deserializer;
 }
 
-Chunk::Chunk(int chunk_x, int chunk_y, int chunk_z)
-	: ISceneNode(smgr->getRootSceneNode(), smgr)
+Chunk::Chunk(int _chunk_x, int _chunk_y, int _chunk_z)
+	: ISceneNode(smgr->getRootSceneNode(), smgr), chunk_x(_chunk_x), chunk_y(_chunk_y), chunk_z(_chunk_z)
 {
 	status = Status::Nothing;
 	inQueue = false;
 	triangleCollector = nullptr;
-
-	this->chunk_x = chunk_x;
-	this->chunk_y = chunk_y;
-	this->chunk_z = chunk_z;
 
 	dirty = true;
 	setPosition(vector3df(chunk_x * CHUNK_SIZE, chunk_y * CHUNK_SIZE, chunk_z * CHUNK_SIZE));
@@ -90,6 +86,8 @@ void Chunk::generate()
 
 void Chunk::setDirty(int x, int y, int z)
 {
+	if (!dirty)
+		world->asyncSaveChunk(this);
 	dirty = true;
 	invalidateLight();
 }
