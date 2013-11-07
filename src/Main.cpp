@@ -133,6 +133,8 @@ int main()
 			s += "FPS: ";
 			s += fps;
 			s += ", ";
+			s += "Avg Frame Time: ";
+			s += 1000.f / fps;
 			s += world->getLoadedChunkCount();
 			s += " chunks loaded";
 			s += ", ";
