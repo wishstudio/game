@@ -6,9 +6,9 @@
 
 Camera::Camera(IVideo *_video):
 	video(_video),
-	position(vector3df(0, 0, 0)),
-	lookAt(vector3df(0, 0, 100)),
-	upVector(vector3df(0, 1, 0)),
+	position(Vector3(0, 0, 0)),
+	lookAt(Vector3(0, 0, 100)),
+	upVector(Vector3(0, 1, 0)),
 	nearValue(1.0f),
 	farValue(3000.0f)
 {
@@ -21,10 +21,10 @@ Camera::Camera(IVideo *_video):
 
 void Camera::updateViewMatrix()
 {
-	viewMatrix.buildCameraLookAtMatrixLH(position, lookAt, upVector);
+	viewMatrix = Matrix4::lookAtLH(position, lookAt, upVector);
 }
 
 void Camera::updateProjectionMatrix()
 {
-	projectionMatrix.buildProjectionMatrixPerspectiveFovLH(fovy, aspectRatio, nearValue, farValue);
+	projectionMatrix = Matrix4::perspectiveFovLH(fovy, aspectRatio, nearValue, farValue);
 }

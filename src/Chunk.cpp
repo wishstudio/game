@@ -22,6 +22,8 @@ Deserializer &operator >> (Deserializer &deserializer, BlockData &data)
 Chunk::Chunk(int _chunk_x, int _chunk_y, int _chunk_z)
 	: chunk_x(_chunk_x), chunk_y(_chunk_y), chunk_z(_chunk_z)
 {
+	if (chunk_x < -100 || chunk_x > 100 || chunk_y < -100 || chunk_y > 100 || chunk_z < -100 || chunk_z > 100)
+		DebugBreak();
 	status = Status::Nothing;
 	inQueue = false;
 	triangleCollector = nullptr;
@@ -30,8 +32,7 @@ Chunk::Chunk(int _chunk_x, int _chunk_y, int _chunk_z)
 
 	boundingBox.reset(vector3df(0, 0, 0));
 	boundingBox.addInternalPoint(CHUNK_SIZE, CHUNK_SIZE, CHUNK_SIZE);
-	absoluteTransformation = matrix4(matrix4::EM4CONST_IDENTITY);
-	absoluteTransformation.setTranslation(vector3df(chunk_x * CHUNK_SIZE, chunk_y * CHUNK_SIZE, chunk_z * CHUNK_SIZE));
+	modelTransform = Matrix4::translation(chunk_x * CHUNK_SIZE, chunk_y * CHUNK_SIZE, chunk_z * CHUNK_SIZE);
 
 	material.Wireframe = false;
 	material.Lighting = false;
@@ -106,10 +107,10 @@ bool Chunk::shouldPreloadBuffer()
 
 bool Chunk::isInViewRange()
 {
-	vector3df position = camera->getPosition();
-	int x = (int)floor(position.X / CHUNK_SIZE);
-	int y = (int)floor(position.Y / CHUNK_SIZE);
-	int z = (int)floor(position.Z / CHUNK_SIZE);
+	Vector3 position = camera->getPosition();
+	int x = (int)floor(position.x / CHUNK_SIZE);
+	int y = (int)floor(position.y / CHUNK_SIZE);
+	int z = (int)floor(position.z / CHUNK_SIZE);
 	int dist = abs(chunk_x - x) + abs(chunk_y - y) + abs(chunk_z - z);
 
 	return dist <= 5;
@@ -127,16 +128,12 @@ void Chunk::render()
 			world->asyncLoadChunk(this);
 		return;
 	}
-	//driver->setTransform(ETS_WORLD, absoluteTransformation);
-	video->setWorldMatrix(absoluteTransformation);
+	video->setModelMatrix(modelTransform);
 	for (u32 i = 0; i < collector->getBufferCount(); i++)
 	{
 		MeshBuffer *buffer = collector->getBuffer(i);
 		video->setTexture(collector->getBufferTexture(i));
 		video->drawMeshBuffer(buffer);
-		//material.setTexture(0, collector->getBufferTexture(i));
-		//driver->setMaterial(material);
-		//driver->drawMeshBuffer(buffer);
 	}
 }
 
@@ -315,7 +312,7 @@ void Chunk::loadBuffer()
 }
 
 /* Gets all triangles which have or may have contact within a specific bounding box */
-void Chunk::getTriangles(std::vector<triangle3df> &triangles, const aabbox3df &box, const matrix4 &transform)
+void Chunk::getTriangles(std::vector<triangle3df> &triangles, const aabbox3df &box, const Matrix4 &transform)
 {
 	loadData();
 	loadLight();
@@ -323,12 +320,11 @@ void Chunk::getTriangles(std::vector<triangle3df> &triangles, const aabbox3df &b
 
 	TriangleCollector *collector = triangleCollector.load();
 
-	matrix4 mat(matrix4::EM4CONST_NOTHING);
+	Matrix4 mat = modelTransform.getInverse();
 	aabbox3df tBox(box);
-	absoluteTransformation.getInverse(mat);
-	mat.transformBoxEx(tBox);
+	mat.transformBox(tBox);
 
-	mat = transform * absoluteTransformation;
+	mat = modelTransform * transform;
 
 	int x_min = bound<int>(0, floor(tBox.MinEdge.X), CHUNK_SIZE - 1);
 	int y_min = bound<int>(0, floor(tBox.MinEdge.Y), CHUNK_SIZE - 1);
@@ -343,9 +339,9 @@ void Chunk::getTriangles(std::vector<triangle3df> &triangles, const aabbox3df &b
 				for (auto it = collector->blockBegin(x, y, z); it != collector->blockEnd(x, y, z); it++)
 				{
 					triangle3df triangle;
-					mat.transformVect(triangle.pointA, it->pointA);
-					mat.transformVect(triangle.pointB, it->pointB);
-					mat.transformVect(triangle.pointC, it->pointC);
+					triangle.pointA = Vector3(it->pointA) * mat;
+					triangle.pointB = Vector3(it->pointB) * mat;
+					triangle.pointC = Vector3(it->pointC) * mat;
 					triangles.push_back(triangle);
 				}
 			}

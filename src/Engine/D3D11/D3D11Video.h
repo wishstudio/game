@@ -8,16 +8,16 @@
 
 struct Vertex
 {
-	vector3df pos;
+	Vector3 pos;
 	Color color;
 	f32 u, v;
 };
 
 struct MatrixBuffer
 {
-	matrix4 world;
-	matrix4 view;
-	matrix4 projection;
+	Matrix4 model;
+	Matrix4 view;
+	Matrix4 projection;
 };
 
 class MeshBuffer
@@ -54,9 +54,9 @@ public:
 	virtual void deleteMeshBuffer(MeshBuffer *buffer) override;
 
 	virtual void setTexture(ITTexture *texture) override;
-	virtual void setWorldMatrix(const matrix4 &matrix) override;
-	virtual void setViewMatrix(const matrix4 &matrix) override;
-	virtual void setProjectionMatrix(const matrix4 &matrix) override;
+	virtual void setModelMatrix(const Matrix4 &matrix) override;
+	virtual void setViewMatrix(const Matrix4 &matrix) override;
+	virtual void setProjectionMatrix(const Matrix4 &matrix) override;
 
 	virtual void drawMeshBuffer(MeshBuffer *buffer) override;
 

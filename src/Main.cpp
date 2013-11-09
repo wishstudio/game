@@ -86,10 +86,10 @@ int main()
 			rightMousePressed = true;
 		lastRightMouseDown = eventReceiver->isRightButtonDown();
 
-		World::CameraIntersectionInfo *info;
-		if (world->getCameraIntersection(line3df(camera->getPosition(), camera->getLookAt()), &info))
+		World::CameraIntersectionInfo *info = nullptr;
+		/*if (world->getCameraIntersection(line3df(camera->getPosition(), camera->getLookAt()), &info))
 		{
-			/*driver->setTransform(ETS_WORLD, IdentityMatrix);
+			driver->setTransform(ETS_WORLD, IdentityMatrix);
 			aabbox3df box = info->block.getBoundingBox();
 			translateBox(box, info->block.x(), info->block.y(), info->block.z());
 			box.MinEdge.X -= .01f;
@@ -102,8 +102,8 @@ int main()
 			if (leftMousePressed)
 				info->block.setType(0);
 			if (rightMousePressed)
-				info->block.getNeighbour(oppositeDirection(info->direction)).setType(shortcutIUI.getCurrentItem());*/
-		}
+				info->block.getNeighbour(oppositeDirection(info->direction)).setType(shortcutIUI.getCurrentItem());
+		}*/
 		while (timeManager->tick())
 		{
 			world->tick();
@@ -127,15 +127,15 @@ int main()
 
 		//int fps = driver->getFPS();
 		int fps = 0;
-		vector3df position = camera->getPosition();
+		Vector3 position = camera->getPosition();
 		stringw s;
 		s += "POS";
 		s += "(";
-		s += position.X;
+		s += position.x;
 		s += ", ";
-		s += position.Y;
+		s += position.y;
 		s += ", ";
-		s += position.Z;
+		s += position.z;
 		s += ") ";
 		if (info) {
 			s += "PT";

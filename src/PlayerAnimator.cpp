@@ -6,7 +6,7 @@
 #include "TimeManager.h"
 #include "World.h"
 
-static const vector3df playerRadius = { 0.48f, 1.9f, 0.48f };
+static const Vector3 playerRadius = { 0.48f, 1.9f, 0.48f };
 static const f32 veryCloseDistance = 0.0001;
 
 PlayerAnimator::PlayerAnimator()
@@ -23,7 +23,7 @@ PlayerAnimator::~PlayerAnimator()
 void PlayerAnimator::tick()
 {
 	/* Update current values */
-	vector3df currentDistance = { 0, 0, 0 };
+	Vector3 currentDistance = { 0, 0, 0 };
 	f32 currentVerticalVelocity = nextVerticalVelocity;
 	f32 currentVerticalDistance = nextVerticalDistance;
 	currentPosition = nextPosition;
@@ -33,10 +33,10 @@ void PlayerAnimator::tick()
 	const f32 MOVE_SPEED = 6 * seconds<f32>(TICK_DURATION);
 	if (!currentFalling)
 	{
-		vector3df forwardVec = (camera->getLookAt() - camera->getPosition());
-		forwardVec.Y = 0;
-		forwardVec.normalize();
-		vector3df leftVec = forwardVec.crossProduct({ 0, 1, 0 });
+		Vector3 forwardVec = (camera->getLookAt() - camera->getPosition());
+		forwardVec.y = 0;
+		forwardVec = forwardVec.getNormalized();
+		Vector3 leftVec = forwardVec.crossProduct({ 0, 1, 0 });
 
 		if (windowSystem->isKeyDown(KEY_W))
 			currentDistance += forwardVec * MOVE_SPEED;
@@ -67,25 +67,26 @@ void PlayerAnimator::tick()
 	/* Collision detection */
 	bool collided;
 	nextPosition = collideEllipsoidWithWorld(nextPosition, currentDistance, true, collided);
-	f32 originalY = nextPosition.Y;
-	nextPosition = collideEllipsoidWithWorld(nextPosition, currentVerticalDistance * vector3df(0, 1, 0), false, collided);
+	f32 originalY = nextPosition.y;
+	nextPosition = collideEllipsoidWithWorld(nextPosition, currentVerticalDistance * Vector3(0, 1, 0), false, collided);
 
 	/* Check if we are stadning on the ground */
 	nextFalling = !(currentVerticalDistance < ROUNDING_ERROR_f32 && collided);
 }
 
-vector3df PlayerAnimator::collideEllipsoidWithWorld(vector3df position, vector3df moveVector, bool canSlide, bool &collided)
+Vector3 PlayerAnimator::collideEllipsoidWithWorld(Vector3 position, Vector3 moveVector, bool canSlide, bool &collided)
 {
+	if (moveVector.getLength() < std::numeric_limits<f32>::epsilon()) /* TODO */
+		return position;
+
 	collided = false;
 
 	/* Transform matrix */
-	matrix4 translation = matrix4(matrix4::EM4CONST_IDENTITY).setInverseTranslation(position);
-	matrix4 scale = matrix4(matrix4::EM4CONST_IDENTITY);
-	scale.setScale({ 1.f / playerRadius.X, 1.f / playerRadius.Y, 1.f / playerRadius.Z });
+	Matrix4 translation = Matrix4::inverseTranslation(position);
+	Matrix4 scale = Matrix4::scale(1.f / playerRadius.x, 1.f / playerRadius.y, 1.f / playerRadius.z);
 
-	matrix4 transform = scale * translation;
-	matrix4 invTransform(matrix4::EM4CONST_NOTHING);
-	transform.getInverse(invTransform);
+	Matrix4 transform = translation * scale;
+	Matrix4 invTransform = transform.getInverse();
 
 	/* Update next position */
 	/* Gather relevant triangles for collision detection
@@ -98,9 +99,9 @@ vector3df PlayerAnimator::collideEllipsoidWithWorld(vector3df position, vector3d
 	box.addInternalPoint(position + moveVector + playerRadius);
 
 	/* Calculating base coordinates */
-	f32 fx = position.X / CHUNK_SIZE;
-	f32 fy = position.Y / CHUNK_SIZE;
-	f32 fz = position.Z / CHUNK_SIZE;
+	f32 fx = position.x / CHUNK_SIZE;
+	f32 fy = position.y / CHUNK_SIZE;
+	f32 fz = position.z / CHUNK_SIZE;
 
 	int basex = (int)floor(fx);
 	int basey = (int)floor(fy);
@@ -113,42 +114,41 @@ vector3df PlayerAnimator::collideEllipsoidWithWorld(vector3df position, vector3d
 	/* Collect triangles */
 	std::vector<triangle3df> triangles;
 	for (int x = 0; x <= 1; x++)
-	for (int y = 0; y <= 1; y++)
-	for (int z = 0; z <= 1; z++)
-	{
-		Chunk *chunk = world->getChunk(x + basex, y + basey, z + basez);
-		int outCount;
-		chunk->getTriangles(triangles, box, transform);
-	}
+		for (int y = 0; y <= 1; y++)
+			for (int z = 0; z <= 1; z++)
+			{
+				Chunk *chunk = world->getChunk(x + basex, y + basey, z + basez);
+				int outCount;
+				chunk->getTriangles(triangles, box, transform);
+			}
 
 	/* Transform vectors to ellipsoid coordinate system */
-	scale.transformVect(moveVector);
-	transform.transformVect(position);
+	moveVector = moveVector * scale;
+
+	position = position * transform;
 	/* From now on, nextPosition is transformed position, currentPosition is not transformed */
 	/* Note the sphere is unit sphere */
 
-	vector3df vn(moveVector);
-	vn.normalize();
+	Vector3 vn = moveVector.getNormalized();
 	f32 remainDistance = moveVector.getLength();
 	for (int depth = 0; depth < 5; depth++) /* Do sliding at most 5 times */
 	{
 		/* Find colliding triangle */
 		f32 minDistance = remainDistance; /* Don't count if colliding distance is larger than move distance */
-		vector3df minPlaneIntersection;
+		Vector3 minPlaneIntersection;
 
-		vector3df invertedVelocity(vn);
-		invertedVelocity.invert();
+		Vector3 invertedVelocity(-vn);
 		for (const triangle3df triangle : triangles)
 		{
 			if (!triangle.isFrontFacing(vn))
 				continue;
 
-			vector3df normal = triangle.getNormal().invert().normalize();
+			Vector3 normal = triangle.getNormal().invert().normalize();
 
 			/* Sphere intersection point
 			 * The potential intersection point on the sphere
 			 */
-			vector3df sphereIntersection = position + normal; /* We have unit sphere */
+			Vector3 sphereIntersection = position + normal; /* We have unit sphere */
 
 			/* Plane intersection point
 			 * The potential intersection point on the plane the triangle reside on
@@ -197,27 +197,27 @@ vector3df PlayerAnimator::collideEllipsoidWithWorld(vector3df position, vector3d
 		 * Origin is the point of plane intersection
 		 * Normal is from the intersection point to the center of the sphere
 		 */
-		vector3df snormal = (position - minPlaneIntersection).normalize();
-		vector3df remainVector = vn * remainDistance;
-		vector3df slideVector = remainVector + snormal * snormal.dotProduct(-remainVector);
+		Vector3 snormal = (position - minPlaneIntersection).getNormalized();
+		Vector3 remainVector = vn * remainDistance;
+		Vector3 slideVector = remainVector + snormal * snormal.dotProduct(-remainVector);
 		remainDistance = slideVector.getLength();
-		vn = slideVector.normalize();
+		vn = slideVector.getNormalized();
 		if (remainDistance < veryCloseDistance)
 			break;
 	}
 	/* Transform back to world coordinate system */
-	invTransform.transformVect(position);
+	position = position * invTransform;
 
 	return position;
 }
 
 void PlayerAnimator::update()
 {
-	const vector3df playerCameraOffset(0, 1.7f, 0);
+	const Vector3 playerCameraOffset(0, 1.7f, 0);
 
 	/* Interpolate camera position for smooth rendering */
-	vector3df position(currentPosition);
-	vector3df diffVec(nextPosition - currentPosition);
+	Vector3 position(currentPosition);
+	Vector3 diffVec(nextPosition - currentPosition);
 	position += diffVec * (seconds<f32>(timeManager->getRemainingTickDuration()) / seconds<f32>(TICK_DURATION));
 	camera->setPosition(position + playerCameraOffset);
 }

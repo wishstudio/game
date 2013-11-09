@@ -58,36 +58,36 @@ void TriangleCollector::setCurrentBlock(const Block &block)
 
 void TriangleCollector::addQuad(
 	const Tile &tile,
-	const vector3df &topLeft,
+	const Vector3 &topLeft,
 	const Color &topLeftColor,
-	const vector3df &topRight,
+	const Vector3 &topRight,
 	const Color &topRightColor,
-	const vector3df &bottomLeft,
+	const Vector3 &bottomLeft,
 	const Color &bottomLeftColor,
-	const vector3df &bottomRight,
+	const Vector3 &bottomRight,
 	const Color &bottomRightColor,
-	const vector3df &normal)
+	const Vector3 &normal)
 {
 	MeshBuffer *buffer = getBuffer(tile.texture);
 
 	u32 s = buffer->vertexBuffer.size();
 	buffer->vertexBuffer.push_back({
-		vector3df(topLeft.X + x, topLeft.Y + y, topLeft.Z + z),
+		Vector3(topLeft.x + x, topLeft.y + y, topLeft.z + z),
 		topLeftColor,
 		tile.u1, tile.v1
 	});
 	buffer->vertexBuffer.push_back({
-		vector3df(topRight.X + x, topRight.Y + y, topRight.Z + z),
+		Vector3(topRight.x + x, topRight.y + y, topRight.z + z),
 		topRightColor,
 		tile.u2, tile.v1
 	});
 	buffer->vertexBuffer.push_back({
-		vector3df(bottomLeft.X + x, bottomLeft.Y + y, bottomLeft.Z + z),
+		Vector3(bottomLeft.x + x, bottomLeft.y + y, bottomLeft.z + z),
 		bottomLeftColor,
 		tile.u1, tile.v2
 	});
 	buffer->vertexBuffer.push_back({
-		vector3df(bottomRight.X + x, bottomRight.Y + y, bottomRight.Z + z),
+		Vector3(bottomRight.x + x, bottomRight.y + y, bottomRight.z + z),
 		bottomRightColor,
 		tile.u2, tile.v2
 	});

@@ -61,12 +61,12 @@ static inline u8 VERTEX_LIGHT(const Block &base, const Block &side1, const Block
 static void drawFace(
 	TriangleCollector *collector,
 	const Tile &tile,
-	const vector3df &p00, const vector3df &p01,
-	const vector3df &p10, const vector3df &p11,
+	const Vector3 &p00, const Vector3 &p01,
+	const Vector3 &p10, const Vector3 &p11,
 	const Block &b00, const Block &b01, const Block &b02,
 	const Block &b10, const Block &b11, const Block &b12,
 	const Block &b20, const Block &b21, const Block &b22,
-	const vector3df &normal)
+	const Vector3 &normal)
 {
 	/*
 	 *    *--*--*--*
@@ -114,15 +114,15 @@ void BlockType::drawBlock(TriangleCollector *collector, const Block &block) cons
 		 *     7          8
 		 *
 		 */
-		vector3df p1(0, 1, 1);
-		vector3df p2(1, 1, 1);
-		vector3df p3(0, 1, 0);
-		vector3df p4(1, 1, 0);
+		Vector3 p1(0, 1, 1);
+		Vector3 p2(1, 1, 1);
+		Vector3 p3(0, 1, 0);
+		Vector3 p4(1, 1, 0);
 
-		vector3df p5(0, 0, 1);
-		vector3df p6(1, 0, 1);
-		vector3df p7(0, 0, 0);
-		vector3df p8(1, 0, 0);
+		Vector3 p5(0, 0, 1);
+		Vector3 p6(1, 0, 1);
+		Vector3 p7(0, 0, 0);
+		Vector3 p8(1, 0, 0);
 
 		Block b[3][3][3];
 		for (int x = -1; x <= 1; x++)
@@ -134,36 +134,36 @@ void BlockType::drawBlock(TriangleCollector *collector, const Block &block) cons
 			b[2][2][0], b[2][2][1], b[2][2][2],
 			b[2][1][0], b[2][1][1], b[2][1][2],
 			b[2][0][0], b[2][0][1], b[2][0][2],
-			vector3df(1, 0, 0));
+			Vector3(1, 0, 0));
 
 		drawFace(collector, tile, p1, p3, p5, p7,
 			b[0][2][2], b[0][2][1], b[0][2][0],
 			b[0][1][2], b[0][1][1], b[0][1][0],
 			b[0][0][2], b[0][0][1], b[0][0][0],
-			vector3df(-1, 0, 0));
+			Vector3(-1, 0, 0));
 
 		drawFace(collector, tile, p1, p2, p3, p4,
 			b[0][2][2], b[1][2][2], b[2][2][2],
 			b[0][2][1], b[1][2][1], b[2][2][1],
 			b[0][2][0], b[1][2][0], b[2][2][0],
-			vector3df(0, 1, 0));
+			Vector3(0, 1, 0));
 
 		drawFace(collector, tile, p7, p8, p5, p6,
 			b[0][0][0], b[1][0][0], b[2][0][0],
 			b[0][0][1], b[1][0][1], b[2][0][1],
 			b[0][0][2], b[1][0][2], b[2][0][2],
-			vector3df(0, -1, 0));
+			Vector3(0, -1, 0));
 
 		drawFace(collector, tile, p2, p1, p6, p5,
 			b[2][2][2], b[1][2][2], b[0][2][2],
 			b[2][1][2], b[1][1][2], b[0][1][2],
 			b[2][0][2], b[1][0][2], b[0][0][2],
-			vector3df(0, 0, 1));
+			Vector3(0, 0, 1));
 
 		drawFace(collector, tile, p3, p4, p7, p8,
 			b[0][2][0], b[1][2][0], b[2][2][0],
 			b[0][1][0], b[1][1][0], b[2][1][0],
 			b[0][0][0], b[1][0][0], b[2][0][0],
-			vector3df(0, 0, -1));
+			Vector3(0, 0, -1));
 	}
 }

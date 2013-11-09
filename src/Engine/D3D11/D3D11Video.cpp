@@ -495,17 +495,17 @@ void D3D11Video::setTexture(ITTexture *_texture)
 	pContext->PSSetShaderResources(0, 1, &texture->pResourceView);
 }
 
-void D3D11Video::setWorldMatrix(const matrix4 &matrix)
+void D3D11Video::setModelMatrix(const Matrix4 &matrix)
 {
-	matrixBuffer.world = matrix;
+	matrixBuffer.model = matrix;
 }
 
-void D3D11Video::setViewMatrix(const matrix4 &matrix)
+void D3D11Video::setViewMatrix(const Matrix4 &matrix)
 {
 	matrixBuffer.view = matrix;
 }
 
-void D3D11Video::setProjectionMatrix(const matrix4 &matrix)
+void D3D11Video::setProjectionMatrix(const Matrix4 &matrix)
 {
 	matrixBuffer.projection = matrix;
 }
@@ -564,7 +564,7 @@ void D3D11Video::drawMeshBuffer(MeshBuffer *buffer)
 	D3D11_MAPPED_SUBRESOURCE pResource;
 	pContext->Map(pMatrixBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &pResource);
 	MatrixBuffer *matrix = (MatrixBuffer *) pResource.pData;
-	matrix->world = matrixBuffer.world;
+	matrix->model = matrixBuffer.model;
 	matrix->view = matrixBuffer.view;
 	matrix->projection = matrixBuffer.projection;
 	pContext->Unmap(pMatrixBuffer, 0);

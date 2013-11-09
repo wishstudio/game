@@ -1,6 +1,8 @@
 #pragma once
 
 #include <string>
+#include "Vector3.h"
+#include "Matrix4.h"
 
 class MeshBuffer;
 class ITTexture;
@@ -20,9 +22,9 @@ public:
 	virtual void deleteMeshBuffer(MeshBuffer *buffer) = 0;
 
 	virtual void setTexture(ITTexture *texture) = 0;
-	virtual void setWorldMatrix(const matrix4 &matrix) = 0;
-	virtual void setViewMatrix(const matrix4 &matrix) = 0;
-	virtual void setProjectionMatrix(const matrix4 &matrix) = 0;
+	virtual void setModelMatrix(const Matrix4 &matrix) = 0;
+	virtual void setViewMatrix(const Matrix4 &matrix) = 0;
+	virtual void setProjectionMatrix(const Matrix4 &matrix) = 0;
 
 	virtual void drawMeshBuffer(MeshBuffer *buffer) = 0;
 };

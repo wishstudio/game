@@ -32,15 +32,17 @@ using namespace irr::video;
 #include <thread>
 #include <unordered_map>
 
-#include "Hash.h"
-#include "MathHelper.h"
-#include "Queue.h"
-
 #include "Engine/Camera.h"
 #include "Engine/Color.h"
 #include "Engine/ITexture.h"
 #include "Engine/IVideo.h"
 #include "Engine/IWindowSystem.h"
+#include "Engine/Matrix4.h"
+#include "Engine/Vector3.h"
+
+#include "Hash.h"
+#include "MathHelper.h"
+#include "Queue.h"
 
 class ChunkSceneNode;
 class Database;

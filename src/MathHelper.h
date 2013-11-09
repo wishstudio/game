@@ -141,7 +141,7 @@ inline bool rayIntersectsWithBox(const line3df &ray, const aabbox3df &box)
 	return tMin <= tMax;
 }
 
-inline bool rayIntersectsWithSphere(const vector3df &point, const vector3df &vec, const vector3df &center, f32 radius, f32 &distance)
+inline bool rayIntersectsWithSphere(const Vector3 &point, const Vector3 &vec, const Vector3 &center, f32 radius, f32 &distance)
 {
 	/*         |
 	 *         |       % % %
@@ -157,15 +157,15 @@ inline bool rayIntersectsWithSphere(const vector3df &point, const vector3df &vec
 	 *         |
 	 */
 	/* Sphere center in point coordinate system */
-	vector3df Q = center - point;
+	Vector3 Q = center - point;
 	/* Distance from sphere center to origin */
 	f32 c = Q.getLength();
 	/* v = Q * vn
 	     = |Q| * 1 * cos(alpha)
 	     = c * cos(alpha)
 	 */
-	vector3df vn(vec);
-	f32 v = Q.dotProduct(vn.normalize());
+	Vector3 vn(vec);
+	f32 v = Q.dotProduct(vn.getNormalized());
 	if (v < 0.f)
 		return false;
 	/* d = R^2 - (c^2 - v^2)

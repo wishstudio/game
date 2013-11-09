@@ -14,10 +14,10 @@ ChunkSceneNode::ChunkSceneNode()
 
 void ChunkSceneNode::render()
 {
-	vector3df position = camera->getPosition();
-	int current_x = (int)floor(position.X / CHUNK_SIZE);
-	int current_y = (int)floor(position.Y / CHUNK_SIZE);
-	int current_z = (int)floor(position.Z / CHUNK_SIZE);
+	Vector3 position = camera->getPosition();
+	int current_x = (int)floor(position.x / CHUNK_SIZE);
+	int current_y = (int)floor(position.y / CHUNK_SIZE);
+	int current_z = (int)floor(position.z / CHUNK_SIZE);
 
 	memcpy(backup, preloadChunk, sizeof preloadChunk);
 	memset(preloadChunk, 0, sizeof preloadChunk);

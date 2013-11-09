@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Vector3.h"
+
 class IVideo;
 class Camera
 {
@@ -18,21 +20,21 @@ public:
 	f32 getFOV() const { return fovy; }
 	void setFOV(f32 fovy) { this->fovy = fovy; updateProjectionMatrix(); }
 
-	const vector3df &getPosition() const { return position; }
-	void setPosition(const vector3df &position)
+	const Vector3 &getPosition() const { return position; }
+	void setPosition(const Vector3 &position)
 	{
 		this->lookAt += position - this->position;
 		this->position = position;
 		updateViewMatrix();
 	}
 
-	const vector3df &getLookAt() const { return lookAt; }
-	void setLookAt(const vector3df &lookAt) { this->lookAt = lookAt; updateViewMatrix(); }
-	const vector3df &getUpVector() const { return upVector; }
-	void setUpVector(const vector3df &upVector) { this->upVector = upVector; updateViewMatrix(); }
+	const Vector3 &getLookAt() const { return lookAt; }
+	void setLookAt(const Vector3 &lookAt) { this->lookAt = lookAt; updateViewMatrix(); }
+	const Vector3 &getUpVector() const { return upVector; }
+	void setUpVector(const Vector3 &upVector) { this->upVector = upVector; updateViewMatrix(); }
 
-	const matrix4 &getViewMatrix() const { return viewMatrix; }
-	const matrix4 &getProjectionMatrix() const { return projectionMatrix; }
+	const Matrix4 &getViewMatrix() const { return viewMatrix; }
+	const Matrix4 &getProjectionMatrix() const { return projectionMatrix; }
 
 private:
 	void updateViewMatrix();
@@ -40,6 +42,6 @@ private:
 
 	IVideo *video;
 	f32 aspectRatio, farValue, nearValue, fovy;
-	vector3df position, lookAt, upVector;
-	matrix4 viewMatrix, projectionMatrix;
+	Vector3 position, lookAt, upVector;
+	Matrix4 viewMatrix, projectionMatrix;
 };

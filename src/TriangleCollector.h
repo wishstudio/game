@@ -19,15 +19,15 @@ public:
 	void setCurrentBlock(const Block &block);
 	void addQuad(
 		const Tile &tile,
-		const vector3df &topLeft,
+		const Vector3 &topLeft,
 		const Color &topLeftColor,
-		const vector3df &topRight,
+		const Vector3 &topRight,
 		const Color &topRightColor,
-		const vector3df &bottomLeft,
+		const Vector3 &bottomLeft,
 		const Color &bottomLeftColor,
-		const vector3df &bottomRight,
+		const Vector3 &bottomRight,
 		const Color &bottomRightColor,
-		const vector3df &normal
+		const Vector3 &normal
 	);
 
 	/* Collision detection utilities */
