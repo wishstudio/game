@@ -44,7 +44,7 @@ public:
 	void save();
 	void render();
 
-	void getTriangles(std::vector<triangle3df> &triangles, const aabbox3df &box, const Matrix4 &transform);
+	void getTriangles(std::vector<triangle3df> &triangles, const AABB &box, const Matrix4 &transform);
 
 	friend Serializer &operator << (Serializer &serializer, const Chunk &data);
 	friend Deserializer &operator >> (Deserializer &deserializer, Chunk &data);
@@ -61,7 +61,7 @@ private:
 	std::atomic<TriangleCollector *> triangleCollector;
 	BlockData blocks[CHUNK_SIZE][CHUNK_SIZE][CHUNK_SIZE];
 	SMaterial material;
-	aabbox3df boundingBox;
+	AABB boundingBox;
 	Matrix4 modelTransform;
 
 	friend class Block;

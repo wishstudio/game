@@ -32,6 +32,7 @@ using namespace irr::video;
 #include <thread>
 #include <unordered_map>
 
+#include "Engine/AABB.h"
 #include "Engine/Camera.h"
 #include "Engine/Color.h"
 #include "Engine/ITexture.h"

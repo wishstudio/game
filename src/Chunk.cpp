@@ -20,7 +20,7 @@ Deserializer &operator >> (Deserializer &deserializer, BlockData &data)
 }
 
 Chunk::Chunk(int _chunk_x, int _chunk_y, int _chunk_z)
-	: chunk_x(_chunk_x), chunk_y(_chunk_y), chunk_z(_chunk_z)
+	: chunk_x(_chunk_x), chunk_y(_chunk_y), chunk_z(_chunk_z), boundingBox({0, 0, 0})
 {
 	if (chunk_x < -100 || chunk_x > 100 || chunk_y < -100 || chunk_y > 100 || chunk_z < -100 || chunk_z > 100)
 		DebugBreak();
@@ -30,8 +30,7 @@ Chunk::Chunk(int _chunk_x, int _chunk_y, int _chunk_z)
 
 	dirty = true;
 
-	boundingBox.reset(vector3df(0, 0, 0));
-	boundingBox.addInternalPoint(CHUNK_SIZE, CHUNK_SIZE, CHUNK_SIZE);
+	boundingBox.merge(Vector3(CHUNK_SIZE, CHUNK_SIZE, CHUNK_SIZE));
 	modelTransform = Matrix4::translation(chunk_x * CHUNK_SIZE, chunk_y * CHUNK_SIZE, chunk_z * CHUNK_SIZE);
 
 	material.Wireframe = false;
@@ -312,7 +311,7 @@ void Chunk::loadBuffer()
 }
 
 /* Gets all triangles which have or may have contact within a specific bounding box */
-void Chunk::getTriangles(std::vector<triangle3df> &triangles, const aabbox3df &box, const Matrix4 &transform)
+void Chunk::getTriangles(std::vector<triangle3df> &triangles, const AABB &box, const Matrix4 &transform)
 {
 	loadData();
 	loadLight();
@@ -321,17 +320,16 @@ void Chunk::getTriangles(std::vector<triangle3df> &triangles, const aabbox3df &b
 	TriangleCollector *collector = triangleCollector.load();
 
 	Matrix4 mat = modelTransform.getInverse();
-	aabbox3df tBox(box);
-	mat.transformBox(tBox);
+	AABB tBox = box.transform(mat);
 
 	mat = modelTransform * transform;
 
-	int x_min = bound<int>(0, floor(tBox.MinEdge.X), CHUNK_SIZE - 1);
-	int y_min = bound<int>(0, floor(tBox.MinEdge.Y), CHUNK_SIZE - 1);
-	int z_min = bound<int>(0, floor(tBox.MinEdge.Z), CHUNK_SIZE - 1);
-	int x_max = bound<int>(0, ceil(tBox.MaxEdge.X), CHUNK_SIZE - 1);
-	int y_max = bound<int>(0, ceil(tBox.MaxEdge.Y), CHUNK_SIZE - 1);
-	int z_max = bound<int>(0, ceil(tBox.MaxEdge.Z), CHUNK_SIZE - 1);
+	int x_min = bound<int>(0, floor(tBox.minPoint.x), CHUNK_SIZE - 1);
+	int y_min = bound<int>(0, floor(tBox.minPoint.y), CHUNK_SIZE - 1);
+	int z_min = bound<int>(0, floor(tBox.minPoint.z), CHUNK_SIZE - 1);
+	int x_max = bound<int>(0, ceil(tBox.maxPoint.x), CHUNK_SIZE - 1);
+	int y_max = bound<int>(0, ceil(tBox.maxPoint.y), CHUNK_SIZE - 1);
+	int z_max = bound<int>(0, ceil(tBox.maxPoint.z), CHUNK_SIZE - 1);
 	for (int x = x_min; x <= x_max; x++)
 		for (int y = y_min; y <= y_max; y++)
 			for (int z = z_min; z <= z_max; z++)

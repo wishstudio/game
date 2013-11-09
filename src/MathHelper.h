@@ -55,24 +55,7 @@ inline T divide(const T &a, const T &b)
 		return a / b;
 }
 
-template<typename DestT, typename SrcT>
-inline vector3d<DestT> vector3d_cast(const vector3d<SrcT> &source)
-{
-	return vector3d<DestT>(source.X, source.Y, source.Z);
-}
-
-inline void translateBox(aabbox3df &box, int offsetX, int offsetY, int offsetZ)
-{
-	box.MinEdge.X += offsetX;
-	box.MinEdge.Y += offsetY;
-	box.MinEdge.Z += offsetZ;
-
-	box.MaxEdge.X += offsetX;
-	box.MaxEdge.Y += offsetY;
-	box.MaxEdge.Z += offsetZ;
-}
-
-inline bool rayIntersectsWithBox(const line3df &ray, const aabbox3df &box)
+inline bool rayIntersectsWithBox(const line3df &ray, const AABB &box)
 {
 	/* MinX <= Xt + x0 <= MaxX
 	   MinY <= Yt + y0 <= MaxY
@@ -93,50 +76,50 @@ inline bool rayIntersectsWithBox(const line3df &ray, const aabbox3df &box)
 	f32 tMin = 0, tMax = std::numeric_limits<f32>::infinity();
 	if (iszero(X)) /* 0 >= MinX - x0 */ /* 0 <= MaxX - x0 */
 	{
-		if (box.MinEdge.X - x0 > ROUNDING_ERROR_f32 || box.MaxEdge.X < -ROUNDING_ERROR_f32)
+		if (box.minPoint.x - x0 > ROUNDING_ERROR_f32 || box.maxPoint.x < -ROUNDING_ERROR_f32)
 			return false;
 	}
 	else if (X > 0)
 	{
-		tMin = max(tMin, (box.MinEdge.X - x0) / X);
-		tMax = min(tMax, (box.MaxEdge.X - x0) / X);
+		tMin = max(tMin, (box.minPoint.x - x0) / X);
+		tMax = min(tMax, (box.maxPoint.x - x0) / X);
 	}
 	else
 	{
-		tMin = max(tMin, (box.MaxEdge.X - x0) / X);
-		tMax = min(tMax, (box.MinEdge.X - x0) / X);
+		tMin = max(tMin, (box.maxPoint.x - x0) / X);
+		tMax = min(tMax, (box.minPoint.x - x0) / X);
 	}
 
 	if (iszero(Y))
 	{
-		if (box.MinEdge.Y - y0 > ROUNDING_ERROR_f32 || box.MaxEdge.Y < -ROUNDING_ERROR_f32)
+		if (box.minPoint.y - y0 > ROUNDING_ERROR_f32 || box.maxPoint.y < -ROUNDING_ERROR_f32)
 			return false;
 	}
 	else if (Y > 0)
 	{
-		tMin = max(tMin, (box.MinEdge.Y - y0) / Y);
-		tMax = min(tMax, (box.MaxEdge.Y - y0) / Y);
+		tMin = max(tMin, (box.minPoint.y - y0) / Y);
+		tMax = min(tMax, (box.maxPoint.y - y0) / Y);
 	}
 	else
 	{
-		tMin = max(tMin, (box.MaxEdge.Y - y0) / Y);
-		tMax = min(tMax, (box.MinEdge.Y - y0) / Y);
+		tMin = max(tMin, (box.maxPoint.y - y0) / Y);
+		tMax = min(tMax, (box.minPoint.y - y0) / Y);
 	}
 
 	if (iszero(Z))
 	{
-		if (box.MinEdge.Z - z0 > ROUNDING_ERROR_f32 || box.MaxEdge.Z < -ROUNDING_ERROR_f32)
+		if (box.minPoint.z - z0 > ROUNDING_ERROR_f32 || box.maxPoint.z < -ROUNDING_ERROR_f32)
 			return false;
 	}
 	else if (Z > 0)
 	{
-		tMin = max(tMin, (box.MinEdge.Z - z0) / Z);
-		tMax = min(tMax, (box.MaxEdge.Z - z0) / Z);
+		tMin = max(tMin, (box.minPoint.z - z0) / Z);
+		tMax = min(tMax, (box.maxPoint.z - z0) / Z);
 	}
 	else
 	{
-		tMin = max(tMin, (box.MaxEdge.Z - z0) / Z);
-		tMax = min(tMax, (box.MinEdge.Z - z0) / Z);
+		tMin = max(tMin, (box.maxPoint.z - z0) / Z);
+		tMax = min(tMax, (box.minPoint.z - z0) / Z);
 	}
 	return tMin <= tMax;
 }

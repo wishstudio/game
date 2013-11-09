@@ -7,8 +7,6 @@
 ChunkSceneNode::ChunkSceneNode()
 {
 	lastPosition = { 0, 0, 0 };
-	f32 inf = std::numeric_limits<f32>::max() / 2;
-	box = { -inf, -inf, -inf, inf, inf, inf };
 	memset(preloadChunk, 0, sizeof preloadChunk);
 }
 
@@ -58,9 +56,4 @@ void ChunkSceneNode::render()
 					p->render();
 			}
 	lastPosition = { current_x, current_y, current_z };
-}
-
-const aabbox3df &ChunkSceneNode::getBoundingBox() const
-{
-	return box;
 }

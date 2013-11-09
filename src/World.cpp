@@ -236,8 +236,7 @@ bool World::getCameraIntersection(const line3df &ray, CameraIntersectionInfo **i
 			block = block.getNeighbour(0, 0, stepZ);
         }
 		/* Test current one */
-		aabbox3df box = block.getBoundingBox();
-		translateBox(box, x, y, z);
+		AABB box = block.getBoundingBox().translate(x, y, z);
 		if (rayIntersectsWithBox(ray, box))
 		{
 			*info = new CameraIntersectionInfo(block, direction);

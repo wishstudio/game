@@ -235,7 +235,4 @@ public:
 
 	static Matrix4 lookAtLH(const Vector3 &eye, const Vector3 &at, const Vector3 &up);
 	static Matrix4 lookAtRH(const Vector3 &eye, const Vector3 &at, const Vector3 &up);
-
-	/* TODO */
-	void transformBox(aabbox3df &box);
 };
