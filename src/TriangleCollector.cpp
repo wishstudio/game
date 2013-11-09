@@ -59,13 +59,13 @@ void TriangleCollector::setCurrentBlock(const Block &block)
 void TriangleCollector::addQuad(
 	const Tile &tile,
 	const vector3df &topLeft,
-	const SColor &topLeftColor,
+	const Color &topLeftColor,
 	const vector3df &topRight,
-	const SColor &topRightColor,
+	const Color &topRightColor,
 	const vector3df &bottomLeft,
-	const SColor &bottomLeftColor,
+	const Color &bottomLeftColor,
 	const vector3df &bottomRight,
-	const SColor &bottomRightColor,
+	const Color &bottomRightColor,
 	const vector3df &normal)
 {
 	MeshBuffer *buffer = getBuffer(tile.texture);

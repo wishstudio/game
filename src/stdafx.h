@@ -37,6 +37,7 @@ using namespace irr::video;
 #include "Queue.h"
 
 #include "Engine/Camera.h"
+#include "Engine/Color.h"
 #include "Engine/ITexture.h"
 #include "Engine/IVideo.h"
 #include "Engine/IWindowSystem.h"

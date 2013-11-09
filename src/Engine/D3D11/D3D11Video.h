@@ -1,5 +1,6 @@
 #pragma once
 
+#include "../Color.h"
 #include "../IVideo.h"
 
 #include <d3d11_2.h>
@@ -8,7 +9,7 @@
 struct Vertex
 {
 	vector3df pos;
-	SColor color;
+	Color color;
 	f32 u, v;
 };
 

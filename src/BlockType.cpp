@@ -45,10 +45,10 @@ ITTexture* BlockType::getTexture(u16 id) const {
 		return nullptr;
 }
 
-static inline SColor LIGHT_COLOR(u8 light)
+static inline Color LIGHT_COLOR(u8 light)
 {
 	int c = 255 * (light + 1) / 16.0;
-	return SColor(255, c, c, c);
+	return Color(255, c, c, c);
 }
 
 static inline u8 VERTEX_LIGHT(const Block &base, const Block &side1, const Block &side2, const Block &corner)
