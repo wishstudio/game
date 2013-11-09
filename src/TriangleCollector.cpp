@@ -15,7 +15,7 @@ TriangleCollector::~TriangleCollector()
 	clear();
 }
 
-MeshBuffer *TriangleCollector::getBuffer(ITTexture *texture)
+MeshBuffer *TriangleCollector::getBuffer(ITexture *texture)
 {
 	auto it = textureMap.find(texture);
 	if (it != textureMap.end())

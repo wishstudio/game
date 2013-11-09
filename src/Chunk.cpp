@@ -32,9 +32,6 @@ Chunk::Chunk(int _chunk_x, int _chunk_y, int _chunk_z)
 
 	boundingBox.merge(Vector3(CHUNK_SIZE, CHUNK_SIZE, CHUNK_SIZE));
 	modelTransform = Matrix4::translation(chunk_x * CHUNK_SIZE, chunk_y * CHUNK_SIZE, chunk_z * CHUNK_SIZE);
-
-	material.Wireframe = false;
-	material.Lighting = false;
 }
 
 Chunk::~Chunk()

@@ -19,7 +19,6 @@ using namespace irr::core;
 using namespace irr::gui;
 using namespace irr::io;
 using namespace irr::scene;
-using namespace irr::video;
 
 #include <atomic>
 #include <chrono>

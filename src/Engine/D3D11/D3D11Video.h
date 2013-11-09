@@ -47,13 +47,13 @@ public:
 	virtual void beginDraw() override;
 	virtual void endDraw() override;
 
-	virtual ITTexture *createTexture(const std::string &path) override;
-	virtual void deleteTexture(ITTexture *texture) override;
+	virtual ITexture *createTexture(const std::string &path) override;
+	virtual void deleteTexture(ITexture *texture) override;
 
 	virtual MeshBuffer *createMeshBuffer() override;
 	virtual void deleteMeshBuffer(MeshBuffer *buffer) override;
 
-	virtual void setTexture(ITTexture *texture) override;
+	virtual void setTexture(ITexture *texture) override;
 	virtual void setModelMatrix(const Matrix4 &matrix) override;
 	virtual void setViewMatrix(const Matrix4 &matrix) override;
 	virtual void setProjectionMatrix(const Matrix4 &matrix) override;
@@ -64,7 +64,7 @@ private:
 	void createShaders();
 	char *decodeImage(const char *raw, int size, int *width, int *height);
 	char *getResourceData(const char *resourceName, int *fileSize);
-	ITTexture *createTexture(int width, int height, const void *initialData, D3D11_USAGE usage, UINT bindFlag);
+	ITexture *createTexture(int width, int height, const void *initialData, D3D11_USAGE usage, UINT bindFlag);
 	void updateHardwareBuffer(MeshBuffer *buffer);
 
 	IWICImagingFactory *pFactory;

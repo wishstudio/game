@@ -405,7 +405,7 @@ char *D3D11Video::getResourceData(const char *resourceName, int *fileSize)
 	return content;
 }
 
-ITTexture *D3D11Video::createTexture(int width, int height, const void *initialData, D3D11_USAGE usage, UINT bindFlag)
+ITexture *D3D11Video::createTexture(int width, int height, const void *initialData, D3D11_USAGE usage, UINT bindFlag)
 {
 	Texture *texture = new Texture();
 	memset(texture, 0, sizeof texture);
@@ -446,10 +446,10 @@ ITTexture *D3D11Video::createTexture(int width, int height, const void *initialD
 	resourceViewDesc.Texture2D.MipLevels = 1;
 
 	pDevice->CreateShaderResourceView(texture->pTexture, &resourceViewDesc, &texture->pResourceView);
-	return (ITTexture *) texture;
+	return (ITexture *) texture;
 };
 
-ITTexture *D3D11Video::createTexture(const std::string &path)
+ITexture *D3D11Video::createTexture(const std::string &path)
 {
 	int size;
 	char *raw = getResourceData(path.c_str(), &size);
@@ -460,12 +460,12 @@ ITTexture *D3D11Video::createTexture(const std::string &path)
 	delete raw;
 	if (image == NULL)
 		return NULL;
-	ITTexture *texture = createTexture(width, height, image, D3D11_USAGE_DEFAULT, D3D11_BIND_SHADER_RESOURCE);
+	ITexture *texture = createTexture(width, height, image, D3D11_USAGE_DEFAULT, D3D11_BIND_SHADER_RESOURCE);
 	delete image;
 	return texture;
 }
 
-void D3D11Video::deleteTexture(ITTexture *_texture)
+void D3D11Video::deleteTexture(ITexture *_texture)
 {
 	Texture *texture = (Texture *) _texture;
 	if (texture->pResourceView)
@@ -489,7 +489,7 @@ void D3D11Video::deleteMeshBuffer(MeshBuffer *buffer)
 	delete buffer;
 }
 
-void D3D11Video::setTexture(ITTexture *_texture)
+void D3D11Video::setTexture(ITexture *_texture)
 {
 	Texture *texture = (Texture *)_texture;
 	pContext->PSSetShaderResources(0, 1, &texture->pResourceView);

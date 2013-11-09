@@ -60,7 +60,6 @@ private:
 	std::atomic<bool> dirty;
 	std::atomic<TriangleCollector *> triangleCollector;
 	BlockData blocks[CHUNK_SIZE][CHUNK_SIZE][CHUNK_SIZE];
-	SMaterial material;
 	AABB boundingBox;
 	Matrix4 modelTransform;
 

@@ -38,7 +38,7 @@ bool BlockType::isSolid(const Block &block) const
 	return blockTypeSpec[block.getType()].type == Type_Cube;
 }
 
-ITTexture* BlockType::getTexture(u16 id) const {
+ITexture* BlockType::getTexture(u16 id) const {
 	if (blockTypeSpec[id].type != 0)
 		return blockTypeSpec[id].tile.texture;
 	else
