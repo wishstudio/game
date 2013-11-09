@@ -6,12 +6,20 @@
 
 #include <irrlicht.h>
 
-using namespace irr;
-using namespace core;
-using namespace gui;
-using namespace io;
-using namespace scene;
-using namespace video;
+using irr::u8;
+using irr::u16;
+using irr::u32;
+using irr::u64;
+using irr::s8;
+using irr::s16;
+using irr::s32;
+using irr::s64;
+using irr::f32;
+using namespace irr::core;
+using namespace irr::gui;
+using namespace irr::io;
+using namespace irr::scene;
+using namespace irr::video;
 
 #include <atomic>
 #include <chrono>
@@ -25,8 +33,13 @@ using namespace video;
 #include <unordered_map>
 
 #include "Hash.h"
-#include "Math.h"
+#include "MathHelper.h"
 #include "Queue.h"
+
+#include "Engine/Camera.h"
+#include "Engine/ITexture.h"
+#include "Engine/IVideo.h"
+#include "Engine/IWindowSystem.h"
 
 class ChunkSceneNode;
 class Database;
@@ -35,9 +48,6 @@ class TileManager;
 class TimeManager;
 class World;
 class EventReceiver;
-extern ISceneManager *smgr;
-extern IVideoDriver *driver;
-extern ICameraSceneNode *camera;
 extern ChunkSceneNode *chunkSceneNode;
 extern Database *database;
 extern BlockType *blockType;
@@ -45,6 +55,10 @@ extern TileManager *tileManager;
 extern TimeManager *timeManager;
 extern World *world;
 extern EventReceiver *eventReceiver;
+
+extern Camera *camera;
+extern IVideo *video;
+extern IWindowSystem *windowSystem;
 
 /* 20 ticks per second */
 static const auto TICK_DURATION = std::chrono::milliseconds(50);

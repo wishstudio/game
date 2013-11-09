@@ -127,13 +127,16 @@ void Chunk::render()
 			world->asyncLoadChunk(this);
 		return;
 	}
-	driver->setTransform(ETS_WORLD, absoluteTransformation);
+	//driver->setTransform(ETS_WORLD, absoluteTransformation);
+	video->setWorldMatrix(absoluteTransformation);
 	for (u32 i = 0; i < collector->getBufferCount(); i++)
 	{
-		SMeshBuffer *buffer = collector->getBuffer(i);
-		material.setTexture(0, collector->getBufferTexture(i));
-		driver->setMaterial(material);
-		driver->drawMeshBuffer(buffer);
+		MeshBuffer *buffer = collector->getBuffer(i);
+		video->setTexture(collector->getBufferTexture(i));
+		video->drawMeshBuffer(buffer);
+		//material.setTexture(0, collector->getBufferTexture(i));
+		//driver->setMaterial(material);
+		//driver->drawMeshBuffer(buffer);
 	}
 }
 

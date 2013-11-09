@@ -14,7 +14,7 @@ BlockType::~BlockType()
 {
 }
 
-void BlockType::registerCube(u16 id, stringw tilePath)
+void BlockType::registerCube(u16 id, const std::string &tilePath)
 {
 	blockTypeSpec[id].type = Type_Cube;
 	blockTypeSpec[id].tile = tileManager->registerTile(tilePath);
@@ -38,7 +38,7 @@ bool BlockType::isSolid(const Block &block) const
 	return blockTypeSpec[block.getType()].type == Type_Cube;
 }
 
-ITexture* BlockType::getTexture(u16 id) const {
+ITTexture* BlockType::getTexture(u16 id) const {
 	if (blockTypeSpec[id].type != 0)
 		return blockTypeSpec[id].tile.texture;
 	else

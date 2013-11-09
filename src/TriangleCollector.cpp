@@ -3,6 +3,7 @@
 #include "Block.h"
 #include "TriangleCollector.h"
 #include "World.h"
+#include "Engine/D3D11/D3D11Video.h"
 
 TriangleCollector::TriangleCollector()
 {
@@ -14,15 +15,14 @@ TriangleCollector::~TriangleCollector()
 	clear();
 }
 
-SMeshBuffer *TriangleCollector::getBuffer(ITexture *texture)
+MeshBuffer *TriangleCollector::getBuffer(ITTexture *texture)
 {
 	auto it = textureMap.find(texture);
 	if (it != textureMap.end())
 		return it->second;
 	else
 	{
-		SMeshBuffer *buffer = new SMeshBuffer();
-		buffer->setHardwareMappingHint(EHM_DYNAMIC, EBT_VERTEX_AND_INDEX);
+		MeshBuffer *buffer = video->createMeshBuffer();
 		buffers.push_back(buffer);
 		textures.push_back(texture);
 		textureMap.insert(std::make_pair(texture, buffer));
@@ -32,11 +32,8 @@ SMeshBuffer *TriangleCollector::getBuffer(ITexture *texture)
 
 void TriangleCollector::clear()
 {
-	for (IMeshBuffer *buffer : buffers)
-	{
-		driver->removeHardwareBuffer(buffer);
-		buffer->drop();
-	}
+	for (MeshBuffer *buffer : buffers)
+		video->deleteMeshBuffer(buffer);
 	buffers.clear();
 	textures.clear();
 	textureMap.clear();
@@ -47,11 +44,6 @@ void TriangleCollector::clear()
 void TriangleCollector::finalize()
 {
 	endIndex[x][y][z] = triangles.size();
-	for (IMeshBuffer *buffer : buffers)
-	{
-		buffer->setDirty();
-		buffer->recalculateBoundingBox();
-	}
 	valid = true;
 }
 
@@ -76,9 +68,30 @@ void TriangleCollector::addQuad(
 	const SColor &bottomRightColor,
 	const vector3df &normal)
 {
-	SMeshBuffer *buffer = getBuffer(tile.texture);
+	MeshBuffer *buffer = getBuffer(tile.texture);
 
-	u32 s = buffer->Vertices.size();
+	u32 s = buffer->vertexBuffer.size();
+	buffer->vertexBuffer.push_back({
+		vector3df(topLeft.X + x, topLeft.Y + y, topLeft.Z + z),
+		topLeftColor,
+		tile.u1, tile.v1
+	});
+	buffer->vertexBuffer.push_back({
+		vector3df(topRight.X + x, topRight.Y + y, topRight.Z + z),
+		topRightColor,
+		tile.u2, tile.v1
+	});
+	buffer->vertexBuffer.push_back({
+		vector3df(bottomLeft.X + x, bottomLeft.Y + y, bottomLeft.Z + z),
+		bottomLeftColor,
+		tile.u1, tile.v2
+	});
+	buffer->vertexBuffer.push_back({
+		vector3df(bottomRight.X + x, bottomRight.Y + y, bottomRight.Z + z),
+		bottomRightColor,
+		tile.u2, tile.v2
+	});
+	/*u32 s = buffer->Vertices.size();
 	buffer->Vertices.push_back(S3DVertex(
 		topLeft.X + x, topLeft.Y + y, topLeft.Z + z,
 		normal.X, normal.Y, normal.Z,
@@ -102,21 +115,21 @@ void TriangleCollector::addQuad(
 		normal.X, normal.Y, normal.Z,
 		bottomRightColor,
 		tile.u2, tile.v2
-	));
+	));*/
 
 	addTriangleIndex(buffer, s, s + 1, s + 2);
 	addTriangleIndex(buffer, s + 2, s + 1, s + 3);
 }
 
-void TriangleCollector::addTriangleIndex(SMeshBuffer *buffer, u32 i1, u32 i2, u32 i3)
+void TriangleCollector::addTriangleIndex(MeshBuffer *buffer, u32 i1, u32 i2, u32 i3)
 {
-	buffer->Indices.push_back(i1);
-	buffer->Indices.push_back(i2);
-	buffer->Indices.push_back(i3);
+	buffer->indexBuffer.push_back(i1);
+	buffer->indexBuffer.push_back(i2);
+	buffer->indexBuffer.push_back(i3);
 
 	triangles.push_back(triangle3df(
-		buffer->Vertices[i1].Pos,
-		buffer->Vertices[i2].Pos,
-		buffer->Vertices[i3].Pos
+		buffer->vertexBuffer[i1].pos,
+		buffer->vertexBuffer[i2].pos,
+		buffer->vertexBuffer[i3].pos
 	));
 }

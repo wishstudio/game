@@ -16,10 +16,17 @@
     <ClInclude Include="src\Chunk.h" />
     <ClInclude Include="src\ChunkSceneNode.h" />
     <ClInclude Include="src\Database.h" />
+    <ClInclude Include="src\Engine\D3D11\D3D11Video.h" />
+    <ClInclude Include="src\Engine\Camera.h" />
+    <ClInclude Include="src\Engine\ITexture.h" />
+    <ClInclude Include="src\Engine\IVideo.h" />
+    <ClInclude Include="src\Engine\IWindowSystem.h" />
+    <ClInclude Include="src\Engine\KeyValue.h" />
+    <ClInclude Include="src\Engine\WindowSystem\Win32WindowSystem.h" />
     <ClInclude Include="src\EventReceiver.h" />
     <ClInclude Include="src\Hash.h" />
     <ClInclude Include="src\lz4\lz4.h" />
-    <ClInclude Include="src\Math.h" />
+    <ClInclude Include="src\MathHelper.h" />
     <ClInclude Include="src\Noise.h" />
     <ClInclude Include="src\PlayerAnimator.h" />
     <ClInclude Include="src\Queue.h" />
@@ -38,6 +45,10 @@
     <ClCompile Include="src\ChunkSceneNode.cpp" />
     <ClCompile Include="src\Database.cpp" />
     <ClCompile Include="src\Deserializer.cpp" />
+    <ClCompile Include="src\Engine\D3D11\D3D11Video.cpp" />
+    <ClCompile Include="src\Engine\Camera.cpp" />
+    <ClCompile Include="src\Engine\IWindowSystem.cpp" />
+    <ClCompile Include="src\Engine\WindowSystem\Win32WindowSystem.cpp" />
     <ClCompile Include="src\EventReceiver.cpp" />
     <ClCompile Include="src\lz4\lz4.c">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
@@ -86,11 +97,11 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>$(ProjectDir)\tools\irrlicht-1.8\include;$(ProjectDir)\tools\sqlite;$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)\src;$(ProjectDir)\tools\irrlicht-1.8\include;$(ProjectDir)\tools\sqlite;$(IncludePath)</IncludePath>
     <LibraryPath>$(ProjectDir)\tools\irrlicht-1.8\lib\Win32-visualstudio;$(ProjectDir)\tools\sqlite;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <IncludePath>$(ProjectDir)\tools\irrlicht-1.8\include;$(ProjectDir)\tools\sqlite;$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)\src;$(ProjectDir)\tools\irrlicht-1.8\include;$(ProjectDir)\tools\sqlite;$(IncludePath)</IncludePath>
     <LibraryPath>$(ProjectDir)\tools\irrlicht-1.8\lib\Win32-visualstudio;$(ProjectDir)\tools\sqlite;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -101,6 +112,7 @@
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>dxguid.lib;windowscodecs.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -116,6 +128,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalDependencies>dxguid.lib;windowscodecs.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

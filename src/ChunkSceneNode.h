@@ -2,14 +2,13 @@
 
 static const int PRELOAD_DISTANCE = 5;
 
-class ChunkSceneNode: public ISceneNode
+class ChunkSceneNode
 {
 public:
 	ChunkSceneNode();
 
-	virtual void OnRegisterSceneNode() override;
-	virtual const aabbox3df &getBoundingBox() const override;
-	virtual void render() override;
+	const aabbox3df &getBoundingBox() const;
+	void render();
 
 private:
 	Chunk *preloadChunk[PRELOAD_DISTANCE * 2 + 1][PRELOAD_DISTANCE * 2 + 1][PRELOAD_DISTANCE * 2 + 1];

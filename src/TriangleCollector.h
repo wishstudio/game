@@ -10,8 +10,8 @@ public:
 	virtual ~TriangleCollector();
 
 	inline u32 getBufferCount() const { return buffers.size(); }
-	inline SMeshBuffer *getBuffer(u32 i) const { return buffers[i]; }
-	inline ITexture *getBufferTexture(u32 i) const { return textures[i]; }
+	inline MeshBuffer *getBuffer(u32 i) const { return buffers[i]; }
+	inline ITTexture *getBufferTexture(u32 i) const { return textures[i]; }
 	
 	bool isValid() { return valid; }
 	void clear();
@@ -44,13 +44,13 @@ public:
 	}
 
 private:
-	SMeshBuffer *getBuffer(ITexture *texture);
-	void addTriangleIndex(SMeshBuffer *buffer, u32 i1, u32 i2, u32 i3);
+	MeshBuffer *getBuffer(ITTexture *texture);
+	void addTriangleIndex(MeshBuffer *buffer, u32 i1, u32 i2, u32 i3);
 
 	bool valid;
-	std::vector<SMeshBuffer *> buffers;
-	std::vector<ITexture *> textures;
-	std::unordered_map<ITexture *, SMeshBuffer *> textureMap;
+	std::vector<MeshBuffer *> buffers;
+	std::vector<ITTexture *> textures;
+	std::unordered_map<ITTexture *, MeshBuffer *> textureMap;
 	int x, y, z;
 	std::vector<triangle3df> triangles;
 	int beginIndex[CHUNK_SIZE][CHUNK_SIZE][CHUNK_SIZE], endIndex[CHUNK_SIZE][CHUNK_SIZE][CHUNK_SIZE];

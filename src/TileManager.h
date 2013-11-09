@@ -8,7 +8,7 @@ struct Tile
 	{
 	}
 
-	ITexture *texture;
+	ITTexture *texture;
 	float u1, v1, u2, v2;
 };
 
@@ -18,5 +18,5 @@ public:
 	TileManager();
 	virtual ~TileManager();
 
-	Tile registerTile(stringw resourcePath);
+	Tile registerTile(const std::string &resourcePath);
 };

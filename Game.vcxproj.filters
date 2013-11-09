@@ -15,6 +15,15 @@
     <Filter Include="Source\lz4">
       <UniqueIdentifier>{e1bbc05c-2240-4c95-aaf7-2685ea7a1637}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Engine">
+      <UniqueIdentifier>{0ebf30c0-2aa9-4ea2-b5b3-c6678e8f71b1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\D3D11">
+      <UniqueIdentifier>{977db717-4a26-4055-92be-4aa17319187c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\WindowSystem">
+      <UniqueIdentifier>{de3fe7f1-ede9-4b6e-90e3-1efe612ac93f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Block.h">
@@ -24,9 +33,6 @@
       <Filter>Header</Filter>
     </ClInclude>
     <ClInclude Include="src\EventReceiver.h">
-      <Filter>Header</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Math.h">
       <Filter>Header</Filter>
     </ClInclude>
     <ClInclude Include="src\Serialization.h">
@@ -73,6 +79,30 @@
     </ClInclude>
     <ClInclude Include="src\ChunkSceneNode.h">
       <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Engine\D3D11\D3D11Video.h">
+      <Filter>Engine\D3D11</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Engine\IVideo.h">
+      <Filter>Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Engine\ITexture.h">
+      <Filter>Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Engine\IWindowSystem.h">
+      <Filter>Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Engine\WindowSystem\Win32WindowSystem.h">
+      <Filter>Engine\WindowSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Engine\KeyValue.h">
+      <Filter>Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="src\MathHelper.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Engine\Camera.h">
+      <Filter>Engine</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -129,6 +159,18 @@
     </ClCompile>
     <ClCompile Include="src\ChunkSceneNode.cpp">
       <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Engine\D3D11\D3D11Video.cpp">
+      <Filter>Engine\D3D11</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Engine\WindowSystem\Win32WindowSystem.cpp">
+      <Filter>Engine\WindowSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Engine\IWindowSystem.cpp">
+      <Filter>Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Engine\Camera.cpp">
+      <Filter>Engine</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

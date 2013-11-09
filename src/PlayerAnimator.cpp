@@ -33,18 +33,18 @@ void PlayerAnimator::tick()
 	const f32 MOVE_SPEED = 6 * seconds<f32>(TICK_DURATION);
 	if (!currentFalling)
 	{
-		vector3df forwardVec = (camera->getTarget() - camera->getPosition());
+		vector3df forwardVec = (camera->getLookAt() - camera->getPosition());
 		forwardVec.Y = 0;
 		forwardVec.normalize();
 		vector3df leftVec = forwardVec.crossProduct({ 0, 1, 0 });
 
-		if (eventReceiver->isKeyDown(KEY_KEY_W))
+		if (windowSystem->isKeyDown(KEY_W))
 			currentDistance += forwardVec * MOVE_SPEED;
-		if (eventReceiver->isKeyDown(KEY_KEY_S))
+		if (windowSystem->isKeyDown(KEY_S))
 			currentDistance -= forwardVec * MOVE_SPEED;
-		if (eventReceiver->isKeyDown(KEY_KEY_A))
+		if (windowSystem->isKeyDown(KEY_A))
 			currentDistance += leftVec * MOVE_SPEED;
-		if (eventReceiver->isKeyDown(KEY_KEY_D))
+		if (windowSystem->isKeyDown(KEY_D))
 			currentDistance -= leftVec * MOVE_SPEED;
 
 		jumpDistance = currentDistance;
@@ -57,7 +57,7 @@ void PlayerAnimator::tick()
 		nextVerticalVelocity -= 9.8 * 2 * seconds<f32>(TICK_DURATION);
 	else
 	{
-		if (eventReceiver->isKeyDown(KEY_SPACE))
+		if (windowSystem->isKeyDown(KEY_SPACE))
 			nextVerticalVelocity = 9.8;
 		else
 			nextVerticalVelocity = 0;
