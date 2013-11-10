@@ -20,6 +20,8 @@ public:
 
 	bool isKeyDown(KeyValue key) const { return keyDownState[key]; }
 	bool isKeyPressed(KeyValue key) const { return keyPressState[key]; }
+	bool isMouseDown(MouseButton button) const { return mouseDownState[button]; }
+	bool isMousePressed(MouseButton button) const { return mousePressState[button]; }
 
 	virtual void setMouseVisible(bool isVisible) = 0;
 	virtual bool isMouseVisible() const = 0;
@@ -31,11 +33,14 @@ public:
 protected:
 	void onKeyDown(KeyValue key);
 	void onKeyUp(KeyValue key);
+	void onMouseDown(MouseButton button);
+	void onMouseUp(MouseButton up);
 	void onMouseMove(int x, int y);
 	void onLostFocus();
 	void onNewFrame();
 
 private:
 	Vector2D normalizedMousePosition = Vector2D(0, 0);
-	bool keyDownState[256], keyPressState[256];
+	bool keyDownState[KEY_VALUE_COUNT], keyPressState[KEY_VALUE_COUNT];
+	bool mouseDownState[MOUSE_BUTTON_COUNT], mousePressState[MOUSE_BUTTON_COUNT];
 };

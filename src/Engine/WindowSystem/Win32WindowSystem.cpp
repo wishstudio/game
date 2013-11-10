@@ -219,6 +219,30 @@ LRESULT Win32WindowSystem::wndProc(HWND hWnd, UINT message, WPARAM wParam, LPARA
 		onKeyUp(Win32KeyCodes[wParam]);
 		break;
 
+	case WM_LBUTTONDOWN:
+		onMouseDown(MOUSE_BUTTON_LEFT);
+		break;
+
+	case WM_LBUTTONUP:
+		onMouseUp(MOUSE_BUTTON_LEFT);
+		break;
+
+	case WM_MBUTTONDOWN:
+		onMouseDown(MOUSE_BUTTON_MIDDLE);
+		break;
+
+	case WM_MBUTTONUP:
+		onMouseUp(MOUSE_BUTTON_MIDDLE);
+		break;
+
+	case WM_RBUTTONDOWN:
+		onMouseDown(MOUSE_BUTTON_RIGHT);
+		break;
+
+	case WM_RBUTTONUP:
+		onMouseUp(MOUSE_BUTTON_RIGHT);
+		break;
+
 	case WM_MOUSEMOVE:
 	{
 		int x = GET_X_LPARAM(lParam), y = GET_Y_LPARAM(lParam);

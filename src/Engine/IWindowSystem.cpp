@@ -21,15 +21,16 @@ void IWindowSystem::onKeyUp(KeyValue key)
 	keyPressState[key] = false;
 }
 
-void IWindowSystem::onNewFrame()
+void IWindowSystem::onMouseDown(MouseButton button)
 {
-	memset(keyPressState, 0, sizeof keyPressState);
+	mouseDownState[button] = true;
+	mousePressState[button] = true;
 }
 
-void IWindowSystem::onLostFocus()
+void IWindowSystem::onMouseUp(MouseButton button)
 {
-	memset(keyPressState, 0, sizeof keyPressState);
-	memset(keyDownState, 0, sizeof keyDownState);
+	mouseDownState[button] = false;
+	mousePressState[button] = false;
 }
 
 void IWindowSystem::onMouseMove(int x, int y)
@@ -39,6 +40,20 @@ void IWindowSystem::onMouseMove(int x, int y)
 	f32 nx = 2.f * (f32)x / (f32)width - 1.f;
 	f32 ny = 2.f * (f32)(height - y) / (f32)height - 1.f;
 	normalizedMousePosition = Vector2D(nx, ny);
+}
+
+void IWindowSystem::onLostFocus()
+{
+	memset(keyDownState, 0, sizeof keyDownState);
+	memset(keyPressState, 0, sizeof keyPressState);
+	memset(mouseDownState, 0, sizeof mouseDownState);
+	memset(mousePressState, 0, sizeof mousePressState);
+}
+
+void IWindowSystem::onNewFrame()
+{
+	memset(keyPressState, 0, sizeof keyPressState);
+	memset(mousePressState, 0, sizeof mousePressState);
 }
 
 void IWindowSystem::setNormalizedMousePosition(f32 nx, f32 ny)
