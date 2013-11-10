@@ -78,23 +78,23 @@ int main()
 		timeManager->update();
 		
 		World::CameraIntersectionInfo *info = nullptr;
-		/*if (world->getCameraIntersection(line3df(camera->getPosition(), camera->getLookAt()), &info))
+		if (world->getCameraIntersection(Ray3D(camera->getPosition(), camera->getLookAt() - camera->getPosition()), &info))
 		{
-			driver->setTransform(ETS_WORLD, IdentityMatrix);
-			aabbox3df box = info->block.getBoundingBox();
-			translateBox(box, info->block.x(), info->block.y(), info->block.z());
-			box.MinEdge.X -= .01f;
+			AABB box = info->block.getBoundingBox();
+			box.translate(info->block.x(), info->block.y(), info->block.z());
+			/*box.MinEdge.X -= .01f;
 			box.MinEdge.Y -= .01f;
 			box.MinEdge.Z -= .01f;
 			box.MaxEdge.X += .01f;
 			box.MaxEdge.Y += .01f;
 			box.MaxEdge.Z += .01f;
-			driver->draw3DBox(box, SColor(255, 255, 0, 0));
-			if (leftMousePressed)
+			driver->setTransform(ETS_WORLD, IdentityMatrix);
+			driver->draw3DBox(box, SColor(255, 255, 0, 0));*/
+			if (windowSystem->isMousePressed(MOUSE_BUTTON_LEFT))
 				info->block.setType(0);
-			if (rightMousePressed)
-				info->block.getNeighbour(oppositeDirection(info->direction)).setType(shortcutIUI.getCurrentItem());
-		}*/
+			if (windowSystem->isMousePressed(MOUSE_BUTTON_RIGHT))
+				info->block.getNeighbour(oppositeDirection(info->direction)).setType(1);//shortcutIUI.getCurrentItem()
+		}
 		while (timeManager->tick())
 		{
 			world->tick();
