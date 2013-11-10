@@ -45,7 +45,6 @@ extern BlockType *blockType;
 extern TileManager *tileManager;
 extern TimeManager *timeManager;
 extern World *world;
-extern EventReceiver *eventReceiver;
 
 extern Camera *camera;
 extern IVideo *video;
