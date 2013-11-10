@@ -4,7 +4,6 @@
 #include "Chunk.h"
 #include "ChunkSceneNode.h"
 #include "Database.h"
-#include "EventReceiver.h"
 #include "PlayerAnimator.h"
 #include "ShortcutItemUI.h"
 #include "TileManager.h"
@@ -23,8 +22,6 @@
 int main()
 {
 	/* Create video device */
-	eventReceiver = new EventReceiver();
-
 	Win32WindowSystem *w = new Win32WindowSystem();
 	w->init(1024, 768);
 	windowSystem = w;
@@ -65,7 +62,6 @@ int main()
 	PlayerAnimator *playerAnimator = new PlayerAnimator();
 	chunkSceneNode = new ChunkSceneNode();
 	
-	bool lastLeftMouseDown = false, lastRightMouseDown = false;
 	while (windowSystem->processMessage())
 	{
 		/* In case of window size changes */
@@ -78,14 +74,6 @@ int main()
 
 		timeManager->update();
 		
-		bool leftMousePressed = false, rightMousePressed = false;
-		if (eventReceiver->isLeftButtonDown() && lastLeftMouseDown == false)
-			leftMousePressed = true;
-		lastLeftMouseDown = eventReceiver->isLeftButtonDown();
-		if (eventReceiver->isRightButtonDown() && lastRightMouseDown == false)
-			rightMousePressed = true;
-		lastRightMouseDown = eventReceiver->isRightButtonDown();
-
 		World::CameraIntersectionInfo *info = nullptr;
 		/*if (world->getCameraIntersection(line3df(camera->getPosition(), camera->getLookAt()), &info))
 		{

@@ -1,6 +1,5 @@
 #pragma once
 
-#include "EventReceiver.h"
 #include "BlockType.h"
 
 class ShortcutItemUI {

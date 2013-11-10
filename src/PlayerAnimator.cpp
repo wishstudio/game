@@ -3,7 +3,6 @@
 #include <DirectXMath.h>
 
 #include "Chunk.h"
-#include "EventReceiver.h"
 #include "PlayerAnimator.h"
 #include "TimeManager.h"
 #include "World.h"

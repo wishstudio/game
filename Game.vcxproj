@@ -29,7 +29,6 @@
     <ClInclude Include="src\Engine\Triangle3D.h" />
     <ClInclude Include="src\Engine\Vector3.h" />
     <ClInclude Include="src\Engine\WindowSystem\Win32WindowSystem.h" />
-    <ClInclude Include="src\EventReceiver.h" />
     <ClInclude Include="src\Hash.h" />
     <ClInclude Include="src\lz4\lz4.h" />
     <ClInclude Include="src\MathHelper.h" />
@@ -56,7 +55,6 @@
     <ClCompile Include="src\Engine\IWindowSystem.cpp" />
     <ClCompile Include="src\Engine\Matrix4.cpp" />
     <ClCompile Include="src\Engine\WindowSystem\Win32WindowSystem.cpp" />
-    <ClCompile Include="src\EventReceiver.cpp" />
     <ClCompile Include="src\lz4\lz4.c">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
