@@ -16,4 +16,6 @@ private:
 	f32 nextVerticalVelocity, nextVerticalDistance;
 	bool nextFalling;
 	Vector3D jumpDistance;
+
+	f32 rotationHorizontal = 0, rotationVertical = 0;
 };

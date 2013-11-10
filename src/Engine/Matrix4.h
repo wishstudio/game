@@ -184,6 +184,7 @@ public:
 			0, 0, 0, 1);
 	}
 
+	/* Rotation counter-clockwise about the X axis */
 	static Matrix4 rotationX(f32 angle)
 	{
 		return Matrix4(
@@ -193,6 +194,7 @@ public:
 			0, 0, 0, 1);
 	}
 
+	/* Rotation counter-clockwise about the Y axis */
 	static Matrix4 rotationY(f32 angle)
 	{
 		return Matrix4(
@@ -202,6 +204,7 @@ public:
 			0, 0, 0, 1);
 	}
 
+	/* Rotation counter-clockwise about the Z axis */
 	static Matrix4 rotationZ(f32 angle)
 	{
 		return Matrix4(

@@ -15,6 +15,7 @@
 #include "Engine/Matrix4.h"
 #include "Engine/Ray3D.h"
 #include "Engine/Triangle3D.h"
+#include "Engine/Vector2D.h"
 #include "Engine/Vector3D.h"
 
 #include <atomic>

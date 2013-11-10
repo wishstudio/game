@@ -21,6 +21,7 @@ int main()
 	/* Create video device */
 	Win32WindowSystem *w = new Win32WindowSystem();
 	w->init(1024, 768);
+	w->setMouseVisible(false);
 	windowSystem = w;
 
 	D3D11Video *v = new D3D11Video();
@@ -61,6 +62,11 @@ int main()
 	
 	while (windowSystem->processMessage())
 	{
+		if (!windowSystem->isActive())
+		{
+			std::this_thread::yield();
+			continue;
+		}
 		/* In case of window size changes */
 		//auto renderTargetSize = driver->getCurrentRenderTargetSize();
 		//camera->setAspectRatio((f32) renderTargetSize.Width / (f32) renderTargetSize.Height);
@@ -146,7 +152,6 @@ int main()
 		windowSystem->setWindowTitle(s.c_str());
 		
 		video->endDraw();
-		windowSystem->onNewFrame();
 	}
 
 	delete playerAnimator;

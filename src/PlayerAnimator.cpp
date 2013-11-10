@@ -1,7 +1,5 @@
 #include "stdafx.h"
 
-#include <DirectXMath.h>
-
 #include "Chunk.h"
 #include "PlayerAnimator.h"
 #include "TimeManager.h"
@@ -215,10 +213,26 @@ Vector3D PlayerAnimator::collideEllipsoidWithWorld(Vector3D position, Vector3D m
 void PlayerAnimator::update()
 {
 	const Vector3D playerCameraOffset(0, 1.7f, 0);
+	const f32 VIEW_DELTA = 0.01;
 
 	/* Interpolate camera position for smooth rendering */
 	Vector3D position(currentPosition);
 	Vector3D diffVec(nextPosition - currentPosition);
 	position += diffVec * (seconds<f32>(timeManager->getRemainingTickDuration()) / seconds<f32>(TICK_DURATION));
-	camera->setPosition(position + playerCameraOffset);
+	position += playerCameraOffset;
+	camera->setPosition(position);
+
+	/* Update rotation */
+	Vector2D mouseDelta = windowSystem->getNormalizedMousePosition();
+	/* TODO: Aspect ratio */
+	f32 rotationHorizontalDelta = -mouseDelta.x * PI / 3;
+	f32 rotationVerticalDelta = mouseDelta.y * PI / 4;
+
+	rotationHorizontal += rotationHorizontalDelta;
+	rotationVertical = bound(-PI / 2, rotationVertical + rotationVerticalDelta, PI / 2 - VIEW_DELTA);
+
+	Vector3D lookDirection = Vector3D(std::sin(rotationHorizontal), std::sin(rotationVertical), std::cos(rotationHorizontal));
+	camera->setLookAt(position + lookDirection);
+
+	windowSystem->setNormalizedMousePosition(0, 0);
 }

@@ -20,14 +20,15 @@
     <ClInclude Include="src\Engine\Color.h" />
     <ClInclude Include="src\Engine\D3D11\D3D11Video.h" />
     <ClInclude Include="src\Engine\Camera.h" />
+    <ClInclude Include="src\Engine\InputValue.h" />
     <ClInclude Include="src\Engine\Matrix4.h" />
     <ClInclude Include="src\Engine\ITexture.h" />
     <ClInclude Include="src\Engine\IVideo.h" />
     <ClInclude Include="src\Engine\IWindowSystem.h" />
-    <ClInclude Include="src\Engine\KeyValue.h" />
     <ClInclude Include="src\Engine\Ray3D.h" />
     <ClInclude Include="src\Engine\Triangle3D.h" />
     <ClInclude Include="src\Engine\Types.h" />
+    <ClInclude Include="src\Engine\Vector2D.h" />
     <ClInclude Include="src\Engine\Vector3D.h" />
     <ClInclude Include="src\Engine\WindowSystem\Win32WindowSystem.h" />
     <ClInclude Include="src\Hash.h" />

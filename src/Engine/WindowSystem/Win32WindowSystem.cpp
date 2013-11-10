@@ -1,6 +1,7 @@
 #include <stdafx.h>
 
-#include "../KeyValue.h"
+#include <windowsx.h>
+
 #include "Win32WindowSystem.h"
 
 static KeyValue Win32KeyCodes[256] = {
@@ -59,40 +60,12 @@ static KeyValue Win32KeyCodes[256] = {
 static LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	Win32WindowSystem *windowSystem = (Win32WindowSystem *) GetWindowLongW(hWnd, GWLP_USERDATA);
-	switch (message)
-	{
-	case WM_DESTROY:
-		/* Don't bother other one's window */
-		if (hWnd == windowSystem->getWindowHandle())
-			PostQuitMessage(0);
-		return 1;
-
-	case WM_SYSKEYDOWN:
-		if (wParam == VK_F10) /* Special case */
-		{
-			windowSystem->onKeyDown(KEY_F10);
-			return 0;
-		}
-		break;
-
-	case WM_KEYDOWN:
-		windowSystem->onKeyDown(Win32KeyCodes[wParam]);
-		break;
-
-	case WM_KEYUP:
-		windowSystem->onKeyUp(Win32KeyCodes[wParam]);
-		break;
-
-	case WM_KILLFOCUS:
-		windowSystem->clearKeyState();
-		break;
-	}
-	return DefWindowProc(hWnd, message, wParam, lParam);
+	return windowSystem->wndProc(hWnd, message, wParam, lParam);
 }
 
 Win32WindowSystem::Win32WindowSystem()
 {
-	hInstance = GetModuleHandleA(NULL);
+	hInstance = GetModuleHandleW(nullptr);
 }
 
 Win32WindowSystem::~Win32WindowSystem()
@@ -109,9 +82,9 @@ bool Win32WindowSystem::init(int width, int height)
 	wcex.cbWndExtra         = 0;
 	wcex.hInstance          = hInstance;
 	wcex.hIcon              = 0;
-	wcex.hCursor            = LoadCursor(NULL, IDC_ARROW);
+	wcex.hCursor            = LoadCursor(nullptr, IDC_ARROW);
 	wcex.hbrBackground      = (HBRUSH) GetStockObject(WHITE_BRUSH);
-	wcex.lpszMenuName       = NULL;
+	wcex.lpszMenuName       = nullptr;
 	wcex.lpszClassName      = getWindowClassName();
 	wcex.hIconSm            = 0;
 	RegisterClassExW(&wcex);
@@ -119,9 +92,9 @@ bool Win32WindowSystem::init(int width, int height)
 	/* Create the window */
 	windowHandle = CreateWindowExW(0, getWindowClassName(), L"",
 		WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX,
-		CW_USEDEFAULT, CW_USEDEFAULT, 0, 0, NULL, NULL, hInstance, NULL);
+		CW_USEDEFAULT, CW_USEDEFAULT, 0, 0, nullptr, nullptr, hInstance, nullptr);
 
-	if (windowHandle == NULL)
+	if (windowHandle == nullptr)
 		return false;
 	SetWindowLongW(windowHandle, GWLP_USERDATA, (LONG) this);
 	setWindowSize(width, height);
@@ -167,6 +140,11 @@ void Win32WindowSystem::setWindowTitle(const wchar_t *title)
 	SetWindowTextW(windowHandle, title);
 }
 
+bool Win32WindowSystem::isActive() const
+{
+	return GetActiveWindow() == windowHandle;
+}
+
 void Win32WindowSystem::showError(const wchar_t *error)
 {
 	MessageBoxW(windowHandle, error, L"ERROR", MB_OK | MB_ICONERROR);
@@ -179,9 +157,10 @@ void Win32WindowSystem::showError(const char *error)
 
 bool Win32WindowSystem::processMessage()
 {
+	onNewFrame();
 	MSG msg;
 	ZeroMemory(&msg, sizeof msg);
-	while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
+	while (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
 	{
 		TranslateMessage(&msg);
 		DispatchMessage(&msg);
@@ -189,4 +168,67 @@ bool Win32WindowSystem::processMessage()
 			return false;
 	}
 	return true;
+}
+
+void Win32WindowSystem::setMouseVisible(bool isVisible)
+{
+	ShowCursor(isVisible);
+	mouseVisible = isVisible;
+}
+
+void Win32WindowSystem::setMousePosition(int x, int y)
+{
+	RECT rect;
+	GetClientRect(windowHandle, &rect);
+	POINT topLeft;
+	topLeft.x = rect.left;
+	topLeft.y = rect.top;
+	ClientToScreen(windowHandle, &topLeft);
+	SetCursorPos(topLeft.x + x, topLeft.y + y);
+}
+
+LRESULT Win32WindowSystem::wndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+{
+	switch (message)
+	{
+	case WM_DESTROY:
+		PostQuitMessage(0);
+		return 1;
+
+	case WM_SYSKEYDOWN:
+		if (wParam == VK_F10) /* Special case */
+		{
+			onKeyDown(KEY_F10);
+			return 0;
+		}
+		break;
+
+	case WM_SYSKEYUP:
+		if (wParam == VK_F10)
+		{
+			onKeyUp(KEY_F10);
+			return 0;
+		}
+		break;
+
+	case WM_KEYDOWN:
+		onKeyDown(Win32KeyCodes[wParam]);
+		break;
+
+	case WM_KEYUP:
+		onKeyUp(Win32KeyCodes[wParam]);
+		break;
+
+	case WM_MOUSEMOVE:
+	{
+		int x = GET_X_LPARAM(lParam), y = GET_Y_LPARAM(lParam);
+		onMouseMove(x, y);
+		break;
+	}
+
+	case WM_KILLFOCUS:
+		onLostFocus();
+		break;
+	}
+	return DefWindowProcW(hWnd, message, wParam, lParam);
 }

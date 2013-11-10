@@ -19,12 +19,22 @@ public:
 	virtual bool setWindowSize(int width, int height) override;
 	virtual void getWindowSize(int *width, int *height) override;
 	virtual void setWindowTitle(const wchar_t *title) override;
+	virtual bool isActive() const override;
 	virtual void showError(const wchar_t *error) override;
 	virtual void showError(const char *error) override;
 	virtual bool processMessage() override;
 
+	virtual void setMouseVisible(bool isVisible) override;
+	virtual bool isMouseVisible() const { return mouseVisible; }
+	virtual void setMousePosition(int x, int y) override;
+
 private:
-	HINSTANCE hInstance;
-	HWND windowHandle;
+	LRESULT wndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
+
+	HINSTANCE hInstance = nullptr;
+	HWND windowHandle = nullptr;
 	int w, h;
+	bool mouseVisible;
+
+	friend LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 };
