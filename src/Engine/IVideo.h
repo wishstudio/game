@@ -1,7 +1,7 @@
 #pragma once
 
 #include <string>
-#include "Vector3.h"
+#include "Vector3D.h"
 #include "Matrix4.h"
 
 class MeshBuffer;

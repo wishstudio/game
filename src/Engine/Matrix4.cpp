@@ -1,23 +1,23 @@
 #include <stdafx.h>
 
 #include "Matrix4.h"
-#include "Vector3.h"
+#include "Vector3D.h"
 
-Matrix4 Matrix4::translation(const Vector3 &offset)
+Matrix4 Matrix4::translation(const Vector3D &offset)
 {
 	return translation(offset.x, offset.y, offset.z);
 }
 
-Matrix4 Matrix4::inverseTranslation(const Vector3 &offset)
+Matrix4 Matrix4::inverseTranslation(const Vector3D &offset)
 {
 	return inverseTranslation(offset.x, offset.y, offset.z);
 }
 
-Matrix4 Matrix4::lookAtLH(const Vector3 &eye, const Vector3 &at, const Vector3 &up)
+Matrix4 Matrix4::lookAtLH(const Vector3D &eye, const Vector3D &at, const Vector3D &up)
 {
-	Vector3 zaxis = (at - eye).getNormalized();
-	Vector3 xaxis = up.crossProduct(zaxis).getNormalized();
-	Vector3 yaxis = zaxis.crossProduct(xaxis);
+	Vector3D zaxis = (at - eye).getNormalized();
+	Vector3D xaxis = up.crossProduct(zaxis).getNormalized();
+	Vector3D yaxis = zaxis.crossProduct(xaxis);
 
 	return Matrix4(
 		xaxis.x, yaxis.x, zaxis.x, 0,
@@ -26,11 +26,11 @@ Matrix4 Matrix4::lookAtLH(const Vector3 &eye, const Vector3 &at, const Vector3 &
 		-xaxis.dotProduct(eye), -yaxis.dotProduct(eye), -zaxis.dotProduct(eye), 1);
 }
 
-Matrix4 Matrix4::lookAtRH(const Vector3 &eye, const Vector3 &at, const Vector3 &up)
+Matrix4 Matrix4::lookAtRH(const Vector3D &eye, const Vector3D &at, const Vector3D &up)
 {
-	Vector3 zaxis = (eye - at).getNormalized();
-	Vector3 xaxis = up.crossProduct(zaxis).getNormalized();
-	Vector3 yaxis = zaxis.crossProduct(xaxis);
+	Vector3D zaxis = (eye - at).getNormalized();
+	Vector3D xaxis = up.crossProduct(zaxis).getNormalized();
+	Vector3D yaxis = zaxis.crossProduct(xaxis);
 
 	return Matrix4(
 		xaxis.x, yaxis.x, zaxis.x, 0,

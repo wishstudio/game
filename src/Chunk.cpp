@@ -30,7 +30,7 @@ Chunk::Chunk(int _chunk_x, int _chunk_y, int _chunk_z)
 
 	dirty = true;
 
-	boundingBox.merge(Vector3(CHUNK_SIZE, CHUNK_SIZE, CHUNK_SIZE));
+	boundingBox.merge(Vector3D(CHUNK_SIZE, CHUNK_SIZE, CHUNK_SIZE));
 	modelTransform = Matrix4::translation(chunk_x * CHUNK_SIZE, chunk_y * CHUNK_SIZE, chunk_z * CHUNK_SIZE);
 }
 
@@ -103,7 +103,7 @@ bool Chunk::shouldPreloadBuffer()
 
 bool Chunk::isInViewRange()
 {
-	Vector3 position = camera->getPosition();
+	Vector3D position = camera->getPosition();
 	int x = (int)floor(position.x / CHUNK_SIZE);
 	int y = (int)floor(position.y / CHUNK_SIZE);
 	int z = (int)floor(position.z / CHUNK_SIZE);

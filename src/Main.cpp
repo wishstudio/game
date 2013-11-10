@@ -112,7 +112,7 @@ int main()
 
 		//int fps = driver->getFPS();
 		int fps = 0;
-		Vector3 position = camera->getPosition();
+		Vector3D position = camera->getPosition();
 		std::wstring s;
 		s += L"POS";
 		s += L"(";

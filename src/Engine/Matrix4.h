@@ -2,7 +2,7 @@
 
 #include <cmath>
 
-class Vector3;
+class Vector3D;
 class Matrix4
 {
 public:
@@ -162,7 +162,7 @@ public:
 			offsetX, offsetY, offsetZ, 1);
 	}
 
-	static Matrix4 translation(const Vector3 &offset);
+	static Matrix4 translation(const Vector3D &offset);
 
 	static Matrix4 inverseTranslation(f32 offsetX, f32 offsetY, f32 offsetZ)
 	{
@@ -173,7 +173,7 @@ public:
 			-offsetX, -offsetY, -offsetZ, 1);
 	}
 
-	static Matrix4 inverseTranslation(const Vector3 &offset);
+	static Matrix4 inverseTranslation(const Vector3D &offset);
 
 	static Matrix4 scale(f32 scaleX, f32 scaleY, f32 scaleZ)
 	{
@@ -235,6 +235,6 @@ public:
 			0, 0, -q * znearPlane, 0);
 	}
 
-	static Matrix4 lookAtLH(const Vector3 &eye, const Vector3 &at, const Vector3 &up);
-	static Matrix4 lookAtRH(const Vector3 &eye, const Vector3 &at, const Vector3 &up);
+	static Matrix4 lookAtLH(const Vector3D &eye, const Vector3D &at, const Vector3D &up);
+	static Matrix4 lookAtRH(const Vector3D &eye, const Vector3D &at, const Vector3D &up);
 };

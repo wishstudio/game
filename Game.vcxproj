@@ -28,7 +28,7 @@
     <ClInclude Include="src\Engine\Ray3D.h" />
     <ClInclude Include="src\Engine\Triangle3D.h" />
     <ClInclude Include="src\Engine\Types.h" />
-    <ClInclude Include="src\Engine\Vector3.h" />
+    <ClInclude Include="src\Engine\Vector3D.h" />
     <ClInclude Include="src\Engine\WindowSystem\Win32WindowSystem.h" />
     <ClInclude Include="src\Hash.h" />
     <ClInclude Include="src\lz4\lz4.h" />

@@ -104,9 +104,6 @@
     <ClInclude Include="src\Engine\Color.h">
       <Filter>Engine</Filter>
     </ClInclude>
-    <ClInclude Include="src\Engine\Vector3.h">
-      <Filter>Engine</Filter>
-    </ClInclude>
     <ClInclude Include="src\Engine\Matrix4.h">
       <Filter>Engine</Filter>
     </ClInclude>
@@ -120,6 +117,9 @@
       <Filter>Engine</Filter>
     </ClInclude>
     <ClInclude Include="src\Engine\Types.h">
+      <Filter>Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Engine\Vector3D.h">
       <Filter>Engine</Filter>
     </ClInclude>
   </ItemGroup>

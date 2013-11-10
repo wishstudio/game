@@ -6,9 +6,9 @@
 
 Camera::Camera(IVideo *_video):
 	video(_video),
-	position(Vector3(0, 0, 0)),
-	lookAt(Vector3(0, 0, -100)),
-	upVector(Vector3(0, 1, 0)),
+	position(Vector3D(0, 0, 0)),
+	lookAt(Vector3D(0, 0, -100)),
+	upVector(Vector3D(0, 1, 0)),
 	nearValue(-1.0f),
 	farValue(-3000.0f)
 {

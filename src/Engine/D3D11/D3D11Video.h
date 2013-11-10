@@ -8,7 +8,7 @@
 
 struct Vertex
 {
-	Vector3 pos;
+	Vector3D pos;
 	Color color;
 	f32 u, v;
 };
