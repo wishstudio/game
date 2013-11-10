@@ -1,5 +1,4 @@
-#ifndef _WIN32WINDOWSYSTEM_H
-#define _WIN32WINDOWSYSTEM_H
+#pragma once
 
 #include <Windows.h>
 #include "../IWindowSystem.h"
@@ -29,5 +28,3 @@ private:
 	HWND windowHandle;
 	int w, h;
 };
-
-#endif
