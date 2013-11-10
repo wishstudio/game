@@ -117,39 +117,17 @@ int main()
 		vector2d<s32>(driver->getScreenSize().Width / 2, driver->getScreenSize().Height / 2 + 10), SColor(255, 255, 255, 255));*/
 
 		//int fps = driver->getFPS();
-		int fps = 0;
+		int fps = 1;
 		Vector3D position = camera->getPosition();
-		std::wstring s;
-		s += L"POS";
-		s += L"(";
-		s += position.x;
-		s += L", ";
-		s += position.y;
-		s += L", ";
-		s += position.z;
-		s += L") ";
-		if (info) {
-			s += L"PT";
-			s += L"(";
-			s += info->block.x();
-			s += L", ";
-			s += info->block.y();
-			s += L", ";
-			s += info->block.z();
-			s += L") ";
-		}
-		s += L"FPS: ";
-		s += fps;
-		s += L", ";
-		s += L"Avg Frame Time: ";
-		s += 1000.f / fps;
-		s += L", ";
-		s += world->getLoadedChunkCount();
-		s += L" chunks loaded";
-		s += L", ";
-		s += world->getLoadedChunkCount() * CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE;
-		s += L" blocks loaded";
-		windowSystem->setWindowTitle(s.c_str());
+		std::wstringstream s;
+		s << "POS(" << position.x << "," << position.y << "," << position.z << ") ";
+		if (info)
+			s << "PICK(" << info->block.x() << "," << info->block.y() << "," << info->block.z() << ") ";
+		s << "FPS: " << fps << " ";
+		s << "Frame Time: " << 1000.f / fps << " ";
+		s << "Chunks: " << world->getLoadedChunkCount() << " ";
+		s << "Blocks: " << world->getLoadedChunkCount() * CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE << " ";
+		windowSystem->setWindowTitle(s.str().c_str());
 		
 		video->endDraw();
 	}
