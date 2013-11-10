@@ -1,5 +1,7 @@
 #include "stdafx.h"
 
+#include <DirectXMath.h>
+
 #include "Chunk.h"
 #include "EventReceiver.h"
 #include "PlayerAnimator.h"
@@ -36,7 +38,7 @@ void PlayerAnimator::tick()
 		Vector3 forwardVec = (camera->getLookAt() - camera->getPosition());
 		forwardVec.y = 0;
 		forwardVec = forwardVec.getNormalized();
-		Vector3 leftVec = forwardVec.crossProduct({ 0, 1, 0 });
+		Vector3 leftVec = forwardVec.crossProduct({ 0, -1, 0 });
 
 		if (windowSystem->isKeyDown(KEY_W))
 			currentDistance += forwardVec * MOVE_SPEED;

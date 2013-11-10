@@ -26,7 +26,7 @@ Matrix4 Matrix4::lookAtLH(const Vector3 &eye, const Vector3 &at, const Vector3 &
 		-xaxis.dotProduct(eye), -yaxis.dotProduct(eye), -zaxis.dotProduct(eye), 1);
 }
 
-static Matrix4 lookAtRH(const Vector3 &eye, const Vector3 &at, const Vector3 &up)
+Matrix4 Matrix4::lookAtRH(const Vector3 &eye, const Vector3 &at, const Vector3 &up)
 {
 	Vector3 zaxis = (eye - at).getNormalized();
 	Vector3 xaxis = up.crossProduct(zaxis).getNormalized();
@@ -36,5 +36,5 @@ static Matrix4 lookAtRH(const Vector3 &eye, const Vector3 &at, const Vector3 &up
 		xaxis.x, yaxis.x, zaxis.x, 0,
 		xaxis.y, yaxis.y, zaxis.y, 0,
 		xaxis.z, yaxis.z, zaxis.z, 0,
-		xaxis.dotProduct(eye), yaxis.dotProduct(eye), zaxis.dotProduct(eye), 1);
+		-xaxis.dotProduct(eye), -yaxis.dotProduct(eye), -zaxis.dotProduct(eye), 1);
 }

@@ -87,6 +87,8 @@ D3D11Video::~D3D11Video()
 		pDepthStencilState->Release();
 	if (pBackBufferRenderTargetView)
 		pBackBufferRenderTargetView->Release();
+	if (pRasterizerState)
+		pRasterizerState->Release();
 
 	if (pInputLayout)
 		pInputLayout->Release();
@@ -212,6 +214,21 @@ bool D3D11Video::init(Win32WindowSystem *windowSystem)
 	if (FAILED(hr))
 		return false;
 	pContext->OMSetDepthStencilState(pDepthStencilState, 1);
+
+	/* Rasterizer state */
+	D3D11_RASTERIZER_DESC rasterizerStateDesc;
+	rasterizerStateDesc.FillMode = D3D11_FILL_SOLID;
+	rasterizerStateDesc.CullMode = D3D11_CULL_BACK;
+	rasterizerStateDesc.FrontCounterClockwise = true;
+	rasterizerStateDesc.DepthBias = 0;
+	rasterizerStateDesc.SlopeScaledDepthBias = 0.0f;
+	rasterizerStateDesc.DepthBiasClamp = 0;
+	rasterizerStateDesc.DepthClipEnable = true;
+	rasterizerStateDesc.ScissorEnable = false;
+	rasterizerStateDesc.MultisampleEnable = false;
+	rasterizerStateDesc.AntialiasedLineEnable = false;
+	pDevice->CreateRasterizerState(&rasterizerStateDesc, &pRasterizerState);
+	pContext->RSSetState(pRasterizerState);
 
 	/* Set viewport */
 	setViewport(width, height);

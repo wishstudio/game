@@ -117,8 +117,8 @@ void TriangleCollector::addQuad(
 		tile.u2, tile.v2
 	));*/
 
-	addTriangleIndex(buffer, s, s + 1, s + 2);
-	addTriangleIndex(buffer, s + 2, s + 1, s + 3);
+	addTriangleIndex(buffer, s, s + 2, s + 1);
+	addTriangleIndex(buffer, s + 1, s + 2, s + 3);
 }
 
 void TriangleCollector::addTriangleIndex(MeshBuffer *buffer, u32 i1, u32 i2, u32 i3)

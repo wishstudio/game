@@ -78,6 +78,7 @@ private:
 	ID3D11DepthStencilView *pDepthStencilView = nullptr;
 	ID3D11DepthStencilState *pDepthStencilState = nullptr;
 	ID3D11RenderTargetView *pBackBufferRenderTargetView = nullptr;
+	ID3D11RasterizerState *pRasterizerState = nullptr;
 
 	ID3D11InputLayout *pInputLayout = nullptr;
 	ID3D11VertexShader *pVertexShader = nullptr;

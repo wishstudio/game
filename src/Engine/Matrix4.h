@@ -225,12 +225,12 @@ public:
 	{
 		f32 h = std::cos(fieldOfViewY / 2) / std::sin(fieldOfViewY / 2);
 		f32 w = h / aspectRatio;
-		f32 q = zfarPlane / (zfarPlane - znearPlane);
+		f32 q = zfarPlane / (znearPlane - zfarPlane);
 		return Matrix4(
 			w, 0, 0, 0,
 			0, h, 0, 0,
 			0, 0, q, -1,
-			0, 0, q * znearPlane, 0);
+			0, 0, -q * znearPlane, 0);
 	}
 
 	static Matrix4 lookAtLH(const Vector3 &eye, const Vector3 &at, const Vector3 &up);

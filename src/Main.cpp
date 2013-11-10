@@ -49,7 +49,7 @@ int main()
 	camera->setNearValue(0.2);
 	device->getCursorControl()->setVisible(false);*/
 	camera = new Camera(video);
-	camera->setNearValue(0.2);
+	camera->setNearValue(-0.2);
 
 	/* Initialize database */
 	database = new Database();
