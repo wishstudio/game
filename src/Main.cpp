@@ -13,7 +13,6 @@
 #include "Engine/D3D11/D3D11Video.h"
 #include "Engine/WindowSystem/Win32WindowSystem.h"
 
-#pragma comment(lib, "Irrlicht.lib")
 #pragma comment(lib, "sqlite3.lib")
 //#pragma comment(linker, "/subsystem:windows /ENTRY:mainCRTStartup")
 
