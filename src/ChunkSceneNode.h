@@ -12,6 +12,6 @@ public:
 private:
 	Chunk *preloadChunk[PRELOAD_DISTANCE * 2 + 1][PRELOAD_DISTANCE * 2 + 1][PRELOAD_DISTANCE * 2 + 1];
 	Chunk *backup[PRELOAD_DISTANCE * 2 + 1][PRELOAD_DISTANCE * 2 + 1][PRELOAD_DISTANCE * 2 + 1];
-	vector3di lastPosition;
-	SViewFrustum viewFrustum;
+	int lastX = 0, lastY = 0, lastZ = 0;
+//	SViewFrustum viewFrustum;
 };

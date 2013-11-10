@@ -72,12 +72,12 @@ void PlayerAnimator::tick()
 	nextPosition = collideEllipsoidWithWorld(nextPosition, currentVerticalDistance * Vector3(0, 1, 0), false, collided);
 
 	/* Check if we are stadning on the ground */
-	nextFalling = !(currentVerticalDistance < ROUNDING_ERROR_f32 && collided);
+	nextFalling = !(currentVerticalDistance < EPSILON && collided);
 }
 
 Vector3 PlayerAnimator::collideEllipsoidWithWorld(Vector3 position, Vector3 moveVector, bool canSlide, bool &collided)
 {
-	if (moveVector.getLength() < std::numeric_limits<f32>::epsilon()) /* TODO */
+	if (moveVector.getLength() < EPSILON)
 		return position;
 
 	collided = false;

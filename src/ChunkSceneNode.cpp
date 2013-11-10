@@ -6,7 +6,6 @@
 
 ChunkSceneNode::ChunkSceneNode()
 {
-	lastPosition = { 0, 0, 0 };
 	memset(preloadChunk, 0, sizeof preloadChunk);
 }
 
@@ -24,9 +23,9 @@ void ChunkSceneNode::render()
 		for (int y = -PRELOAD_DISTANCE; y <= PRELOAD_DISTANCE; y++)
 			for (int z = -PRELOAD_DISTANCE; z <= PRELOAD_DISTANCE; z++)
 			{
-				int dx = lastPosition.X + x - current_x;
-				int dy = lastPosition.Y + y - current_y;
-				int dz = lastPosition.Z + z - current_z;
+				int dx = lastX + x - current_x;
+				int dy = lastY + y - current_y;
+				int dz = lastZ + z - current_z;
 				if (dx >= -PRELOAD_DISTANCE && dx <= PRELOAD_DISTANCE && dy >= -PRELOAD_DISTANCE && dy <= PRELOAD_DISTANCE && dz >= -PRELOAD_DISTANCE && dz <= PRELOAD_DISTANCE)
 					preloadChunk[dx + PRELOAD_DISTANCE][dy + PRELOAD_DISTANCE][dz + PRELOAD_DISTANCE] = backup[x + PRELOAD_DISTANCE][y + PRELOAD_DISTANCE][z + PRELOAD_DISTANCE];
 			}
@@ -55,5 +54,7 @@ void ChunkSceneNode::render()
 				if (visible)*/
 					p->render();
 			}
-	lastPosition = { current_x, current_y, current_z };
+	lastX = current_x;
+	lastY = current_y;
+	lastZ = current_z;
 }

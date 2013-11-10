@@ -13,7 +13,6 @@ public:
 	Triangle3D(const Vector3 &_pointA, const Vector3 &_pointB, const Vector3 &_pointC):
 		pointA(_pointA), pointB(_pointB), pointC(_pointC)
 	{}
-	operator triangle3df() const { return triangle3df(pointA, pointB, pointC); }
 
 	Triangle3D &operator= (const Triangle3D &) = default;
 
@@ -30,7 +29,7 @@ public:
 	bool isFrontFacing(const Vector3 &lookDirection) const
 	{
 		f32 d = getNormal().dotProduct(lookDirection);
-		return d <= std::numeric_limits<f32>::epsilon(); /* TODO */
+		return d < EPSILON;
 	}
 
 	/* Point must lie on the plane of the triangle */
@@ -42,12 +41,12 @@ public:
 		Vector3 u = a.crossProduct(b);
 		Vector3 v = b.crossProduct(c);
 		/* Make sure they are both pointing in the same direction */
-		if (u.dotProduct(v) < -std::numeric_limits<f32>::epsilon()) /* TODO */
+		if (u.dotProduct(v) < -EPSILON)
 			return false;
 		/* Compute normal for triangle PCA */
 		Vector3 w = c.crossProduct(a);
 		/* Make sure it points in the same direction as the first two */
-		if (u.dotProduct(w) < -std::numeric_limits<f32>::epsilon()) /* TODO */
+		if (u.dotProduct(w) < -EPSILON)
 			return false;
 		/* P must be in (or on) the triangle */
 		return true;

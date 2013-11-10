@@ -4,32 +4,7 @@
 #include <Windows.h>
 #undef NOMINMAX
 
-#include <irrlicht.h>
-
-using irr::u8;
-using irr::u16;
-using irr::u32;
-using irr::u64;
-using irr::s8;
-using irr::s16;
-using irr::s32;
-using irr::s64;
-using irr::f32;
-using namespace irr::core;
-using namespace irr::gui;
-using namespace irr::io;
-using namespace irr::scene;
-
-#include <atomic>
-#include <chrono>
-#include <concurrent_queue.h>
-#include <concurrent_unordered_map.h>
-#include <condition_variable>
-#include <limits>
-#include <memory>
-#include <mutex>
-#include <thread>
-#include <unordered_map>
+#include "Engine/Types.h"
 
 #include "Engine/AABB.h"
 #include "Engine/Camera.h"
@@ -41,6 +16,17 @@ using namespace irr::scene;
 #include "Engine/Ray3D.h"
 #include "Engine/Triangle3D.h"
 #include "Engine/Vector3.h"
+
+#include <atomic>
+#include <chrono>
+#include <concurrent_queue.h>
+#include <concurrent_unordered_map.h>
+#include <condition_variable>
+#include <limits>
+#include <memory>
+#include <mutex>
+#include <thread>
+#include <unordered_map>
 
 #include "Hash.h"
 #include "MathHelper.h"

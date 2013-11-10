@@ -13,11 +13,9 @@
 #include "Engine/D3D11/D3D11Video.h"
 #include "Engine/WindowSystem/Win32WindowSystem.h"
 
-#ifdef _IRR_WINDOWS_
 #pragma comment(lib, "Irrlicht.lib")
 #pragma comment(lib, "sqlite3.lib")
 //#pragma comment(linker, "/subsystem:windows /ENTRY:mainCRTStartup")
-#endif
 
 int main()
 {
@@ -116,36 +114,36 @@ int main()
 		//int fps = driver->getFPS();
 		int fps = 0;
 		Vector3 position = camera->getPosition();
-		stringw s;
-		s += "POS";
-		s += "(";
+		std::wstring s;
+		s += L"POS";
+		s += L"(";
 		s += position.x;
-		s += ", ";
+		s += L", ";
 		s += position.y;
-		s += ", ";
+		s += L", ";
 		s += position.z;
-		s += ") ";
+		s += L") ";
 		if (info) {
-			s += "PT";
-			s += "(";
+			s += L"PT";
+			s += L"(";
 			s += info->block.x();
-			s += ", ";
+			s += L", ";
 			s += info->block.y();
-			s += ", ";
+			s += L", ";
 			s += info->block.z();
-			s += ") ";
+			s += L") ";
 		}
-		s += "FPS: ";
+		s += L"FPS: ";
 		s += fps;
-		s += ", ";
-		s += "Avg Frame Time: ";
+		s += L", ";
+		s += L"Avg Frame Time: ";
 		s += 1000.f / fps;
-		s += ", ";
+		s += L", ";
 		s += world->getLoadedChunkCount();
-		s += " chunks loaded";
-		s += ", ";
+		s += L" chunks loaded";
+		s += L", ";
 		s += world->getLoadedChunkCount() * CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE;
-		s += " blocks loaded";
+		s += L" blocks loaded";
 		windowSystem->setWindowTitle(s.c_str());
 		
 		video->endDraw();

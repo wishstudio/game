@@ -15,9 +15,6 @@ public:
 	Vector3() : x(0), y(0), z(0) {}
 	Vector3(f32 _x, f32 _y, f32 _z) : x(_x), y(_y), z(_z) {}
 
-	Vector3(const vector3df &vec): x(vec.X), y(vec.Y), z(vec.Z) {}
-	operator vector3df() const { return vector3df(x, y, z); }
-
 	Vector3 &operator= (const Vector3 &vec) { x = vec.x, y = vec.y, z = vec.z; return *this; }
 
 	Vector3 operator+ (const Vector3 &vec) const

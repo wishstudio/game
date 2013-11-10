@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cmath>
+
 class Vector3;
 class Matrix4
 {
@@ -129,7 +131,7 @@ public:
 		/* Calculate determinant */
 		f32 det = src._11 * m11 + src._12 * m12 + src._13 * m13 + src._14 * m14;
 		/* TODO */
-		/*if (abs(det) < std::numeric_limits<f32>::epsilon())
+		/*if (abs(det) < EPSILON)
 			throw;*/
 		det = 1.0f / det;
 

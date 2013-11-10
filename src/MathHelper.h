@@ -74,9 +74,9 @@ inline bool rayIntersectsWithBox(const Ray3D &ray, const AABB &box)
 	   It is obvious the range of t can be determined.
 	 */
 	f32 tMin = 0, tMax = std::numeric_limits<f32>::infinity();
-	if (iszero(X)) /* 0 >= MinX - x0 */ /* 0 <= MaxX - x0 */
+	if (isZero(X)) /* 0 >= MinX - x0 */ /* 0 <= MaxX - x0 */
 	{
-		if (box.minPoint.x - x0 > ROUNDING_ERROR_f32 || box.maxPoint.x < -ROUNDING_ERROR_f32)
+		if (box.minPoint.x - x0 > EPSILON || box.maxPoint.x < -EPSILON)
 			return false;
 	}
 	else if (X > 0)
@@ -90,9 +90,9 @@ inline bool rayIntersectsWithBox(const Ray3D &ray, const AABB &box)
 		tMax = min(tMax, (box.minPoint.x - x0) / X);
 	}
 
-	if (iszero(Y))
+	if (isZero(Y))
 	{
-		if (box.minPoint.y - y0 > ROUNDING_ERROR_f32 || box.maxPoint.y < -ROUNDING_ERROR_f32)
+		if (box.minPoint.y - y0 > EPSILON || box.maxPoint.y < -EPSILON)
 			return false;
 	}
 	else if (Y > 0)
@@ -106,9 +106,9 @@ inline bool rayIntersectsWithBox(const Ray3D &ray, const AABB &box)
 		tMax = min(tMax, (box.minPoint.y - y0) / Y);
 	}
 
-	if (iszero(Z))
+	if (isZero(Z))
 	{
-		if (box.minPoint.z - z0 > ROUNDING_ERROR_f32 || box.maxPoint.z < -ROUNDING_ERROR_f32)
+		if (box.minPoint.z - z0 > EPSILON || box.maxPoint.z < -EPSILON)
 			return false;
 	}
 	else if (Z > 0)
@@ -177,7 +177,7 @@ inline bool rayIntersectsPlane(const Ray3D &ray, const Triangle3D &plane, Vector
 	f32 d = plane.pointA.dotProduct(n);
 	f32 t = (d - n.dotProduct(ray.start)) / n.dotProduct(ray.direction);
 	/* If n * V == 0 we will get Inf or NaN, they are correctly handled below */
-	if (t > -std::numeric_limits<f32>::epsilon() && t < std::numeric_limits<f32>::infinity())
+	if (t > -EPSILON && t < std::numeric_limits<f32>::infinity())
 	{
 		intersectionPoint = ray.start + t * ray.direction;
 		return true;
