@@ -32,13 +32,13 @@ public:
 
 	/* Collision detection utilities */
 	inline u32 getTriangleCount() const { return triangles.size(); }
-	inline std::vector<triangle3df>::const_iterator begin() const { return triangles.cbegin(); }
-	inline std::vector<triangle3df>::const_iterator end() const { return triangles.cend(); }
-	inline std::vector<triangle3df>::const_iterator blockBegin(int x, int y, int z) const
+	inline std::vector<Triangle3D>::const_iterator begin() const { return triangles.cbegin(); }
+	inline std::vector<Triangle3D>::const_iterator end() const { return triangles.cend(); }
+	inline std::vector<Triangle3D>::const_iterator blockBegin(int x, int y, int z) const
 	{
 		return triangles.cbegin() + beginIndex[x][y][z];
 	}
-	inline std::vector<triangle3df>::const_iterator blockEnd(int x, int y, int z) const
+	inline std::vector<Triangle3D>::const_iterator blockEnd(int x, int y, int z) const
 	{
 		return triangles.cbegin() + endIndex[x][y][z];
 	}
@@ -52,6 +52,6 @@ private:
 	std::vector<ITexture *> textures;
 	std::unordered_map<ITexture *, MeshBuffer *> textureMap;
 	int x, y, z;
-	std::vector<triangle3df> triangles;
+	std::vector<Triangle3D> triangles;
 	int beginIndex[CHUNK_SIZE][CHUNK_SIZE][CHUNK_SIZE], endIndex[CHUNK_SIZE][CHUNK_SIZE][CHUNK_SIZE];
 };

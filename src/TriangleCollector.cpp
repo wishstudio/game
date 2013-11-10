@@ -127,7 +127,7 @@ void TriangleCollector::addTriangleIndex(MeshBuffer *buffer, u32 i1, u32 i2, u32
 	buffer->indexBuffer.push_back(i2);
 	buffer->indexBuffer.push_back(i3);
 
-	triangles.push_back(triangle3df(
+	triangles.push_back(Triangle3D(
 		buffer->vertexBuffer[i1].pos,
 		buffer->vertexBuffer[i2].pos,
 		buffer->vertexBuffer[i3].pos

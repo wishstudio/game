@@ -44,7 +44,7 @@ public:
 	void save();
 	void render();
 
-	void getTriangles(std::vector<triangle3df> &triangles, const AABB &box, const Matrix4 &transform);
+	void getTriangles(std::vector<Triangle3D> &triangles, const AABB &box, const Matrix4 &transform);
 
 	friend Serializer &operator << (Serializer &serializer, const Chunk &data);
 	friend Deserializer &operator >> (Deserializer &deserializer, Chunk &data);

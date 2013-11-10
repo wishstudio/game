@@ -165,6 +165,27 @@ inline bool rayIntersectsWithSphere(const Vector3 &point, const Vector3 &vec, co
 	return true;
 }
 
+inline bool rayIntersectsPlane(const Vector3 &point, const Vector3 &vec, const Triangle3D &plane, Vector3 &intersectionPoint)
+{
+	/* Plane: n * X = d
+	 * Line : X = P + tV
+	 * =>   n * (P + tV) = d
+	 * => n * P + tn * V = d
+	 * =>         tn * V = d - n * P
+	 * =>              t = (d - n * P) / (n * V)
+	 */
+	Vector3 n = plane.getNormal().getNormalized();
+	f32 d = plane.pointA.dotProduct(n);
+	f32 t = (d - n.dotProduct(point)) / n.dotProduct(vec);
+	/* If n * V == 0 we will get Inf or NaN, they are correctly handled below */
+	if (t > -std::numeric_limits<f32>::epsilon() && t < std::numeric_limits<f32>::infinity())
+	{
+		intersectionPoint = point + t * vec;
+		return true;
+	}
+	return false;
+}
+
 enum Direction
 {
 	DIRECTION_X = 0,

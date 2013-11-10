@@ -114,7 +114,7 @@ Vector3 PlayerAnimator::collideEllipsoidWithWorld(Vector3 position, Vector3 move
 	basez = (fz - basez < .5f) ? basez - 1 : basez;
 
 	/* Collect triangles */
-	std::vector<triangle3df> triangles;
+	std::vector<Triangle3D> triangles;
 	for (int x = 0; x <= 1; x++)
 		for (int y = 0; y <= 1; y++)
 			for (int z = 0; z <= 1; z++)
@@ -140,12 +140,12 @@ Vector3 PlayerAnimator::collideEllipsoidWithWorld(Vector3 position, Vector3 move
 		Vector3 minPlaneIntersection;
 
 		Vector3 invertedVelocity(-vn);
-		for (const triangle3df triangle : triangles)
+		for (const Triangle3D triangle : triangles)
 		{
 			if (!triangle.isFrontFacing(vn))
 				continue;
 
-			Vector3 normal = triangle.getNormal().invert().normalize();
+			Vector3 normal = triangle.getNormal().getInverted().getNormalized();
 
 			/* Sphere intersection point
 			 * The potential intersection point on the sphere
@@ -155,8 +155,8 @@ Vector3 PlayerAnimator::collideEllipsoidWithWorld(Vector3 position, Vector3 move
 			/* Plane intersection point
 			 * The potential intersection point on the plane the triangle reside on
 			 */
-			vector3df planeIntersection;
-			if (triangle.getIntersectionOfPlaneWithLine(sphereIntersection, vn, planeIntersection))
+			Vector3 planeIntersection;
+			if (rayIntersectsPlane(sphereIntersection, vn, triangle, planeIntersection));
 			{
 				f32 distance;
 				if (triangle.isPointInside(planeIntersection))

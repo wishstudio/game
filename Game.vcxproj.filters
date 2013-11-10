@@ -116,6 +116,9 @@
     <ClInclude Include="src\Engine\AABB.h">
       <Filter>Engine</Filter>
     </ClInclude>
+    <ClInclude Include="src\Engine\Triangle3D.h">
+      <Filter>Engine</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Block.cpp">
