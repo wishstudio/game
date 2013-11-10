@@ -25,6 +25,7 @@
     <ClInclude Include="src\Engine\IVideo.h" />
     <ClInclude Include="src\Engine\IWindowSystem.h" />
     <ClInclude Include="src\Engine\KeyValue.h" />
+    <ClInclude Include="src\Engine\Ray3D.h" />
     <ClInclude Include="src\Engine\Triangle3D.h" />
     <ClInclude Include="src\Engine\Vector3.h" />
     <ClInclude Include="src\Engine\WindowSystem\Win32WindowSystem.h" />

@@ -55,14 +55,14 @@ inline T divide(const T &a, const T &b)
 		return a / b;
 }
 
-inline bool rayIntersectsWithBox(const line3df &ray, const AABB &box)
+inline bool rayIntersectsWithBox(const Ray3D &ray, const AABB &box)
 {
 	/* MinX <= Xt + x0 <= MaxX
 	   MinY <= Yt + y0 <= MaxY
 	   MinZ <= Zt + z0 <= MinZ */
-	f32 x0 = ray.start.X, X = ray.end.X - ray.start.X;
-	f32 y0 = ray.start.Y, Y = ray.end.Y - ray.start.Y;
-	f32 z0 = ray.start.Z, Z = ray.end.Z - ray.start.Z;
+	f32 x0 = ray.start.x, X = ray.direction.x;
+	f32 y0 = ray.start.y, Y = ray.direction.y;
+	f32 z0 = ray.start.z, Z = ray.direction.z;
 
 	/* Note the following formulas (derived from above)
 	   Xt >= MinX - x0
@@ -124,7 +124,7 @@ inline bool rayIntersectsWithBox(const line3df &ray, const AABB &box)
 	return tMin <= tMax;
 }
 
-inline bool rayIntersectsWithSphere(const Vector3 &point, const Vector3 &vec, const Vector3 &center, f32 radius, f32 &distance)
+inline bool rayIntersectsWithSphere(const Ray3D &ray, const Vector3 &center, f32 radius, f32 &distance)
 {
 	/*         |
 	 *         |       % % %
@@ -140,15 +140,14 @@ inline bool rayIntersectsWithSphere(const Vector3 &point, const Vector3 &vec, co
 	 *         |
 	 */
 	/* Sphere center in point coordinate system */
-	Vector3 Q = center - point;
+	Vector3 Q = center - ray.start;
 	/* Distance from sphere center to origin */
 	f32 c = Q.getLength();
 	/* v = Q * vn
 	     = |Q| * 1 * cos(alpha)
 	     = c * cos(alpha)
 	 */
-	Vector3 vn(vec);
-	f32 v = Q.dotProduct(vn.getNormalized());
+	f32 v = Q.dotProduct(ray.direction.getNormalized());
 	if (v < 0.f)
 		return false;
 	/* d = R^2 - (c^2 - v^2)
@@ -165,7 +164,7 @@ inline bool rayIntersectsWithSphere(const Vector3 &point, const Vector3 &vec, co
 	return true;
 }
 
-inline bool rayIntersectsPlane(const Vector3 &point, const Vector3 &vec, const Triangle3D &plane, Vector3 &intersectionPoint)
+inline bool rayIntersectsPlane(const Ray3D &ray, const Triangle3D &plane, Vector3 &intersectionPoint)
 {
 	/* Plane: n * X = d
 	 * Line : X = P + tV
@@ -176,11 +175,11 @@ inline bool rayIntersectsPlane(const Vector3 &point, const Vector3 &vec, const T
 	 */
 	Vector3 n = plane.getNormal().getNormalized();
 	f32 d = plane.pointA.dotProduct(n);
-	f32 t = (d - n.dotProduct(point)) / n.dotProduct(vec);
+	f32 t = (d - n.dotProduct(ray.start)) / n.dotProduct(ray.direction);
 	/* If n * V == 0 we will get Inf or NaN, they are correctly handled below */
 	if (t > -std::numeric_limits<f32>::epsilon() && t < std::numeric_limits<f32>::infinity())
 	{
-		intersectionPoint = point + t * vec;
+		intersectionPoint = ray.start + t * ray.direction;
 		return true;
 	}
 	return false;

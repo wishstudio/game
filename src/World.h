@@ -36,7 +36,7 @@ public:
 
 	Chunk *preloadChunk(int chunk_x, int chunk_y, int chunk_z);
 
-	bool getCameraIntersection(const line3df &ray, CameraIntersectionInfo **info);
+	bool getCameraIntersection(const Ray3D &ray, CameraIntersectionInfo **info);
 
 private:
 	void run();

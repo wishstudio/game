@@ -162,7 +162,7 @@ void World::run()
 	}
 }
 
-bool World::getCameraIntersection(const line3df &ray, CameraIntersectionInfo **info)
+bool World::getCameraIntersection(const Ray3D &ray, CameraIntersectionInfo **info)
 {
 	/* Implementation is based on
 	   "A Fast Voxel Traversal Algorithm for Ray Tracing"
@@ -171,15 +171,14 @@ bool World::getCameraIntersection(const line3df &ray, CameraIntersectionInfo **i
 	   http://www.devmaster.net/articles/raytracing_series/A%20faster%20voxel%20traversal%20algorithm%20for%20ray%20tracing.pdf */
 
 	/* The cell in which the ray starts (in chunk coordinate system). */
-	int x = (int) floor(ray.start.X);
-	int y = (int) floor(ray.start.Y);
-	int z = (int) floor(ray.start.Z);
+	int x = (int) floor(ray.start.x);
+	int y = (int) floor(ray.start.y);
+	int z = (int) floor(ray.start.z);
 
 	/* Determine which way we go. */
-	const vector3df rayvec = ray.getVector();
-	const int stepX = sgn(rayvec.X);
-	const int stepY = sgn(rayvec.Y);
-	const int stepZ = sgn(rayvec.Z);
+	const int stepX = sgn(ray.direction.x);
+	const int stepY = sgn(ray.direction.y);
+	const int stepZ = sgn(ray.direction.z);
 
 	/* Calculate cell boundaries. When the step (i.e. direction sign) is positive,
 	   the next boundary is AFTER our current position, meaning that we have to add 1.
@@ -190,14 +189,14 @@ bool World::getCameraIntersection(const line3df &ray, CameraIntersectionInfo **i
 
 	/* Determine how far we can travel along the ray before we hit a voxel boundary. */
 	const f32 inf = std::numeric_limits<f32>::infinity();
-	f32 tMaxX = iszero(rayvec.X) ? inf : (cellBoundaryX - ray.start.X) / rayvec.X;
-	f32 tMaxY = iszero(rayvec.Y) ? inf : (cellBoundaryY - ray.start.Y) / rayvec.Y;
-	f32 tMaxZ = iszero(rayvec.Z) ? inf : (cellBoundaryZ - ray.start.Z) / rayvec.Z;
+	f32 tMaxX = iszero(ray.direction.x) ? inf : (cellBoundaryX - ray.start.x) / ray.direction.x;
+	f32 tMaxY = iszero(ray.direction.y) ? inf : (cellBoundaryY - ray.start.y) / ray.direction.y;
+	f32 tMaxZ = iszero(ray.direction.z) ? inf : (cellBoundaryZ - ray.start.z) / ray.direction.z;
  
 	/* Determine how far we must travel along the ray before we have crossed a gridcell. */
-	const f32 tDeltaX = iszero(rayvec.X) ? inf : (stepX / rayvec.X);
-	const f32 tDeltaY = iszero(rayvec.Y) ? inf : (stepY / rayvec.Y);
-	const f32 tDeltaZ = iszero(rayvec.Z) ? inf : (stepZ / rayvec.Z);
+	const f32 tDeltaX = iszero(ray.direction.x) ? inf : (stepX / ray.direction.x);
+	const f32 tDeltaY = iszero(ray.direction.y) ? inf : (stepY / ray.direction.y);
+	const f32 tDeltaZ = iszero(ray.direction.z) ? inf : (stepZ / ray.direction.z);
 
 	/* For step == 0, this does not matter. */
 	const Direction directionX = (stepX > 0) ? DIRECTION_X : DIRECTION_MX;

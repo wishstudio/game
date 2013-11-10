@@ -156,7 +156,7 @@ Vector3 PlayerAnimator::collideEllipsoidWithWorld(Vector3 position, Vector3 move
 			 * The potential intersection point on the plane the triangle reside on
 			 */
 			Vector3 planeIntersection;
-			if (rayIntersectsPlane(sphereIntersection, vn, triangle, planeIntersection));
+			if (rayIntersectsPlane(Ray3D(sphereIntersection, vn), triangle, planeIntersection));
 			{
 				f32 distance;
 				if (triangle.isPointInside(planeIntersection))
@@ -171,7 +171,7 @@ Vector3 PlayerAnimator::collideEllipsoidWithWorld(Vector3 position, Vector3 move
 					planeIntersection = triangle.closestPointOnTriangle(planeIntersection);
 
 					/* Reverse intersecting the sphere */
-					if (!rayIntersectsWithSphere(planeIntersection, invertedVelocity, position, 1, distance))
+					if (!rayIntersectsWithSphere(Ray3D(planeIntersection, invertedVelocity), position, 1, distance))
 						continue;
 				}
 
