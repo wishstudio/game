@@ -39,9 +39,9 @@ struct PS_InputType
 PS_InputType VS_Main(VS_InputType input)
 {
 	PS_InputType output = input;
-	output.pos = mul(world, output.pos);
-	output.pos = mul(view, output.pos);
-	output.pos = mul(projection, output.pos);
+	output.pos = mul(output.pos, world);
+	output.pos = mul(output.pos, view);
+	output.pos = mul(output.pos, projection);
 	return output;
 }
 
@@ -288,9 +288,12 @@ void D3D11Video::createShaders()
 
 	const u32 size = sizeof(SHADER_SRC);
 	ID3DBlob *errMsg;
+
+	UINT compileFlags = D3DCOMPILE_PACK_MATRIX_ROW_MAJOR | D3DCOMPILE_OPTIMIZATION_LEVEL3;
+
 	/* Vertex shader */
 	ID3DBlob *vsBlob;
-	D3DCompile(SHADER_SRC, size, nullptr, nullptr, nullptr, "VS_Main", "vs_5_0", D3DCOMPILE_OPTIMIZATION_LEVEL3, 0, &vsBlob, &errMsg);
+	D3DCompile(SHADER_SRC, size, nullptr, nullptr, nullptr, "VS_Main", "vs_5_0", compileFlags, 0, &vsBlob, &errMsg);
 	if (errMsg)
 	{
 		printf("Vertex shader compilation message:\n%s\n", errMsg->GetBufferPointer());
@@ -300,7 +303,7 @@ void D3D11Video::createShaders()
 
 	/* Pixel shader */
 	ID3DBlob *psBlob;
-	D3DCompile(SHADER_SRC, size, nullptr, nullptr, nullptr, "PS_Main", "ps_5_0", D3DCOMPILE_OPTIMIZATION_LEVEL3, 0, &psBlob, &errMsg);
+	D3DCompile(SHADER_SRC, size, nullptr, nullptr, nullptr, "PS_Main", "ps_5_0", compileFlags, 0, &psBlob, &errMsg);
 	if (errMsg)
 	{
 		printf("Pixel shader compilation message:\n%s\n", errMsg->GetBufferPointer());
