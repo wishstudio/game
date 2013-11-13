@@ -2,6 +2,9 @@
 
 #include <d3dcompiler.h>
 #include "../WindowSystem/Win32WindowSystem.h"
+#include "D3D11IndexBuffer.h"
+#include "D3D11VertexBuffer.h"
+#include "D3D11VertexFormat.h"
 #include "D3D11Video.h"
 
 struct Texture
@@ -90,10 +93,12 @@ D3D11Video::~D3D11Video()
 	if (pRasterizerState)
 		pRasterizerState->Release();
 
-	if (pInputLayout)
-		pInputLayout->Release();
+	if (pVertexShaderData)
+		pVertexShaderData->Release();
 	if (pVertexShader)
 		pVertexShader->Release();
+	if (pPixelShaderData)
+		pPixelShaderData->Release();
 	if (pPixelShader)
 		pPixelShader->Release();
 
@@ -248,26 +253,6 @@ void D3D11Video::resetBackBuffer()
 	pContext->OMSetRenderTargets(1, &pBackBufferRenderTargetView, pDepthStencilView);
 }
 
-void D3D11Video::setViewport(s32 width, s32 height)
-{
-	D3D11_VIEWPORT viewport;
-	viewport.Width = width;
-	viewport.Height = height;
-	viewport.MinDepth = 0.0f;
-	viewport.MaxDepth = 1.0f;
-	viewport.TopLeftX = 0.0f;
-	viewport.TopLeftY = 0.0f;
-	pContext->RSSetViewports(1, &viewport);
-}
-
-void D3D11Video::clearScreen()
-{
-	//float clearColor[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
-	float clearColor[4] = { 127.0 / 255.0f, 200 / 255.0f, 251 / 255.0f, 255.0 / 255.0f };
-	pContext->ClearRenderTargetView(pBackBufferRenderTargetView, clearColor);
-	pContext->ClearDepthStencilView(pDepthStencilView, D3D11_CLEAR_DEPTH, 1.0f, 0);
-}
-
 void D3D11Video::createShaders()
 {
 	typedef HRESULT(_stdcall * PD3DCOMPILE)(
@@ -292,45 +277,22 @@ void D3D11Video::createShaders()
 	UINT compileFlags = D3DCOMPILE_PACK_MATRIX_ROW_MAJOR | D3DCOMPILE_OPTIMIZATION_LEVEL3;
 
 	/* Vertex shader */
-	ID3DBlob *vsBlob;
-	D3DCompile(SHADER_SRC, size, nullptr, nullptr, nullptr, "VS_Main", "vs_5_0", compileFlags, 0, &vsBlob, &errMsg);
+	D3DCompile(SHADER_SRC, size, nullptr, nullptr, nullptr, "VS_Main", "vs_5_0", compileFlags, 0, &pVertexShaderData, &errMsg);
 	if (errMsg)
 	{
 		printf("Vertex shader compilation message:\n%s\n", errMsg->GetBufferPointer());
 		errMsg->Release();
 	}
-	pDevice->CreateVertexShader(vsBlob->GetBufferPointer(), vsBlob->GetBufferSize(), nullptr, &pVertexShader);
+	pDevice->CreateVertexShader(pVertexShaderData->GetBufferPointer(), pVertexShaderData->GetBufferSize(), nullptr, &pVertexShader);
 
 	/* Pixel shader */
-	ID3DBlob *psBlob;
-	D3DCompile(SHADER_SRC, size, nullptr, nullptr, nullptr, "PS_Main", "ps_5_0", compileFlags, 0, &psBlob, &errMsg);
+	D3DCompile(SHADER_SRC, size, nullptr, nullptr, nullptr, "PS_Main", "ps_5_0", compileFlags, 0, &pPixelShaderData, &errMsg);
 	if (errMsg)
 	{
 		printf("Pixel shader compilation message:\n%s\n", errMsg->GetBufferPointer());
 		errMsg->Release();
 	}
-	pDevice->CreatePixelShader(psBlob->GetBufferPointer(), psBlob->GetBufferSize(), nullptr, &pPixelShader);
-
-	/* Input layout */
-	D3D11_INPUT_ELEMENT_DESC vertexShader2DInputDesc[] =
-	{
-		{ "SV_POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-		{ "COLOR",    0, DXGI_FORMAT_R8G8B8A8_UNORM, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-		{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-	};
-	pDevice->CreateInputLayout(vertexShader2DInputDesc, ARRAYSIZE(vertexShader2DInputDesc), vsBlob->GetBufferPointer(), vsBlob->GetBufferSize(), &pInputLayout);
-
-	vsBlob->Release();
-	psBlob->Release();
-}
-
-void D3D11Video::beginDraw()
-{
-}
-
-void D3D11Video::endDraw()
-{
-	pSwapChain->Present(0, 0);
+	pDevice->CreatePixelShader(pPixelShaderData->GetBufferPointer(), pPixelShaderData->GetBufferSize(), nullptr, &pPixelShader);
 }
 
 char *D3D11Video::decodeImage(const char *raw, int size, int *width, int *height)
@@ -495,18 +457,19 @@ void D3D11Video::deleteTexture(ITexture *_texture)
 	delete texture;
 }
 
-MeshBuffer *D3D11Video::createMeshBuffer()
+IVertexFormat *D3D11Video::createVertexFormat()
 {
-	return new MeshBuffer();
+	return new D3D11VertexFormat();
 }
 
-void D3D11Video::deleteMeshBuffer(MeshBuffer *buffer)
+IVertexBuffer *D3D11Video::createVertexBuffer(IVertexFormat *format, u32 size)
 {
-	if (buffer->pVertexBuffer)
-		buffer->pVertexBuffer->Release();
-	if (buffer->pIndexBuffer)
-		buffer->pIndexBuffer->Release();
-	delete buffer;
+	return new D3D11VertexBuffer(this, format, size);
+}
+
+IIndexBuffer *D3D11Video::createIndexBuffer(VertexElementType type, u32 size)
+{
+	return new D3D11IndexBuffer(this, type, size);
 }
 
 void D3D11Video::setTexture(ITexture *_texture)
@@ -530,60 +493,48 @@ void D3D11Video::setProjectionMatrix(const Matrix4 &matrix)
 	matrixBuffer.projection = matrix;
 }
 
-void D3D11Video::updateHardwareBuffer(MeshBuffer *buffer)
+void D3D11Video::setViewport(s32 width, s32 height)
 {
-	if (buffer->vertexDirty)
-	{
-		if (buffer->pVertexBuffer)
-			buffer->pVertexBuffer->Release();
-
-		D3D11_BUFFER_DESC bufferDesc;
-		bufferDesc.Usage = D3D11_USAGE_DEFAULT;
-		bufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-		bufferDesc.CPUAccessFlags = 0;
-		bufferDesc.ByteWidth = sizeof(Vertex) * buffer->vertexBuffer.size();
-		bufferDesc.MiscFlags = 0;
-		bufferDesc.StructureByteStride = 0;
-
-		D3D11_SUBRESOURCE_DATA resourceData;
-		resourceData.pSysMem = buffer->vertexBuffer.data();
-		resourceData.SysMemPitch = 0;
-		resourceData.SysMemSlicePitch = 0;
-		pDevice->CreateBuffer(&bufferDesc, &resourceData, &buffer->pVertexBuffer);
-
-		buffer->vertexDirty = false;
-	}
-	if (buffer->indexDirty)
-	{
-		if (buffer->pIndexBuffer)
-			buffer->pIndexBuffer->Release();
-
-		D3D11_BUFFER_DESC bufferDesc;
-		bufferDesc.Usage = D3D11_USAGE_DEFAULT;
-		bufferDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
-		bufferDesc.CPUAccessFlags = 0;
-		bufferDesc.ByteWidth = sizeof(u32) * buffer->indexBuffer.size();
-		bufferDesc.MiscFlags = 0;
-		bufferDesc.StructureByteStride = 0;
-
-		D3D11_SUBRESOURCE_DATA resourceData;
-		resourceData.pSysMem = buffer->indexBuffer.data();
-		resourceData.SysMemPitch = 0;
-		resourceData.SysMemSlicePitch = 0;
-		pDevice->CreateBuffer(&bufferDesc, &resourceData, &buffer->pIndexBuffer);
-
-		buffer->indexDirty = false;
-	}
+	D3D11_VIEWPORT viewport;
+	viewport.Width = width;
+	viewport.Height = height;
+	viewport.MinDepth = 0.0f;
+	viewport.MaxDepth = 1.0f;
+	viewport.TopLeftX = 0.0f;
+	viewport.TopLeftY = 0.0f;
+	pContext->RSSetViewports(1, &viewport);
 }
 
-void D3D11Video::drawMeshBuffer(MeshBuffer *buffer)
+void D3D11Video::clearScreen()
 {
-	updateHardwareBuffer(buffer);
+	//float clearColor[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
+	float clearColor[4] = { 127.0 / 255.0f, 200 / 255.0f, 251 / 255.0f, 255.0 / 255.0f };
+	pContext->ClearRenderTargetView(pBackBufferRenderTargetView, clearColor);
+	pContext->ClearDepthStencilView(pDepthStencilView, D3D11_CLEAR_DEPTH, 1.0f, 0);
+}
 
+void D3D11Video::beginDraw()
+{
+}
+
+void D3D11Video::endDraw()
+{
+	pSwapChain->Present(0, 0);
+}
+
+void D3D11Video::drawIndexed(
+	IVertexBuffer *vertexBuffer,
+	u32 startVertex,
+	IIndexBuffer *indexBuffer,
+	u32 startIndex,
+	u32 count,
+	PrimitiveTopology topology
+	)
+{
 	/* Set matrix */
 	D3D11_MAPPED_SUBRESOURCE pResource;
 	pContext->Map(pMatrixBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &pResource);
-	MatrixBuffer *matrix = (MatrixBuffer *) pResource.pData;
+	MatrixBuffer *matrix = (MatrixBuffer *)pResource.pData;
 	matrix->model = matrixBuffer.model;
 	matrix->view = matrixBuffer.view;
 	matrix->projection = matrixBuffer.projection;
@@ -595,15 +546,18 @@ void D3D11Video::drawMeshBuffer(MeshBuffer *buffer)
 	pContext->PSSetShader(pPixelShader, nullptr, 0);
 
 	/* Set input layout */
-	pContext->IASetInputLayout(pInputLayout);
+	pContext->IASetInputLayout(((D3D11VertexFormat *) vertexBuffer->getVertexFormat())->getInputLayout(pDevice, pVertexShaderData));
 
 	/* Set buffers */
-	UINT stride = sizeof(Vertex);
+	UINT stride = vertexBuffer->getVertexFormat()->getSize();
 	UINT offsets = 0;
-	pContext->IASetVertexBuffers(0, 1, &buffer->pVertexBuffer, &stride, &offsets);
-	pContext->IASetIndexBuffer(buffer->pIndexBuffer, DXGI_FORMAT_R32_UINT, 0);
-	pContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	ID3D11Buffer *vb = ((D3D11VertexBuffer *) vertexBuffer)->getVertexBuffer();
+	pContext->IASetVertexBuffers(0, 1, &vb, &stride, &offsets);
+	pContext->IASetIndexBuffer(((D3D11IndexBuffer *) indexBuffer)->getIndexBuffer(),
+		D3D11VertexFormat::getFormatMapping(indexBuffer->getType()),
+		0);
+	pContext->IASetPrimitiveTopology(D3D11VertexFormat::getTopologyMapping(topology));
 
-	/* Draw buffer */
-	pContext->DrawIndexed(buffer->indexBuffer.size(), 0, 0);
+	/* Draw */
+	pContext->DrawIndexed(count, startIndex, startVertex);
 }

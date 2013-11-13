@@ -2,6 +2,7 @@
 
 #include "TileManager.h"
 
+struct MeshBuffer;
 class Block;
 class TriangleCollector
 {
@@ -9,9 +10,7 @@ public:
 	TriangleCollector();
 	virtual ~TriangleCollector();
 
-	inline u32 getBufferCount() const { return buffers.size(); }
-	inline MeshBuffer *getBuffer(u32 i) const { return buffers[i]; }
-	inline ITexture *getBufferTexture(u32 i) const { return textures[i]; }
+	void render();
 	
 	bool isValid() { return valid; }
 	void clear();
@@ -45,7 +44,7 @@ public:
 
 private:
 	MeshBuffer *getBuffer(ITexture *texture);
-	void addTriangleIndex(MeshBuffer *buffer, u32 i1, u32 i2, u32 i3);
+	void addTriangleIndex(MeshBuffer *buffer, u16 i1, u16 i2, u16 i3);
 
 	bool valid;
 	std::vector<MeshBuffer *> buffers;

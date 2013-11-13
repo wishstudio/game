@@ -125,12 +125,7 @@ void Chunk::render()
 		return;
 	}
 	video->setModelMatrix(modelTransform);
-	for (u32 i = 0; i < collector->getBufferCount(); i++)
-	{
-		MeshBuffer *buffer = collector->getBuffer(i);
-		video->setTexture(collector->getBufferTexture(i));
-		video->drawMeshBuffer(buffer);
-	}
+	collector->render();
 }
 
 void Chunk::save()

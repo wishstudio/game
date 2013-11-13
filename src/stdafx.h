@@ -9,7 +9,10 @@
 #include "Engine/AABB.h"
 #include "Engine/Camera.h"
 #include "Engine/Color.h"
+#include "Engine/IIndexBuffer.h"
 #include "Engine/ITexture.h"
+#include "Engine/IVertexBuffer.h"
+#include "Engine/IVertexFormat.h"
 #include "Engine/IVideo.h"
 #include "Engine/IWindowSystem.h"
 #include "Engine/Matrix4.h"
@@ -67,3 +70,12 @@ inline DestRep seconds(std::chrono::duration<SrcRep, SrcPeriod> duration)
 {
 	return std::chrono::duration_cast<std::chrono::duration<DestRep>>(duration).count();
 }
+
+struct Vertex
+{
+	Vector3D position;
+	Color color;
+	f32 u, v;
+};
+
+extern IVertexFormat *vertexFormat;

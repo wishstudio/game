@@ -5,6 +5,15 @@
 #include "World.h"
 #include "Engine/D3D11/D3D11Video.h"
 
+struct MeshBuffer
+{
+	IVertexBuffer *vertexBuffer = nullptr;
+	IIndexBuffer *indexBuffer = nullptr;
+	u32 indexCount = 0;
+	std::vector<Vertex> vertices;
+	std::vector<u16> indices;
+};
+
 TriangleCollector::TriangleCollector()
 {
 	valid = false;
@@ -22,7 +31,7 @@ MeshBuffer *TriangleCollector::getBuffer(ITexture *texture)
 		return it->second;
 	else
 	{
-		MeshBuffer *buffer = video->createMeshBuffer();
+		MeshBuffer *buffer = new MeshBuffer();
 		buffers.push_back(buffer);
 		textures.push_back(texture);
 		textureMap.insert(std::make_pair(texture, buffer));
@@ -30,10 +39,43 @@ MeshBuffer *TriangleCollector::getBuffer(ITexture *texture)
 	}
 }
 
+void TriangleCollector::render()
+{
+	for (u32 i = 0; i < buffers.size(); i++)
+	{
+		MeshBuffer *buffer = buffers[i];
+		ITexture *texture = textures[i];
+		if (buffer->vertexBuffer == nullptr)
+		{
+			delete buffer->vertexBuffer;
+			buffer->vertexBuffer = video->createVertexBuffer(vertexFormat, buffer->vertices.size());
+			buffer->vertexBuffer->update(0, buffer->vertices.size(), buffer->vertices.data());
+			buffer->vertices.clear(); /* To save memory */
+		}
+		
+		if (buffer->indexBuffer == nullptr)
+		{
+			delete buffer->indexBuffer;
+			buffer->indexBuffer = video->createIndexBuffer(TYPE_USHORT, buffer->indices.size());
+			buffer->indexBuffer->update(0, buffer->indices.size(), buffer->indices.data());
+			buffer->indexCount = buffer->indices.size();
+			buffer->indices.clear(); /* To save memory */
+		}
+		video->setTexture(texture);
+		video->drawIndexed(buffer->vertexBuffer, 0, buffer->indexBuffer, 0, buffer->indexCount, TOPOLOGY_TRIANGLELIST);
+	}
+}
+
 void TriangleCollector::clear()
 {
 	for (MeshBuffer *buffer : buffers)
-		video->deleteMeshBuffer(buffer);
+	{
+		if (buffer->vertexBuffer)
+			delete buffer->vertexBuffer;
+		if (buffer->indexBuffer)
+			delete buffer->indexBuffer;
+		delete buffer;
+	}
 	buffers.clear();
 	textures.clear();
 	textureMap.clear();
@@ -70,66 +112,41 @@ void TriangleCollector::addQuad(
 {
 	MeshBuffer *buffer = getBuffer(tile.texture);
 
-	u32 s = buffer->vertexBuffer.size();
-	buffer->vertexBuffer.push_back({
+	u32 s = buffer->vertices.size();
+	buffer->vertices.push_back({
 		Vector3D(topLeft.x + x, topLeft.y + y, topLeft.z + z),
 		topLeftColor,
 		tile.u1, tile.v1
 	});
-	buffer->vertexBuffer.push_back({
+	buffer->vertices.push_back({
 		Vector3D(topRight.x + x, topRight.y + y, topRight.z + z),
 		topRightColor,
 		tile.u2, tile.v1
 	});
-	buffer->vertexBuffer.push_back({
+	buffer->vertices.push_back({
 		Vector3D(bottomLeft.x + x, bottomLeft.y + y, bottomLeft.z + z),
 		bottomLeftColor,
 		tile.u1, tile.v2
 	});
-	buffer->vertexBuffer.push_back({
+	buffer->vertices.push_back({
 		Vector3D(bottomRight.x + x, bottomRight.y + y, bottomRight.z + z),
 		bottomRightColor,
 		tile.u2, tile.v2
 	});
-	/*u32 s = buffer->Vertices.size();
-	buffer->Vertices.push_back(S3DVertex(
-		topLeft.X + x, topLeft.Y + y, topLeft.Z + z,
-		normal.X, normal.Y, normal.Z,
-		topLeftColor,
-		tile.u1, tile.v1
-	));
-	buffer->Vertices.push_back(S3DVertex(
-		topRight.X + x, topRight.Y + y, topRight.Z + z,
-		normal.X, normal.Y, normal.Z,
-		topRightColor,
-		tile.u2, tile.v1
-	));
-	buffer->Vertices.push_back(S3DVertex(
-		bottomLeft.X + x, bottomLeft.Y + y, bottomLeft.Z + z,
-		normal.X, normal.Y, normal.Z,
-		bottomLeftColor,
-		tile.u1, tile.v2
-	));
-	buffer->Vertices.push_back(S3DVertex(
-		bottomRight.X + x, bottomRight.Y + y, bottomRight.Z + z,
-		normal.X, normal.Y, normal.Z,
-		bottomRightColor,
-		tile.u2, tile.v2
-	));*/
 
 	addTriangleIndex(buffer, s, s + 2, s + 1);
 	addTriangleIndex(buffer, s + 1, s + 2, s + 3);
 }
 
-void TriangleCollector::addTriangleIndex(MeshBuffer *buffer, u32 i1, u32 i2, u32 i3)
+void TriangleCollector::addTriangleIndex(MeshBuffer *buffer, u16 i1, u16 i2, u16 i3)
 {
-	buffer->indexBuffer.push_back(i1);
-	buffer->indexBuffer.push_back(i2);
-	buffer->indexBuffer.push_back(i3);
+	buffer->indices.push_back(i1);
+	buffer->indices.push_back(i2);
+	buffer->indices.push_back(i3);
 
 	triangles.push_back(Triangle3D(
-		buffer->vertexBuffer[i1].pos,
-		buffer->vertexBuffer[i2].pos,
-		buffer->vertexBuffer[i3].pos
+		buffer->vertices[i1].position,
+		buffer->vertices[i2].position,
+		buffer->vertices[i3].position
 	));
 }

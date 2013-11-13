@@ -28,6 +28,12 @@ int main()
 	v->init(w);
 	video = v;
 
+	/* Create vertex format */
+	vertexFormat = video->createVertexFormat();
+	vertexFormat->addElement(TYPE_FLOAT3, SEMANTIC_POSITION);
+	vertexFormat->addElement(TYPE_UBYTE4_NORM, SEMANTIC_COLOR);
+	vertexFormat->addElement(TYPE_FLOAT2, SEMANTIC_TEXCOORD);
+
 	/*
 	irr::IrrlichtDevice *device = irr::createDevice(EDT_DIRECT3D9, dimension2d<u32>(1024, 768), 16, false, false, false, eventReceiver);
 	if (!device)

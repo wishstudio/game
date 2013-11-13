@@ -10,3 +10,5 @@ World *world;
 Camera *camera;
 IVideo *video;
 IWindowSystem *windowSystem;
+
+IVertexFormat *vertexFormat;
