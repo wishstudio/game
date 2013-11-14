@@ -62,6 +62,7 @@ ID3D11InputLayout *D3D11VertexFormat::getInputLayout(ID3D11Device *device, ID3DB
 	ID3D11InputLayout *pInputLayout;
 	device->CreateInputLayout(elements.data(), elements.size(), shaderData->GetBufferPointer(), shaderData->GetBufferSize(), &pInputLayout);
 	shaderInputLayouts.insert(std::make_pair(shaderData, pInputLayout));
+	dirty = false;
 	return pInputLayout;
 }
 
