@@ -119,15 +119,13 @@ int main()
 		driver->draw2DLine(vector2d<s32>(driver->getScreenSize().Width / 2, driver->getScreenSize().Height / 2 - 10),
 		vector2d<s32>(driver->getScreenSize().Width / 2, driver->getScreenSize().Height / 2 + 10), SColor(255, 255, 255, 255));*/
 
-		//int fps = driver->getFPS();
-		int fps = 1;
 		Vector3D position = camera->getPosition();
 		std::wstringstream s;
 		s << "POS(" << position.x << "," << position.y << "," << position.z << ") ";
 		if (info)
 			s << "PICK(" << info->block.x() << "," << info->block.y() << "," << info->block.z() << ") ";
-		s << "FPS: " << fps << " ";
-		s << "Frame Time: " << 1000.f / fps << " ";
+		s << "FPS: " << windowSystem->getFPS() << " ";
+		s << "Frame Time: " << windowSystem->getAverageFrameTime() << " ";
 		s << "Chunks: " << world->getLoadedChunkCount() << " ";
 		s << "Blocks: " << world->getLoadedChunkCount() * CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE << " ";
 		windowSystem->setWindowTitle(s.str().c_str());

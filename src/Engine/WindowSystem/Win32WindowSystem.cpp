@@ -162,8 +162,8 @@ bool Win32WindowSystem::processMessage()
 {
 	LARGE_INTEGER currentCount;
 	QueryPerformanceCounter(&currentCount);
-	u64 currentTimeMilliseconds = ((double) currentCount.QuadPart / (double) performanceFrequency) * 1000;
-	onNewFrame(currentTimeMilliseconds);
+	u64 currentTimeMicroseconds = ((double) currentCount.QuadPart / (double) performanceFrequency) * 1000000;
+	onNewFrame(currentTimeMicroseconds);
 	MSG msg;
 	ZeroMemory(&msg, sizeof msg);
 	while (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))

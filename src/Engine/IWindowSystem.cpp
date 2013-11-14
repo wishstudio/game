@@ -50,17 +50,24 @@ void IWindowSystem::onLostFocus()
 	memset(mousePressState, 0, sizeof mousePressState);
 }
 
-void IWindowSystem::onNewFrame(u64 _currentTimeMilliseconds)
+void IWindowSystem::onNewFrame(u64 _currentTimeMicroseconds)
 {
 	memset(keyPressState, 0, sizeof keyPressState);
 	memset(mousePressState, 0, sizeof mousePressState);
-	if (currentTickTimeMilliseconds == -1)
+	if (currentTickTimeMicroseconds == -1)
 	{
 		/* We are just initializing */
-		initialTimeMilliseconds = _currentTimeMilliseconds;
-		currentTickTimeMilliseconds = 0;
+		initialTimeMicroseconds = _currentTimeMicroseconds;
+		currentTimeMicroseconds = 0;
+		currentTickTimeMicroseconds = 0;
 	}
-	currentTimeMilliseconds = _currentTimeMilliseconds - initialTimeMilliseconds;
+	else
+	{
+		u64 lastTimeMicroseconds = currentTimeMicroseconds;
+		currentTimeMicroseconds = _currentTimeMicroseconds - initialTimeMicroseconds;
+		u32 frameTimeMicroseconds = currentTimeMicroseconds - lastTimeMicroseconds;
+		averageFrameTimeMicroseconds = 0.9 * frameTimeMicroseconds + 0.1 * averageFrameTimeMicroseconds;
+	}
 }
 
 void IWindowSystem::setNormalizedMousePosition(f32 nx, f32 ny)
@@ -75,11 +82,11 @@ void IWindowSystem::setNormalizedMousePosition(f32 nx, f32 ny)
 bool IWindowSystem::tick()
 {
 	/* Calculate all things every time instead of accumulations to avoid cumulative error */
-	/* (currentTick + 1) / ticksPerSecond <= currentTimeMilliseconds / 1000 */
-	if ((currentTick + 1) * 1000 <= currentTimeMilliseconds * ticksPerSecond)
+	/* (currentTick + 1) / ticksPerSecond <= currentTimeMilliseconds / 1000000 */
+	if ((currentTick + 1) * 1000000 <= currentTimeMicroseconds * ticksPerSecond)
 	{
 		currentTick++;
-		currentTickTimeMilliseconds = currentTick * 1000 / ticksPerSecond;
+		currentTickTimeMicroseconds = currentTick * 1000000 / ticksPerSecond;
 		return true;
 	}
 	return false;

@@ -36,8 +36,11 @@ public:
 	bool tick();
 	u64 getTick() const { return currentTick; }
 	f32 getTickIntervalSecondsF() const { return 1.0f / ticksPerSecond; }
-	u32 getElapsedTickTimeMilliseconds() const { return currentTimeMilliseconds - currentTickTimeMilliseconds; }
+	u32 getElapsedTickTimeMilliseconds() const { return (currentTimeMicroseconds - currentTickTimeMicroseconds) / 1000; }
 	f32 getElapsedTickTimeSecondsF() const { return getElapsedTickTimeMilliseconds() / 1000.f; };
+
+	f32 getFPS() const { return averageFrameTimeMicroseconds == 0? 0: 1000000.f / averageFrameTimeMicroseconds; }
+	f32 getAverageFrameTime() const { return averageFrameTimeMicroseconds / 1000000.f; }
 
 protected:
 	void onKeyDown(KeyValue key);
@@ -46,13 +49,14 @@ protected:
 	void onMouseUp(MouseButton up);
 	void onMouseMove(int x, int y);
 	void onLostFocus();
-	void onNewFrame(u64 currentTimeMilliseconds);
+	void onNewFrame(u64 currentTimeMicroseconds);
 
 private:
 	Vector2D normalizedMousePosition = Vector2D(0, 0);
 	bool keyDownState[KEY_VALUE_COUNT], keyPressState[KEY_VALUE_COUNT];
 	bool mouseDownState[MOUSE_BUTTON_COUNT], mousePressState[MOUSE_BUTTON_COUNT];
 	u32 ticksPerSecond;
-	u64 currentTick = 0, initialTimeMilliseconds;
-	u64 currentTimeMilliseconds = -1, currentTickTimeMilliseconds = -1;
+	u64 currentTick = 0, initialTimeMicroseconds;
+	u64 currentTimeMicroseconds = -1, currentTickTimeMicroseconds = -1;
+	u32 averageFrameTimeMicroseconds = 0;
 };
