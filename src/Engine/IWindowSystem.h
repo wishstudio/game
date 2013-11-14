@@ -18,6 +18,7 @@ public:
 	virtual void showError(const char *error) = 0;
 	virtual bool processMessage() = 0;
 
+	/* Device input */
 	bool isKeyDown(KeyValue key) const { return keyDownState[key]; }
 	bool isKeyPressed(KeyValue key) const { return keyPressState[key]; }
 	bool isMouseDown(MouseButton button) const { return mouseDownState[button]; }
@@ -30,6 +31,14 @@ public:
 	void setNormalizedMousePosition(f32 x, f32 y);
 	void setNormalizedMousePosition(Vector2D position) { setNormalizedMousePosition(position.x, position.y); }
 
+	/* Time flow */
+	void setTicksPerSecond(u32 _ticksPerSecond) { ticksPerSecond = _ticksPerSecond; }
+	bool tick();
+	u64 getTick() const { return currentTick; }
+	f32 getTickIntervalSecondsF() const { return 1.0f / ticksPerSecond; }
+	u32 getElapsedTickTimeMilliseconds() const { return currentTimeMilliseconds - currentTickTimeMilliseconds; }
+	f32 getElapsedTickTimeSecondsF() const { return getElapsedTickTimeMilliseconds() / 1000.f; };
+
 protected:
 	void onKeyDown(KeyValue key);
 	void onKeyUp(KeyValue key);
@@ -37,10 +46,13 @@ protected:
 	void onMouseUp(MouseButton up);
 	void onMouseMove(int x, int y);
 	void onLostFocus();
-	void onNewFrame();
+	void onNewFrame(u64 currentTimeMilliseconds);
 
 private:
 	Vector2D normalizedMousePosition = Vector2D(0, 0);
 	bool keyDownState[KEY_VALUE_COUNT], keyPressState[KEY_VALUE_COUNT];
 	bool mouseDownState[MOUSE_BUTTON_COUNT], mousePressState[MOUSE_BUTTON_COUNT];
+	u32 ticksPerSecond;
+	u64 currentTick = 0, initialTimeMilliseconds;
+	u64 currentTimeMilliseconds = -1, currentTickTimeMilliseconds = -1;
 };

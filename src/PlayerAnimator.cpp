@@ -2,7 +2,6 @@
 
 #include "Chunk.h"
 #include "PlayerAnimator.h"
-#include "TimeManager.h"
 #include "World.h"
 
 static const Vector3D playerRadius = { 0.48f, 1.9f, 0.48f };
@@ -29,7 +28,7 @@ void PlayerAnimator::tick()
 	bool currentFalling = nextFalling;
 
 	/* Update next velocity */
-	const f32 MOVE_SPEED = 6 * seconds<f32>(TICK_DURATION);
+	const f32 MOVE_SPEED = 6 * windowSystem->getTickIntervalSecondsF();
 	if (!currentFalling)
 	{
 		Vector3D forwardVec = (camera->getLookAt() - camera->getPosition());
@@ -53,7 +52,7 @@ void PlayerAnimator::tick()
 
 	if (currentFalling)
 		/* Add gravity */
-		nextVerticalVelocity -= 9.8 * 2 * seconds<f32>(TICK_DURATION);
+		nextVerticalVelocity -= 9.8 * 2 * windowSystem->getTickIntervalSecondsF();
 	else
 	{
 		if (windowSystem->isKeyDown(KEY_SPACE))
@@ -61,7 +60,7 @@ void PlayerAnimator::tick()
 		else
 			nextVerticalVelocity = 0;
 	}
-	nextVerticalDistance = (currentVerticalVelocity + nextVerticalVelocity) * seconds<f32>(TICK_DURATION) / 2;
+	nextVerticalDistance = (currentVerticalVelocity + nextVerticalVelocity) * windowSystem->getTickIntervalSecondsF() / 2;
 
 	/* Collision detection */
 	bool collided;
@@ -218,7 +217,7 @@ void PlayerAnimator::update()
 	/* Interpolate camera position for smooth rendering */
 	Vector3D position(currentPosition);
 	Vector3D diffVec(nextPosition - currentPosition);
-	position += diffVec * (seconds<f32>(timeManager->getRemainingTickDuration()) / seconds<f32>(TICK_DURATION));
+	position += diffVec * (windowSystem->getElapsedTickTimeSecondsF() / windowSystem->getTickIntervalSecondsF());
 	position += playerCameraOffset;
 	camera->setPosition(position);
 

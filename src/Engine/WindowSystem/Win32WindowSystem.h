@@ -35,6 +35,7 @@ private:
 	HWND windowHandle = nullptr;
 	int w, h;
 	bool mouseVisible;
+	u64 performanceFrequency;
 
 	friend LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 };

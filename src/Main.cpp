@@ -7,7 +7,6 @@
 #include "PlayerAnimator.h"
 #include "ShortcutItemUI.h"
 #include "TileManager.h"
-#include "TimeManager.h"
 #include "World.h"
 
 #include "Engine/D3D11/D3D11Video.h"
@@ -21,8 +20,9 @@ int main()
 	/* Create video device */
 	Win32WindowSystem *w = new Win32WindowSystem();
 	w->init(1024, 768);
-	w->setMouseVisible(false);
 	windowSystem = w;
+	windowSystem->setMouseVisible(false);
+	windowSystem->setTicksPerSecond(20);
 
 	D3D11Video *v = new D3D11Video();
 	v->init(w);
@@ -56,7 +56,6 @@ int main()
 	database = new Database();
 
 	/* Initialize game logic */
-	timeManager = new TimeManager();
 	world = new World();
 	tileManager = new TileManager();
 	blockType = new BlockType();
@@ -80,8 +79,6 @@ int main()
 		//driver->beginScene(true, true, SColor(255, 127, 200, 251));
 		video->beginDraw();
 		video->clearScreen();
-
-		timeManager->update();
 		
 		World::CameraIntersectionInfo *info = nullptr;
 		if (world->getCameraIntersection(Ray3D(camera->getPosition(), camera->getLookAt() - camera->getPosition()), &info))
@@ -101,7 +98,7 @@ int main()
 			if (windowSystem->isMousePressed(MOUSE_BUTTON_RIGHT))
 				info->block.getNeighbour(oppositeDirection(info->direction)).setType(1);//shortcutIUI.getCurrentItem()
 		}
-		while (timeManager->tick())
+		while (windowSystem->tick())
 		{
 			world->tick();
 			playerAnimator->tick();
@@ -140,7 +137,6 @@ int main()
 
 	delete playerAnimator;
 	delete world;
-	delete timeManager;
 
 	delete database;
 	return 0;

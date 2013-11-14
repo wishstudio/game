@@ -66,6 +66,9 @@ static LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM l
 Win32WindowSystem::Win32WindowSystem()
 {
 	hInstance = GetModuleHandleW(nullptr);
+	LARGE_INTEGER frequency;
+	QueryPerformanceFrequency(&frequency);
+	performanceFrequency = frequency.QuadPart;
 }
 
 Win32WindowSystem::~Win32WindowSystem()
@@ -157,7 +160,10 @@ void Win32WindowSystem::showError(const char *error)
 
 bool Win32WindowSystem::processMessage()
 {
-	onNewFrame();
+	LARGE_INTEGER currentCount;
+	QueryPerformanceCounter(&currentCount);
+	u64 currentTimeMilliseconds = ((double) currentCount.QuadPart / (double) performanceFrequency) * 1000;
+	onNewFrame(currentTimeMilliseconds);
 	MSG msg;
 	ZeroMemory(&msg, sizeof msg);
 	while (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))

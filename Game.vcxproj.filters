@@ -71,9 +71,6 @@
     <ClInclude Include="src\PlayerAnimator.h">
       <Filter>Header</Filter>
     </ClInclude>
-    <ClInclude Include="src\TimeManager.h">
-      <Filter>Header</Filter>
-    </ClInclude>
     <ClInclude Include="src\ChunkSceneNode.h">
       <Filter>Header</Filter>
     </ClInclude>
@@ -188,9 +185,6 @@
       <Filter>Source\lz4</Filter>
     </ClCompile>
     <ClCompile Include="src\PlayerAnimator.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="src\TimeManager.cpp">
       <Filter>Source</Filter>
     </ClCompile>
     <ClCompile Include="src\ChunkSceneNode.cpp">
