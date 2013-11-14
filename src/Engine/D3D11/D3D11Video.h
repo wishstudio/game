@@ -80,6 +80,4 @@ private:
 	
 	ID3D11Buffer *pMatrixBuffer = nullptr;
 	MatrixBuffer matrixBuffer;
-
-	ID3D11SamplerState *pSamplerState = nullptr;
 };
