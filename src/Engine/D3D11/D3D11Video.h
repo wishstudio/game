@@ -6,13 +6,6 @@
 #include <d3d11_2.h>
 #include <wincodec.h>
 
-struct MatrixBuffer
-{
-	Matrix4 model;
-	Matrix4 view;
-	Matrix4 projection;
-};
-
 class ITexture;
 class Win32WindowSystem;
 class D3D11Video: public IVideo
@@ -79,5 +72,5 @@ private:
 	ID3D11PixelShader *pPixelShader = nullptr;
 	
 	ID3D11Buffer *pMatrixBuffer = nullptr;
-	MatrixBuffer matrixBuffer;
+	Matrix4 modelMatrix, viewMatrix, projectionMatrix;
 };

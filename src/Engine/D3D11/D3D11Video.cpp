@@ -20,9 +20,7 @@ static PWICCBS _WICConvertBitmapSource;
 static const char SHADER_SRC[] = R"DELIM(
 cbuffer MatrixBuffer
 {
-	float4x4 world;
-	float4x4 view;
-	float4x4 projection;
+	float4x4 mvpMatrix;
 };
 
 struct VS_InputType
@@ -42,9 +40,7 @@ struct PS_InputType
 PS_InputType VS_Main(VS_InputType input)
 {
 	PS_InputType output = input;
-	output.pos = mul(output.pos, world);
-	output.pos = mul(output.pos, view);
-	output.pos = mul(output.pos, projection);
+	output.pos = mul(output.pos, mvpMatrix);
 	return output;
 }
 
@@ -161,7 +157,7 @@ bool D3D11Video::init(Win32WindowSystem *windowSystem)
 	/* Matrix buffer */
 	D3D11_BUFFER_DESC desc;
 	desc.Usage = D3D11_USAGE_DYNAMIC;
-	desc.ByteWidth = sizeof(MatrixBuffer);
+	desc.ByteWidth = sizeof(Matrix4);
 	desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
 	desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 	desc.MiscFlags = 0;
@@ -463,17 +459,17 @@ void D3D11Video::setTexture(ITexture *_texture)
 
 void D3D11Video::setModelMatrix(const Matrix4 &matrix)
 {
-	matrixBuffer.model = matrix;
+	modelMatrix = matrix;
 }
 
 void D3D11Video::setViewMatrix(const Matrix4 &matrix)
 {
-	matrixBuffer.view = matrix;
+	viewMatrix = matrix;
 }
 
 void D3D11Video::setProjectionMatrix(const Matrix4 &matrix)
 {
-	matrixBuffer.projection = matrix;
+	projectionMatrix = matrix;
 }
 
 void D3D11Video::setViewport(s32 width, s32 height)
@@ -517,10 +513,7 @@ void D3D11Video::drawIndexed(
 	/* Set matrix */
 	D3D11_MAPPED_SUBRESOURCE pResource;
 	pContext->Map(pMatrixBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &pResource);
-	MatrixBuffer *matrix = (MatrixBuffer *)pResource.pData;
-	matrix->model = matrixBuffer.model;
-	matrix->view = matrixBuffer.view;
-	matrix->projection = matrixBuffer.projection;
+	*(Matrix4 *) pResource.pData = modelMatrix * viewMatrix * projectionMatrix;
 	pContext->Unmap(pMatrixBuffer, 0);
 	pContext->VSSetConstantBuffers(0, 1, &pMatrixBuffer);
 
