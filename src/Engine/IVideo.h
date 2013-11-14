@@ -24,6 +24,9 @@ public:
 	virtual void setViewMatrix(const Matrix4 &matrix) = 0;
 	virtual void setProjectionMatrix(const Matrix4 &matrix) = 0;
 
+	/* Query functions */
+	virtual u32 getVertexCount() const = 0;
+
 	/* Rendering functions */
 	virtual void clearScreen() = 0;
 	virtual void setViewport(s32 width, s32 height) = 0;

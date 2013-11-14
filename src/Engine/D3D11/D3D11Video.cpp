@@ -494,6 +494,7 @@ void D3D11Video::clearScreen()
 
 void D3D11Video::beginDraw()
 {
+	vertexCount = 0;
 }
 
 void D3D11Video::endDraw()
@@ -536,4 +537,6 @@ void D3D11Video::drawIndexed(
 
 	/* Draw */
 	pContext->DrawIndexed(count, startIndex, startVertex);
+
+	vertexCount += count;
 }

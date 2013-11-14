@@ -129,6 +129,7 @@ int main()
 		s << "Frame Time: " << windowSystem->getAverageFrameTime() * 1000 << "ms ";
 		s << "Chunks: " << world->getLoadedChunkCount() << " ";
 		s << "Blocks: " << world->getLoadedChunkCount() * CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE << " ";
+		s << "Vertices: " << video->getVertexCount() / 1000 << "k";
 		windowSystem->setWindowTitle(s.str().c_str());
 		
 		video->endDraw();

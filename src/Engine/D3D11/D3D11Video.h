@@ -29,6 +29,8 @@ public:
 	virtual void setViewMatrix(const Matrix4 &matrix) override;
 	virtual void setProjectionMatrix(const Matrix4 &matrix) override;
 
+	virtual u32 getVertexCount() const override { return vertexCount; }
+
 	virtual void setViewport(s32 width, s32 height) override;
 	virtual void clearScreen() override;
 
@@ -53,6 +55,8 @@ private:
 	char *decodeImage(const char *raw, int size, int *width, int *height);
 	char *getResourceData(const char *resourceName, int *fileSize);
 	ITexture *createTexture(int width, int height, const void *initialData, D3D11_USAGE usage, UINT bindFlag);
+
+	u32 vertexCount;
 
 	IWICImagingFactory *pFactory;
 	
