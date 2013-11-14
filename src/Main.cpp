@@ -121,11 +121,12 @@ int main()
 
 		Vector3D position = camera->getPosition();
 		std::wstringstream s;
+		s.setf(std::ios::fixed, std::ios::floatfield);
 		s << "POS(" << position.x << "," << position.y << "," << position.z << ") ";
 		if (info)
 			s << "PICK(" << info->block.x() << "," << info->block.y() << "," << info->block.z() << ") ";
 		s << "FPS: " << windowSystem->getFPS() << " ";
-		s << "Frame Time: " << windowSystem->getAverageFrameTime() << " ";
+		s << "Frame Time: " << windowSystem->getAverageFrameTime() * 1000 << "ms ";
 		s << "Chunks: " << world->getLoadedChunkCount() << " ";
 		s << "Blocks: " << world->getLoadedChunkCount() * CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE << " ";
 		windowSystem->setWindowTitle(s.str().c_str());

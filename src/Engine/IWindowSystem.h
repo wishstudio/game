@@ -35,11 +35,11 @@ public:
 	void setTicksPerSecond(u32 _ticksPerSecond) { ticksPerSecond = _ticksPerSecond; }
 	bool tick();
 	u64 getTick() const { return currentTick; }
-	f32 getTickIntervalSecondsF() const { return 1.0f / ticksPerSecond; }
+	f32 getTickInterval() const { return 1.0f / ticksPerSecond; }
 	u32 getElapsedTickTimeMilliseconds() const { return (currentTimeMicroseconds - currentTickTimeMicroseconds) / 1000; }
-	f32 getElapsedTickTimeSecondsF() const { return getElapsedTickTimeMilliseconds() / 1000.f; };
+	f32 getElapsedTickTime() const { return getElapsedTickTimeMilliseconds() / 1000.f; };
 
-	f32 getFPS() const { return averageFrameTimeMicroseconds == 0? 0: 1000000.f / averageFrameTimeMicroseconds; }
+	u32 getFPS() const { return averageFrameTimeMicroseconds == 0? 0: 1000000.f / averageFrameTimeMicroseconds; }
 	f32 getAverageFrameTime() const { return averageFrameTimeMicroseconds / 1000000.f; }
 
 protected:
@@ -56,7 +56,10 @@ private:
 	bool keyDownState[KEY_VALUE_COUNT], keyPressState[KEY_VALUE_COUNT];
 	bool mouseDownState[MOUSE_BUTTON_COUNT], mousePressState[MOUSE_BUTTON_COUNT];
 	u32 ticksPerSecond;
-	u64 currentTick = 0, initialTimeMicroseconds;
-	u64 currentTimeMicroseconds = -1, currentTickTimeMicroseconds = -1;
+	u64 currentTick = 0, initialTimeMicroseconds = -1;
+	u64 currentTimeMicroseconds, currentTickTimeMicroseconds;
+
+	/* Used for FPS Counting */
 	u32 averageFrameTimeMicroseconds = 0;
+	u32 fpsFrameCount = 0, fpsLastTimeMicroseconds = 0;
 };

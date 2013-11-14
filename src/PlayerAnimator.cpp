@@ -28,7 +28,7 @@ void PlayerAnimator::tick()
 	bool currentFalling = nextFalling;
 
 	/* Update next velocity */
-	const f32 MOVE_SPEED = 6 * windowSystem->getTickIntervalSecondsF();
+	const f32 MOVE_SPEED = 6 * windowSystem->getTickInterval();
 	if (!currentFalling)
 	{
 		Vector3D forwardVec = (camera->getLookAt() - camera->getPosition());
@@ -52,7 +52,7 @@ void PlayerAnimator::tick()
 
 	if (currentFalling)
 		/* Add gravity */
-		nextVerticalVelocity -= 9.8 * 2 * windowSystem->getTickIntervalSecondsF();
+		nextVerticalVelocity -= 9.8 * 2 * windowSystem->getTickInterval();
 	else
 	{
 		if (windowSystem->isKeyDown(KEY_SPACE))
@@ -60,7 +60,7 @@ void PlayerAnimator::tick()
 		else
 			nextVerticalVelocity = 0;
 	}
-	nextVerticalDistance = (currentVerticalVelocity + nextVerticalVelocity) * windowSystem->getTickIntervalSecondsF() / 2;
+	nextVerticalDistance = (currentVerticalVelocity + nextVerticalVelocity) * windowSystem->getTickInterval() / 2;
 
 	/* Collision detection */
 	bool collided;
@@ -217,7 +217,7 @@ void PlayerAnimator::update()
 	/* Interpolate camera position for smooth rendering */
 	Vector3D position(currentPosition);
 	Vector3D diffVec(nextPosition - currentPosition);
-	position += diffVec * (windowSystem->getElapsedTickTimeSecondsF() / windowSystem->getTickIntervalSecondsF());
+	position += diffVec * (windowSystem->getElapsedTickTime() / windowSystem->getTickInterval());
 	position += playerCameraOffset;
 	camera->setPosition(position);
 

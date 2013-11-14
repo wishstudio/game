@@ -54,7 +54,7 @@ void IWindowSystem::onNewFrame(u64 _currentTimeMicroseconds)
 {
 	memset(keyPressState, 0, sizeof keyPressState);
 	memset(mousePressState, 0, sizeof mousePressState);
-	if (currentTickTimeMicroseconds == -1)
+	if (initialTimeMicroseconds == -1)
 	{
 		/* We are just initializing */
 		initialTimeMicroseconds = _currentTimeMicroseconds;
@@ -63,10 +63,14 @@ void IWindowSystem::onNewFrame(u64 _currentTimeMicroseconds)
 	}
 	else
 	{
-		u64 lastTimeMicroseconds = currentTimeMicroseconds;
 		currentTimeMicroseconds = _currentTimeMicroseconds - initialTimeMicroseconds;
-		u32 frameTimeMicroseconds = currentTimeMicroseconds - lastTimeMicroseconds;
-		averageFrameTimeMicroseconds = 0.9 * frameTimeMicroseconds + 0.1 * averageFrameTimeMicroseconds;
+		fpsFrameCount++;
+		if (currentTimeMicroseconds - fpsLastTimeMicroseconds >= 1000000)
+		{
+			averageFrameTimeMicroseconds = (currentTimeMicroseconds - fpsLastTimeMicroseconds) / fpsFrameCount;
+			fpsLastTimeMicroseconds = currentTimeMicroseconds;
+			fpsFrameCount = 0;
+		}
 	}
 }
 
