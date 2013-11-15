@@ -15,6 +15,42 @@
 #pragma comment(lib, "sqlite3.lib")
 //#pragma comment(linker, "/subsystem:windows /ENTRY:mainCRTStartup")
 
+static const char SHADER_SRC[] = R"DELIM(
+cbuffer MatrixBuffer
+{
+	float4x4 mvpMatrix;
+};
+
+struct VS_InputType
+{
+	float4 pos : SV_POSITION;
+	float4 color : COLOR;
+	float2 tex : TEXCOORD;
+};
+
+struct PS_InputType
+{
+	float4 pos : SV_POSITION;
+	float4 color : COLOR;
+	float2 tex : TEXCOORD;
+};
+
+PS_InputType VS_Main(VS_InputType input)
+{
+	PS_InputType output = input;
+	output.pos = mul(output.pos, mvpMatrix);
+	return output;
+}
+
+Texture2D shaderTexture: register(t0);
+SamplerState shaderSampler: register(s0);
+
+float4 PS_Main(PS_InputType input): SV_TARGET
+{
+	return shaderTexture.Sample(shaderSampler, input.tex) * input.color;
+}
+)DELIM";
+
 int main()
 {
 	/* Create video device */
@@ -27,6 +63,9 @@ int main()
 	D3D11Video *v = new D3D11Video();
 	v->init(w);
 	video = v;
+
+	Material *defaultMaterial = new Material(video);
+	defaultMaterial->setShaders(SHADER_SRC, "VS_Main", "PS_Main");
 
 	/* Create vertex format */
 	vertexFormat = video->createVertexFormat();
@@ -109,6 +148,8 @@ int main()
 		playerAnimator->update();
 		video->setViewMatrix(camera->getViewMatrix());
 		video->setProjectionMatrix(camera->getProjectionMatrix());
+
+		defaultMaterial->apply();/* TODO */
 		chunkSceneNode->render();
 		//smgr->drawAll();
 

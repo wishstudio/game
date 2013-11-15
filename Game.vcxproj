@@ -25,8 +25,10 @@
     <ClInclude Include="src\Engine\Camera.h" />
     <ClInclude Include="src\Engine\IIndexBuffer.h" />
     <ClInclude Include="src\Engine\InputValue.h" />
+    <ClInclude Include="src\Engine\IShader.h" />
     <ClInclude Include="src\Engine\IVertexBuffer.h" />
     <ClInclude Include="src\Engine\IVertexFormat.h" />
+    <ClInclude Include="src\Engine\Material.h" />
     <ClInclude Include="src\Engine\Matrix4.h" />
     <ClInclude Include="src\Engine\ITexture.h" />
     <ClInclude Include="src\Engine\IVideo.h" />
@@ -63,6 +65,7 @@
     <ClCompile Include="src\Engine\D3D11\D3D11Video.cpp" />
     <ClCompile Include="src\Engine\Camera.cpp" />
     <ClCompile Include="src\Engine\IWindowSystem.cpp" />
+    <ClCompile Include="src\Engine\Material.cpp" />
     <ClCompile Include="src\Engine\Matrix4.cpp" />
     <ClCompile Include="src\Engine\Types.cpp" />
     <ClCompile Include="src\Engine\WindowSystem\Win32WindowSystem.cpp" />

@@ -140,6 +140,12 @@
     <ClInclude Include="src\Engine\D3D11\D3D11IndexBuffer.h">
       <Filter>Engine\D3D11</Filter>
     </ClInclude>
+    <ClInclude Include="src\Engine\Material.h">
+      <Filter>Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Engine\IShader.h">
+      <Filter>Engine</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Block.cpp">
@@ -215,6 +221,9 @@
       <Filter>Engine\D3D11</Filter>
     </ClCompile>
     <ClCompile Include="src\Engine\Types.cpp">
+      <Filter>Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Engine\Material.cpp">
       <Filter>Engine</Filter>
     </ClCompile>
   </ItemGroup>

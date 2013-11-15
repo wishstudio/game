@@ -14,44 +14,23 @@ struct Texture
 	int width, height;
 };
 
+struct D3D11Shader
+{
+	union
+	{
+		IUnknown *pShader;
+		ID3D11VertexShader *pVertexShader;
+		ID3D11PixelShader *pPixelShader;
+		ID3D11GeometryShader *pGeometryShader;
+		ID3D11HullShader *pHullShader;
+		ID3D11DomainShader *pDomainShader;
+		ID3D11ComputeShader *pComputeShader;
+	};
+	ID3DBlob *pShaderBlob;
+};
+
 typedef HRESULT(_stdcall * PWICCBS)(REFWICPixelFormatGUID, IWICBitmapSource *, IWICBitmapSource **ppIDst);
 static PWICCBS _WICConvertBitmapSource;
-
-static const char SHADER_SRC[] = R"DELIM(
-cbuffer MatrixBuffer
-{
-	float4x4 mvpMatrix;
-};
-
-struct VS_InputType
-{
-	float4 pos : SV_POSITION;
-	float4 color : COLOR;
-	float2 tex : TEXCOORD;
-};
-
-struct PS_InputType
-{
-	float4 pos : SV_POSITION;
-	float4 color : COLOR;
-	float2 tex : TEXCOORD;
-};
-
-PS_InputType VS_Main(VS_InputType input)
-{
-	PS_InputType output = input;
-	output.pos = mul(output.pos, mvpMatrix);
-	return output;
-}
-
-Texture2D shaderTexture: register(t0);
-SamplerState shaderSampler: register(s0);
-
-float4 PS_Main(PS_InputType input): SV_TARGET
-{
-	return shaderTexture.Sample(shaderSampler, input.tex) * input.color;
-}
-)DELIM";
 
 D3D11Video::D3D11Video()
 {
@@ -88,15 +67,6 @@ D3D11Video::~D3D11Video()
 		pBackBufferRenderTargetView->Release();
 	if (pRasterizerState)
 		pRasterizerState->Release();
-
-	if (pVertexShaderData)
-		pVertexShaderData->Release();
-	if (pVertexShader)
-		pVertexShader->Release();
-	if (pPixelShaderData)
-		pPixelShaderData->Release();
-	if (pPixelShader)
-		pPixelShader->Release();
 
 	if (pMatrixBuffer)
 		pMatrixBuffer->Release();
@@ -151,8 +121,6 @@ bool D3D11Video::init(Win32WindowSystem *windowSystem)
 		D3D11_SDK_VERSION, &swapChainDesc, &pSwapChain, &pDevice, &featureLevel, &pContext);
 	if (FAILED(hr))
 		return false;
-
-	createShaders();
 
 	/* Matrix buffer */
 	D3D11_BUFFER_DESC desc;
@@ -230,48 +198,6 @@ void D3D11Video::resetBackBuffer()
 	pDevice->CreateRenderTargetView(backBufferTexture, 0, &pBackBufferRenderTargetView);
 	backBufferTexture->Release();
 	pContext->OMSetRenderTargets(1, &pBackBufferRenderTargetView, pDepthStencilView);
-}
-
-void D3D11Video::createShaders()
-{
-	typedef HRESULT(_stdcall * PD3DCOMPILE)(
-		LPCVOID pSrcData,
-		SIZE_T SrcDataSize,
-		LPCSTR pSourceName,
-		const D3D_SHADER_MACRO *pDefines,
-		ID3DInclude *pInclude,
-		LPCSTR pEntrypoint,
-		LPCSTR pTarget,
-		UINT Flags1,
-		UINT Flags2,
-		ID3DBlob **ppCode,
-		ID3DBlob **ppErrorMsgs
-	);
-	HMODULE hm = LoadLibraryA("D3DCompiler_43.dll");
-	PD3DCOMPILE D3DCompile = (PD3DCOMPILE) GetProcAddress(hm, "D3DCompile");
-
-	const u32 size = sizeof(SHADER_SRC);
-	ID3DBlob *errMsg;
-
-	UINT compileFlags = D3DCOMPILE_PACK_MATRIX_ROW_MAJOR | D3DCOMPILE_OPTIMIZATION_LEVEL3;
-
-	/* Vertex shader */
-	D3DCompile(SHADER_SRC, size, nullptr, nullptr, nullptr, "VS_Main", "vs_5_0", compileFlags, 0, &pVertexShaderData, &errMsg);
-	if (errMsg)
-	{
-		printf("Vertex shader compilation message:\n%s\n", errMsg->GetBufferPointer());
-		errMsg->Release();
-	}
-	pDevice->CreateVertexShader(pVertexShaderData->GetBufferPointer(), pVertexShaderData->GetBufferSize(), nullptr, &pVertexShader);
-
-	/* Pixel shader */
-	D3DCompile(SHADER_SRC, size, nullptr, nullptr, nullptr, "PS_Main", "ps_5_0", compileFlags, 0, &pPixelShaderData, &errMsg);
-	if (errMsg)
-	{
-		printf("Pixel shader compilation message:\n%s\n", errMsg->GetBufferPointer());
-		errMsg->Release();
-	}
-	pDevice->CreatePixelShader(pPixelShaderData->GetBufferPointer(), pPixelShaderData->GetBufferSize(), nullptr, &pPixelShader);
 }
 
 char *D3D11Video::decodeImage(const char *raw, int size, int *width, int *height)
@@ -451,6 +377,116 @@ IIndexBuffer *D3D11Video::createIndexBuffer(VertexElementType type, u32 size)
 	return new D3D11IndexBuffer(this, type, size);
 }
 
+ID3DBlob *D3D11Video::createShader(const char *program, const char *entrypoint, const char *target)
+{
+	typedef HRESULT(_stdcall * PD3DCOMPILE)(
+		LPCVOID pSrcData,
+		SIZE_T SrcDataSize,
+		LPCSTR pSourceName,
+		const D3D_SHADER_MACRO *pDefines,
+		ID3DInclude *pInclude,
+		LPCSTR pEntrypoint,
+		LPCSTR pTarget,
+		UINT Flags1,
+		UINT Flags2,
+		ID3DBlob **ppCode,
+		ID3DBlob **ppErrorMsgs
+		);
+	HMODULE hm = LoadLibraryA("D3DCompiler_43.dll");
+	PD3DCOMPILE D3DCompile = (PD3DCOMPILE)GetProcAddress(hm, "D3DCompile");
+
+	ID3DBlob *shaderBlob, *errMsg;
+
+	UINT compileFlags = D3DCOMPILE_PACK_MATRIX_ROW_MAJOR | D3DCOMPILE_OPTIMIZATION_LEVEL3;
+	D3DCompile(program, strlen(program), nullptr, nullptr, nullptr, entrypoint, target, compileFlags, 0, &shaderBlob, &errMsg);
+
+	if (errMsg)
+	{
+		printf("Shader compilation error. Message:\n%s\n", errMsg->GetBufferPointer());
+		errMsg->Release();
+		return nullptr;
+	}
+	return shaderBlob;
+}
+
+IVertexShader *D3D11Video::createVertexShader(const char *program, const char *entrypoint)
+{
+	ID3DBlob *blob = createShader(program, entrypoint, "vs_5_0");
+	if (blob == nullptr)
+		return nullptr;
+	D3D11Shader *shader = new D3D11Shader();
+	shader->pShaderBlob = blob;
+	pDevice->CreateVertexShader(blob->GetBufferPointer(), blob->GetBufferSize(), nullptr, &shader->pVertexShader);
+	return (IVertexShader *) shader;
+}
+
+IPixelShader *D3D11Video::createPixelShader(const char *program, const char *entrypoint)
+{
+	ID3DBlob *blob = createShader(program, entrypoint, "ps_5_0");
+	if (blob == nullptr)
+		return nullptr;
+	D3D11Shader *shader = new D3D11Shader();
+	shader->pShaderBlob = blob;
+	pDevice->CreatePixelShader(blob->GetBufferPointer(), blob->GetBufferSize(), nullptr, &shader->pPixelShader);
+	return (IPixelShader *) shader;
+}
+
+IGeometryShader *D3D11Video::createGeometryShader(const char *program, const char *entrypoint)
+{
+	ID3DBlob *blob = createShader(program, entrypoint, "gs_5_0");
+	if (blob == nullptr)
+		return nullptr;
+	D3D11Shader *shader = new D3D11Shader();
+	shader->pShaderBlob = blob;
+	pDevice->CreateGeometryShader(blob->GetBufferPointer(), blob->GetBufferSize(), nullptr, &shader->pGeometryShader);
+	return (IGeometryShader *) shader;
+}
+
+IHullShader *D3D11Video::createHullShader(const char *program, const char *entrypoint)
+{
+	ID3DBlob *blob = createShader(program, entrypoint, "hs_5_0");
+	if (blob == nullptr)
+		return nullptr;
+	D3D11Shader *shader = new D3D11Shader();
+	shader->pShaderBlob = blob;
+	pDevice->CreateHullShader(blob->GetBufferPointer(), blob->GetBufferSize(), nullptr, &shader->pHullShader);
+	return (IHullShader *) shader;
+}
+
+IDomainShader *D3D11Video::createDomainShader(const char *program, const char *entrypoint)
+{
+	ID3DBlob *blob = createShader(program, entrypoint, "ds_5_0");
+	if (blob == nullptr)
+		return nullptr;
+	D3D11Shader *shader = new D3D11Shader();
+	shader->pShaderBlob = blob;
+	pDevice->CreateDomainShader(blob->GetBufferPointer(), blob->GetBufferSize(), nullptr, &shader->pDomainShader);
+	return (IDomainShader *) shader;
+}
+
+IComputeShader *D3D11Video::createComputeShader(const char *program, const char *entrypoint)
+{
+	ID3DBlob *blob = createShader(program, entrypoint, "cs_5_0");
+	if (blob == nullptr)
+		return nullptr;
+	D3D11Shader *shader = new D3D11Shader();
+	shader->pShaderBlob = blob;
+	pDevice->CreateComputeShader(blob->GetBufferPointer(), blob->GetBufferSize(), nullptr, &shader->pComputeShader);
+	return (IComputeShader *) shader;
+}
+
+void D3D11Video::setViewport(s32 width, s32 height)
+{
+	D3D11_VIEWPORT viewport;
+	viewport.Width = width;
+	viewport.Height = height;
+	viewport.MinDepth = 0.0f;
+	viewport.MaxDepth = 1.0f;
+	viewport.TopLeftX = 0.0f;
+	viewport.TopLeftY = 0.0f;
+	pContext->RSSetViewports(1, &viewport);
+}
+
 void D3D11Video::setTexture(ITexture *_texture)
 {
 	Texture *texture = (Texture *)_texture;
@@ -472,16 +508,35 @@ void D3D11Video::setProjectionMatrix(const Matrix4 &matrix)
 	projectionMatrix = matrix;
 }
 
-void D3D11Video::setViewport(s32 width, s32 height)
+void D3D11Video::setVertexShader(IVertexShader *shader)
 {
-	D3D11_VIEWPORT viewport;
-	viewport.Width = width;
-	viewport.Height = height;
-	viewport.MinDepth = 0.0f;
-	viewport.MaxDepth = 1.0f;
-	viewport.TopLeftX = 0.0f;
-	viewport.TopLeftY = 0.0f;
-	pContext->RSSetViewports(1, &viewport);
+	pContext->VSSetShader(((D3D11Shader *)shader)->pVertexShader, nullptr, 0);
+	currentVertexShader = (D3D11Shader *)shader;
+}
+
+void D3D11Video::setPixelShader(IPixelShader *shader)
+{
+	pContext->PSSetShader(((D3D11Shader *)shader)->pPixelShader, nullptr, 0);
+}
+
+void D3D11Video::setGeometryShader(IGeometryShader *shader)
+{
+	pContext->GSSetShader(((D3D11Shader *)shader)->pGeometryShader, nullptr, 0);
+}
+
+void D3D11Video::setHullShader(IHullShader *shader)
+{
+	pContext->HSSetShader(((D3D11Shader *)shader)->pHullShader, nullptr, 0);
+}
+
+void D3D11Video::setDomainShader(IDomainShader *shader)
+{
+	pContext->DSSetShader(((D3D11Shader *)shader)->pDomainShader, nullptr, 0);
+}
+
+void D3D11Video::setComputeShader(IComputeShader *shader)
+{
+	pContext->CSSetShader(((D3D11Shader *)shader)->pComputeShader, nullptr, 0);
 }
 
 void D3D11Video::clearScreen()
@@ -518,12 +573,8 @@ void D3D11Video::drawIndexed(
 	pContext->Unmap(pMatrixBuffer, 0);
 	pContext->VSSetConstantBuffers(0, 1, &pMatrixBuffer);
 
-	/* Set shaders */
-	pContext->VSSetShader(pVertexShader, nullptr, 0);
-	pContext->PSSetShader(pPixelShader, nullptr, 0);
-
 	/* Set input layout */
-	pContext->IASetInputLayout(((D3D11VertexFormat *) vertexBuffer->getVertexFormat())->getInputLayout(pDevice, pVertexShaderData));
+	pContext->IASetInputLayout(((D3D11VertexFormat *) vertexBuffer->getVertexFormat())->getInputLayout(pDevice, currentVertexShader->pShaderBlob));
 
 	/* Set buffers */
 	UINT stride = vertexBuffer->getVertexFormat()->getSize();

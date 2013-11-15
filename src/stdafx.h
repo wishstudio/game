@@ -15,6 +15,7 @@
 #include "Engine/IVertexFormat.h"
 #include "Engine/IVideo.h"
 #include "Engine/IWindowSystem.h"
+#include "Engine/Material.h"
 #include "Engine/Matrix4.h"
 #include "Engine/Ray3D.h"
 #include "Engine/Triangle3D.h"

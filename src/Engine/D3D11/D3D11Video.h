@@ -8,6 +8,7 @@
 
 class ITexture;
 class Win32WindowSystem;
+class D3D11Shader;
 class D3D11Video: public IVideo
 {
 public:
@@ -24,14 +25,27 @@ public:
 	virtual IVertexBuffer *createVertexBuffer(IVertexFormat *format, u32 size) override;
 	virtual IIndexBuffer *createIndexBuffer(VertexElementType type, u32 size) override;
 
+	virtual IVertexShader *createVertexShader(const char *program, const char *entrypoint) override;
+	virtual IPixelShader *createPixelShader(const char *program, const char *entrypoint) override;
+	virtual IGeometryShader *createGeometryShader(const char *program, const char *entrypoint) override;
+	virtual IHullShader *createHullShader(const char *program, const char *entrypoint) override;
+	virtual IDomainShader *createDomainShader(const char *program, const char *entrypoint) override;
+	virtual IComputeShader *createComputeShader(const char *program, const char *entrypoint) override;
+
+	virtual void setViewport(s32 width, s32 height) override;
 	virtual void setTexture(ITexture *texture) override;
 	virtual void setModelMatrix(const Matrix4 &matrix) override;
 	virtual void setViewMatrix(const Matrix4 &matrix) override;
 	virtual void setProjectionMatrix(const Matrix4 &matrix) override;
+	virtual void setVertexShader(IVertexShader *shader) override;
+	virtual void setPixelShader(IPixelShader *shader) override;
+	virtual void setGeometryShader(IGeometryShader *shader) override;
+	virtual void setHullShader(IHullShader *shader) override;
+	virtual void setDomainShader(IDomainShader *shader) override;
+	virtual void setComputeShader(IComputeShader *shader) override;
 
 	virtual u32 getVertexCount() const override { return vertexCount; }
 
-	virtual void setViewport(s32 width, s32 height) override;
 	virtual void clearScreen() override;
 
 	virtual void beginDraw() override;
@@ -51,7 +65,7 @@ public:
 	ID3D11DeviceContext *getDeviceContext() const { return pContext; }
 
 private:
-	void createShaders();
+	ID3DBlob *createShader(const char *program, const char *entrypoint, const char *target);
 	char *decodeImage(const char *raw, int size, int *width, int *height);
 	char *getResourceData(const char *resourceName, int *fileSize);
 	ITexture *createTexture(int width, int height, const void *initialData, D3D11_USAGE usage, UINT bindFlag);
@@ -70,11 +84,8 @@ private:
 	ID3D11DepthStencilState *pDepthStencilState = nullptr;
 	ID3D11RenderTargetView *pBackBufferRenderTargetView = nullptr;
 	ID3D11RasterizerState *pRasterizerState = nullptr;
-
-	ID3DBlob *pVertexShaderData = nullptr, *pPixelShaderData = nullptr;
-	ID3D11VertexShader *pVertexShader = nullptr;
-	ID3D11PixelShader *pPixelShader = nullptr;
 	
 	ID3D11Buffer *pMatrixBuffer = nullptr;
 	Matrix4 modelMatrix, viewMatrix, projectionMatrix;
+	D3D11Shader *currentVertexShader = nullptr;
 };
