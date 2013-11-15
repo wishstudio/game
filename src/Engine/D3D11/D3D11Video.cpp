@@ -544,17 +544,13 @@ void D3D11Video::setComputeShader(IComputeShader *shader)
 	pContext->CSSetShader(((D3D11Shader *)shader)->pComputeShader, nullptr, 0);
 }
 
-void D3D11Video::clearScreen()
-{
-	//float clearColor[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
-	float clearColor[4] = { 127.0 / 255.0f, 200 / 255.0f, 251 / 255.0f, 255.0 / 255.0f };
-	pContext->ClearRenderTargetView(pBackBufferRenderTargetView, clearColor);
-	pContext->ClearDepthStencilView(pDepthStencilView, D3D11_CLEAR_DEPTH, 1.0f, 0);
-}
-
-void D3D11Video::beginDraw()
+void D3D11Video::beginDraw(Color clearColor)
 {
 	vertexCount = 0;
+	//float clearColor[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
+	//float clearColor[4] = { 127.0 / 255.0f, 200 / 255.0f, 251 / 255.0f, 255.0 / 255.0f };
+	pContext->ClearRenderTargetView(pBackBufferRenderTargetView, (const FLOAT *) &Colorf(clearColor));
+	pContext->ClearDepthStencilView(pDepthStencilView, D3D11_CLEAR_DEPTH, 1.0f, 0);
 }
 
 void D3D11Video::endDraw()

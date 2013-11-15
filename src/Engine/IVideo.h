@@ -49,9 +49,7 @@ public:
 	virtual u32 getVertexCount() const = 0;
 
 	/* Rendering functions */
-	virtual void clearScreen() = 0;
-
-	virtual void beginDraw() = 0;
+	virtual void beginDraw(Color clearColor) = 0;
 	virtual void endDraw() = 0;
 
 	virtual void draw(IVertexBuffer *vertexBuffer, u32 startVertex, u32 count, PrimitiveTopology topology) = 0;

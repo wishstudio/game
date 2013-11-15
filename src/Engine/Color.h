@@ -83,7 +83,7 @@ public:
 	}
 };
 
-Color::Color(const Colorf &c)
+inline Color::Color(const Colorf &c)
 {
 	r = c.r * 0xFF;
 	g = c.g * 0xFF;
@@ -91,7 +91,7 @@ Color::Color(const Colorf &c)
 	a = c.a * 0xFF;
 }
 
-Color &Color::operator= (const Colorf &c)
+inline Color &Color::operator= (const Colorf &c)
 {
 	r = c.r * 0xFF;
 	g = c.g * 0xFF;
@@ -100,7 +100,7 @@ Color &Color::operator= (const Colorf &c)
 	return *this;
 }
 
-Colorf::Colorf(const Color &c)
+inline Colorf::Colorf(const Color &c)
 {
 	r = c.r / (f32)0xFF;
 	g = c.g / (f32)0xFF;
@@ -108,7 +108,7 @@ Colorf::Colorf(const Color &c)
 	a = c.a / (f32)0xFF;
 }
 
-Colorf &Colorf::operator= (const Color &c)
+inline Colorf &Colorf::operator= (const Color &c)
 {
 	r = c.r / (f32)0xFF;
 	g = c.g / (f32)0xFF;

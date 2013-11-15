@@ -47,9 +47,7 @@ public:
 
 	virtual u32 getVertexCount() const override { return vertexCount; }
 
-	virtual void clearScreen() override;
-
-	virtual void beginDraw() override;
+	virtual void beginDraw(Color clearColor) override;
 	virtual void endDraw() override;
 
 	virtual void draw(IVertexBuffer *vertexBuffer, u32 startVertex, u32 count, PrimitiveTopology topology) override;

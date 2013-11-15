@@ -176,8 +176,7 @@ int main()
 
 		playerAnimator->update();
 
-		video->beginDraw();
-		video->clearScreen();
+		video->beginDraw({ 127, 200, 251, 255 });
 		video->setViewMatrix(camera->getViewMatrix());
 		video->setProjectionMatrix(camera->getProjectionMatrix());
 
