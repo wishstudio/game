@@ -18,6 +18,7 @@ public:
 	bool init(Win32WindowSystem *windowSystem);
 	void resetBackBuffer();
 
+	virtual ITexture *createTexture(int width, int height, const void *data) override;
 	virtual ITexture *createTexture(const std::string &path) override;
 	virtual void deleteTexture(ITexture *texture) override;
 
@@ -51,6 +52,7 @@ public:
 	virtual void beginDraw() override;
 	virtual void endDraw() override;
 
+	virtual void draw(IVertexBuffer *vertexBuffer, u32 startVertex, u32 count, PrimitiveTopology topology) override;
 	virtual void drawIndexed(
 		IVertexBuffer *vertexBuffer,
 		u32 startVertex,

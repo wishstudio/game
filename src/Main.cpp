@@ -51,6 +51,44 @@ float4 PS_Main(PS_InputType input): SV_TARGET
 }
 )DELIM";
 
+static ITexture *whiteTexture = nullptr;
+
+static void draw3DBox(const AABB &box, Color color)
+{
+	static IVertexBuffer *buffer = video->createVertexBuffer(vertexFormat, 24);
+
+	video->setTexture(whiteTexture);
+	video->setModelMatrix(Matrix4::identity());
+
+	Vector3D p000(box.minPoint.x, box.minPoint.y, box.minPoint.z);
+	Vector3D p001(box.minPoint.x, box.minPoint.y, box.maxPoint.z);
+	Vector3D p010(box.minPoint.x, box.maxPoint.y, box.minPoint.z);
+	Vector3D p011(box.minPoint.x, box.maxPoint.y, box.maxPoint.z);
+	Vector3D p100(box.maxPoint.x, box.minPoint.y, box.minPoint.z);
+	Vector3D p101(box.maxPoint.x, box.minPoint.y, box.maxPoint.z);
+	Vector3D p110(box.maxPoint.x, box.maxPoint.y, box.minPoint.z);
+	Vector3D p111(box.maxPoint.x, box.maxPoint.y, box.maxPoint.z);
+	Vertex vertices[24] =
+	{
+		{ p000, color, 0.f, 0.f }, { p001, color, 0.f, 0.f },
+		{ p001, color, 0.f, 0.f }, { p011, color, 0.f, 0.f },
+		{ p011, color, 0.f, 0.f }, { p010, color, 0.f, 0.f },
+		{ p010, color, 0.f, 0.f }, { p000, color, 0.f, 0.f },
+
+		{ p100, color, 0.f, 0.f }, { p101, color, 0.f, 0.f },
+		{ p101, color, 0.f, 0.f }, { p111, color, 0.f, 0.f },
+		{ p111, color, 0.f, 0.f }, { p110, color, 0.f, 0.f },
+		{ p110, color, 0.f, 0.f }, { p100, color, 0.f, 0.f },
+
+		{ p000, color, 0.f, 0.f }, { p100, color, 0.f, 0.f },
+		{ p001, color, 0.f, 0.f }, { p101, color, 0.f, 0.f },
+		{ p010, color, 0.f, 0.f }, { p110, color, 0.f, 0.f },
+		{ p011, color, 0.f, 0.f }, { p111, color, 0.f, 0.f },
+	};
+	buffer->update(0, 24, vertices);
+	video->draw(buffer, 0, 24, TOPOLOGY_LINELIST);
+}
+
 int main()
 {
 	/* Create video device */
@@ -66,6 +104,9 @@ int main()
 
 	Material *defaultMaterial = new Material(video);
 	defaultMaterial->setShaders(SHADER_SRC, "VS_Main", "PS_Main");
+
+	Color whiteData(255, 255, 255, 255);
+	whiteTexture = video->createTexture(1, 1, &whiteData);
 
 	/* Create vertex format */
 	vertexFormat = video->createVertexFormat();
@@ -116,22 +157,10 @@ int main()
 		//camera->setAspectRatio((f32) renderTargetSize.Width / (f32) renderTargetSize.Height);
 
 		//driver->beginScene(true, true, SColor(255, 127, 200, 251));
-		video->beginDraw();
-		video->clearScreen();
 		
 		World::CameraIntersectionInfo *info = nullptr;
 		if (world->getCameraIntersection(Ray3D(camera->getPosition(), camera->getLookAt() - camera->getPosition()), &info))
 		{
-			AABB box = info->block.getBoundingBox();
-			box.translate(info->block.x(), info->block.y(), info->block.z());
-			/*box.MinEdge.X -= .01f;
-			box.MinEdge.Y -= .01f;
-			box.MinEdge.Z -= .01f;
-			box.MaxEdge.X += .01f;
-			box.MaxEdge.Y += .01f;
-			box.MaxEdge.Z += .01f;
-			driver->setTransform(ETS_WORLD, IdentityMatrix);
-			driver->draw3DBox(box, SColor(255, 255, 0, 0));*/
 			if (windowSystem->isMousePressed(MOUSE_BUTTON_LEFT))
 				info->block.setType(0);
 			if (windowSystem->isMousePressed(MOUSE_BUTTON_RIGHT))
@@ -144,14 +173,21 @@ int main()
 		}
 		world->update();
 		world->save();
-			
+
 		playerAnimator->update();
+
+		video->beginDraw();
+		video->clearScreen();
 		video->setViewMatrix(camera->getViewMatrix());
 		video->setProjectionMatrix(camera->getProjectionMatrix());
 
 		defaultMaterial->apply();/* TODO */
 		chunkSceneNode->render();
-		//smgr->drawAll();
+		if (world->getCameraIntersection(Ray3D(camera->getPosition(), camera->getLookAt() - camera->getPosition()), &info))
+		{
+			AABB box = info->block.getBoundingBox().translate(info->block.x(), info->block.y(), info->block.z());
+			draw3DBox(box, Color(255, 0, 0, 255));
+		}
 
 		//eventReceiver->update();
 		/*shortcutIUI.show();

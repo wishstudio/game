@@ -336,6 +336,11 @@ ITexture *D3D11Video::createTexture(int width, int height, const void *initialDa
 	return (ITexture *) texture;
 };
 
+ITexture *D3D11Video::createTexture(int width, int height, const void *data)
+{
+	return createTexture(width, height, data, D3D11_USAGE_DEFAULT, D3D11_BIND_SHADER_RESOURCE);
+}
+
 ITexture *D3D11Video::createTexture(const std::string &path)
 {
 	int size;
@@ -555,6 +560,31 @@ void D3D11Video::beginDraw()
 void D3D11Video::endDraw()
 {
 	pSwapChain->Present(0, 0);
+}
+
+void D3D11Video::draw(IVertexBuffer *vertexBuffer, u32 startVertex, u32 count, PrimitiveTopology topology)
+{
+	/* Set matrix */
+	D3D11_MAPPED_SUBRESOURCE pResource;
+	pContext->Map(pMatrixBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &pResource);
+	*(Matrix4 *)pResource.pData = modelMatrix * viewMatrix * projectionMatrix;
+	pContext->Unmap(pMatrixBuffer, 0);
+	pContext->VSSetConstantBuffers(0, 1, &pMatrixBuffer);
+
+	/* Set input layout */
+	pContext->IASetInputLayout(((D3D11VertexFormat *)vertexBuffer->getVertexFormat())->getInputLayout(pDevice, currentVertexShader->pShaderBlob));
+
+	/* Set buffers */
+	UINT stride = vertexBuffer->getVertexFormat()->getSize();
+	UINT offsets = 0;
+	ID3D11Buffer *vb = ((D3D11VertexBuffer *)vertexBuffer)->getVertexBuffer();
+	pContext->IASetVertexBuffers(0, 1, &vb, &stride, &offsets);
+	pContext->IASetPrimitiveTopology(D3D11VertexFormat::getTopologyMapping(topology));
+
+	/* Draw */
+	pContext->Draw(count, startVertex);
+
+	vertexCount += count;
 }
 
 void D3D11Video::drawIndexed(

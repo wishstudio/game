@@ -17,6 +17,7 @@ class IVideo
 {
 public:
 	/* Resource management */
+	virtual ITexture *createTexture(int width, int height, const void *data) = 0;
 	virtual ITexture *createTexture(const std::string &path) = 0;
 	virtual void deleteTexture(ITexture *texture) = 0;
 
@@ -53,6 +54,7 @@ public:
 	virtual void beginDraw() = 0;
 	virtual void endDraw() = 0;
 
+	virtual void draw(IVertexBuffer *vertexBuffer, u32 startVertex, u32 count, PrimitiveTopology topology) = 0;
 	virtual void drawIndexed(
 		IVertexBuffer *vertexBuffer,
 		u32 startVertex,

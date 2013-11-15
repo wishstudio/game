@@ -10,6 +10,7 @@
 #include "Engine/Camera.h"
 #include "Engine/Color.h"
 #include "Engine/IIndexBuffer.h"
+#include "Engine/IShader.h"
 #include "Engine/ITexture.h"
 #include "Engine/IVertexBuffer.h"
 #include "Engine/IVertexFormat.h"
@@ -59,6 +60,11 @@ struct Vertex
 	Vector3D position;
 	Color color;
 	f32 u, v;
+
+	Vertex() = default;
+	Vertex(Vector3D _position, Color _color, f32 _u, f32 _v):
+		position(_position), color(_color), u(_u), v(_v)
+	{}
 };
 
 extern IVertexFormat *vertexFormat;
