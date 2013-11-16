@@ -178,7 +178,7 @@ bool D3D11Video::init(Win32WindowSystem *windowSystem)
 	rasterizerStateDesc.DepthClipEnable = true;
 	rasterizerStateDesc.ScissorEnable = false;
 	rasterizerStateDesc.MultisampleEnable = false;
-	rasterizerStateDesc.AntialiasedLineEnable = false;
+	rasterizerStateDesc.AntialiasedLineEnable = true;
 	pDevice->CreateRasterizerState(&rasterizerStateDesc, &pRasterizerState);
 	pContext->RSSetState(pRasterizerState);
 
