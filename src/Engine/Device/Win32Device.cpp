@@ -256,6 +256,10 @@ LRESULT Win32Device::wndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
 		break;
 	}
 
+	case WM_MOUSEWHEEL:
+		onMouseWheel(GET_WHEEL_DELTA_WPARAM(wParam));
+		break;
+
 	case WM_KILLFOCUS:
 		onLostFocus();
 		break;

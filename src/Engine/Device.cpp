@@ -7,6 +7,7 @@ Device::Device()
 {
 	memset(keyDownState, 0, sizeof keyDownState);
 	memset(keyPressState, 0, sizeof keyPressState);
+	mouseWheel = 0;
 }
 
 void Device::onKeyDown(KeyValue key)
@@ -42,18 +43,25 @@ void Device::onMouseMove(int x, int y)
 	normalizedMousePosition = Vector2D(nx, ny);
 }
 
+void Device::onMouseWheel(s32 degree)
+{
+	mouseWheel = degree / 120.f;
+}
+
 void Device::onLostFocus()
 {
 	memset(keyDownState, 0, sizeof keyDownState);
 	memset(keyPressState, 0, sizeof keyPressState);
 	memset(mouseDownState, 0, sizeof mouseDownState);
 	memset(mousePressState, 0, sizeof mousePressState);
+	mouseWheel = 0;
 }
 
 void Device::onNewFrame(u64 _currentTimeMicroseconds)
 {
 	memset(keyPressState, 0, sizeof keyPressState);
 	memset(mousePressState, 0, sizeof mousePressState);
+	mouseWheel = 0;
 	if (initialTimeMicroseconds == -1)
 	{
 		/* We are just initializing */
