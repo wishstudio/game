@@ -6,7 +6,6 @@
 #include <d3d11_2.h>
 #include <wincodec.h>
 
-class ITexture;
 class Win32Device;
 class D3D11Shader;
 class D3D11Video: public IVideo
@@ -18,9 +17,8 @@ public:
 	bool init(Win32Device *device);
 	void resetBackBuffer();
 
-	virtual ITexture *createTexture(int width, int height, const void *data) override;
-	virtual ITexture *createTexture(const std::string &path) override;
-	virtual void deleteTexture(ITexture *texture) override;
+	virtual PTexture createTexture(u32 width, u32 height, const void *data) override;
+	virtual PTexture createTexture(const std::string &path) override;
 
 	virtual IVertexFormat *createVertexFormat() override;
 	virtual IVertexBuffer *createVertexBuffer(IVertexFormat *format, u32 size) override;
@@ -34,7 +32,7 @@ public:
 	virtual IComputeShader *createComputeShader(const char *program, const char *entrypoint) override;
 
 	virtual void setViewport(s32 width, s32 height) override;
-	virtual void setTexture(ITexture *texture) override;
+	virtual void setTexture(PTexture texture) override;
 	virtual void setModelMatrix(const Matrix4 &matrix) override;
 	virtual void setViewMatrix(const Matrix4 &matrix) override;
 	virtual void setProjectionMatrix(const Matrix4 &matrix) override;
@@ -66,9 +64,9 @@ public:
 
 private:
 	ID3DBlob *createShader(const char *program, const char *entrypoint, const char *target);
-	char *decodeImage(const char *raw, int size, int *width, int *height);
-	char *getResourceData(const char *resourceName, int *fileSize);
-	ITexture *createTexture(int width, int height, const void *initialData, D3D11_USAGE usage, UINT bindFlag);
+	char *decodeImage(const char *raw, u32 size, u32 *width, u32 *height);
+	char *getResourceData(const char *resourceName, u32 *fileSize);
+	PTexture createTexture(u32 width, u32 height, const void *initialData, D3D11_USAGE usage, UINT bindFlag);
 
 	u32 vertexCount;
 

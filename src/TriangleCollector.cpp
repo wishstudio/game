@@ -24,7 +24,7 @@ TriangleCollector::~TriangleCollector()
 	clear();
 }
 
-MeshBuffer *TriangleCollector::getBuffer(ITexture *texture)
+MeshBuffer *TriangleCollector::getBuffer(PTexture texture)
 {
 	auto it = textureMap.find(texture);
 	if (it != textureMap.end())
@@ -44,7 +44,7 @@ void TriangleCollector::render()
 	for (u32 i = 0; i < buffers.size(); i++)
 	{
 		MeshBuffer *buffer = buffers[i];
-		ITexture *texture = textures[i];
+		PTexture texture = textures[i];
 		if (buffer->vertexBuffer == nullptr)
 		{
 			delete buffer->vertexBuffer;

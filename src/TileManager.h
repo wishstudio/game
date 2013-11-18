@@ -8,7 +8,7 @@ struct Tile
 	{
 	}
 
-	ITexture *texture;
+	PTexture texture;
 	float u1, v1, u2, v2;
 };
 

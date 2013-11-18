@@ -43,13 +43,13 @@ public:
 	}
 
 private:
-	MeshBuffer *getBuffer(ITexture *texture);
+	MeshBuffer *getBuffer(PTexture texture);
 	void addTriangleIndex(MeshBuffer *buffer, u16 i1, u16 i2, u16 i3);
 
 	bool valid;
 	std::vector<MeshBuffer *> buffers;
-	std::vector<ITexture *> textures;
-	std::unordered_map<ITexture *, MeshBuffer *> textureMap;
+	std::vector<PTexture> textures;
+	std::unordered_map<PTexture, MeshBuffer *> textureMap;
 	int x, y, z;
 	std::vector<Triangle3D> triangles;
 	int beginIndex[CHUNK_SIZE][CHUNK_SIZE][CHUNK_SIZE], endIndex[CHUNK_SIZE][CHUNK_SIZE][CHUNK_SIZE];

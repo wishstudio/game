@@ -3,16 +3,10 @@
 #include <d3dcompiler.h>
 #include "../Device/Win32Device.h"
 #include "D3D11IndexBuffer.h"
+#include "D3D11Texture.h"
 #include "D3D11VertexBuffer.h"
 #include "D3D11VertexFormat.h"
 #include "D3D11Video.h"
-
-struct Texture
-{
-	ID3D11Texture2D *pTexture;
-	ID3D11ShaderResourceView *pResourceView;
-	int width, height;
-};
 
 struct D3D11Shader
 {
@@ -200,7 +194,7 @@ void D3D11Video::resetBackBuffer()
 	pContext->OMSetRenderTargets(1, &pBackBufferRenderTargetView, pDepthStencilView);
 }
 
-char *D3D11Video::decodeImage(const char *raw, int size, int *width, int *height)
+char *D3D11Video::decodeImage(const char *raw, u32 size, u32 *width, u32 *height)
 {
 	IWICStream *pStream = nullptr;
 	IWICBitmapDecoder *pDecoder = nullptr;
@@ -269,7 +263,7 @@ Finish:
 	return buffer;
 }
 
-char *D3D11Video::getResourceData(const char *resourceName, int *fileSize)
+char *D3D11Video::getResourceData(const char *resourceName, u32 *fileSize)
 {
 	HANDLE hFile = CreateFileA(resourceName, GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
 	if (hFile == INVALID_HANDLE_VALUE)
@@ -280,7 +274,7 @@ char *D3D11Video::getResourceData(const char *resourceName, int *fileSize)
 		CloseHandle(hFile);
 		return NULL;
 	}
-	(*fileSize) = (int)size.QuadPart;
+	(*fileSize) = (u32)size.QuadPart;
 	char *content = (char *)malloc(*fileSize);
 	DWORD bytesRead; /* XP Requires this */
 	if (!ReadFile(hFile, content, (*fileSize), &bytesRead, NULL))
@@ -292,13 +286,10 @@ char *D3D11Video::getResourceData(const char *resourceName, int *fileSize)
 	return content;
 }
 
-ITexture *D3D11Video::createTexture(int width, int height, const void *initialData, D3D11_USAGE usage, UINT bindFlag)
+PTexture D3D11Video::createTexture(u32 width, u32 height, const void *initialData, D3D11_USAGE usage, UINT bindFlag)
 {
-	Texture *texture = new Texture();
-	memset(texture, 0, sizeof texture);
-	texture->width = width;
-	texture->height = height;
-	HRESULT hr;
+	ID3D11Texture2D *pTexture2D;
+	ID3D11ShaderResourceView *pShaderResourceView;
 
 	D3D11_TEXTURE2D_DESC textureDesc;
 	textureDesc.Width = width;
@@ -321,10 +312,10 @@ ITexture *D3D11Video::createTexture(int width, int height, const void *initialDa
 		dataDesc.pSysMem = initialData;
 		dataDesc.SysMemPitch = width * 4;
 		dataDesc.SysMemSlicePitch = 0;
-		pDevice->CreateTexture2D(&textureDesc, &dataDesc, &texture->pTexture);
+		pDevice->CreateTexture2D(&textureDesc, &dataDesc, &pTexture2D);
 	}
 	else
-		pDevice->CreateTexture2D(&textureDesc, NULL, &texture->pTexture);
+		pDevice->CreateTexture2D(&textureDesc, nullptr, &pTexture2D);
 
 	D3D11_SHADER_RESOURCE_VIEW_DESC resourceViewDesc;
 	resourceViewDesc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
@@ -332,39 +323,27 @@ ITexture *D3D11Video::createTexture(int width, int height, const void *initialDa
 	resourceViewDesc.Texture2D.MostDetailedMip = 0;
 	resourceViewDesc.Texture2D.MipLevels = 1;
 
-	pDevice->CreateShaderResourceView(texture->pTexture, &resourceViewDesc, &texture->pResourceView);
-	return (ITexture *) texture;
+	pDevice->CreateShaderResourceView(pTexture2D, &resourceViewDesc, &pShaderResourceView);
+
+	return std::make_shared<D3D11Texture>(pTexture2D, pShaderResourceView, width, height);
 };
 
-ITexture *D3D11Video::createTexture(int width, int height, const void *data)
+PTexture D3D11Video::createTexture(u32 width, u32 height, const void *data)
 {
 	return createTexture(width, height, data, D3D11_USAGE_DEFAULT, D3D11_BIND_SHADER_RESOURCE);
 }
 
-ITexture *D3D11Video::createTexture(const std::string &path)
+PTexture D3D11Video::createTexture(const std::string &path)
 {
-	int size;
-	char *raw = getResourceData(path.c_str(), &size);
+	u32 size;
+	std::unique_ptr<char> raw(getResourceData(path.c_str(), &size));
 	if (raw == nullptr)
 		return nullptr;
-	int width, height;
-	char *image = decodeImage(raw, size, &width, &height);
-	delete raw;
-	if (image == NULL)
-		return NULL;
-	ITexture *texture = createTexture(width, height, image, D3D11_USAGE_DEFAULT, D3D11_BIND_SHADER_RESOURCE);
-	delete image;
-	return texture;
-}
-
-void D3D11Video::deleteTexture(ITexture *_texture)
-{
-	Texture *texture = (Texture *) _texture;
-	if (texture->pResourceView)
-		texture->pResourceView->Release();
-	if (texture->pTexture)
-		texture->pTexture->Release();
-	delete texture;
+	u32 width, height;
+	std::unique_ptr<char> image(decodeImage(raw.get(), size, &width, &height));
+	if (image == nullptr)
+		return nullptr;
+	return createTexture(width, height, image.get(), D3D11_USAGE_DEFAULT, D3D11_BIND_SHADER_RESOURCE);
 }
 
 IVertexFormat *D3D11Video::createVertexFormat()
@@ -492,10 +471,11 @@ void D3D11Video::setViewport(s32 width, s32 height)
 	pContext->RSSetViewports(1, &viewport);
 }
 
-void D3D11Video::setTexture(ITexture *_texture)
+void D3D11Video::setTexture(PTexture _texture)
 {
-	Texture *texture = (Texture *)_texture;
-	pContext->PSSetShaderResources(0, 1, &texture->pResourceView);
+	D3D11Texture *texture = (D3D11Texture *)_texture.get();
+	ID3D11ShaderResourceView *shaderResourceView = texture->getShaderResourceView();
+	pContext->PSSetShaderResources(0, 1, &shaderResourceView);
 }
 
 void D3D11Video::setModelMatrix(const Matrix4 &matrix)

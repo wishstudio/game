@@ -51,7 +51,7 @@ float4 PS_Main(PS_InputType input): SV_TARGET
 }
 )DELIM";
 
-static ITexture *whiteTexture = nullptr;
+static PTexture whiteTexture = nullptr;
 
 static void draw3DBox(const AABB &box, Color color)
 {

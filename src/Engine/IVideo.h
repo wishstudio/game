@@ -10,16 +10,14 @@ class IGeometryShader;
 class IHullShader;
 class IIndexBuffer;
 class IPixelShader;
-class ITexture;
 class IVertexBuffer;
 class IVertexShader;
 class IVideo
 {
 public:
 	/* Resource management */
-	virtual ITexture *createTexture(int width, int height, const void *data) = 0;
-	virtual ITexture *createTexture(const std::string &path) = 0;
-	virtual void deleteTexture(ITexture *texture) = 0;
+	virtual PTexture createTexture(u32 width, u32 height, const void *data) = 0;
+	virtual PTexture createTexture(const std::string &path) = 0;
 
 	virtual IVertexFormat *createVertexFormat() = 0;
 	virtual IVertexBuffer *createVertexBuffer(IVertexFormat *format, u32 size) = 0;
@@ -34,7 +32,7 @@ public:
 
 	/* Render state manipulation */
 	virtual void setViewport(s32 width, s32 height) = 0;
-	virtual void setTexture(ITexture *texture) = 0;
+	virtual void setTexture(PTexture texture) = 0;
 	virtual void setModelMatrix(const Matrix4 &matrix) = 0;
 	virtual void setViewMatrix(const Matrix4 &matrix) = 0;
 	virtual void setProjectionMatrix(const Matrix4 &matrix) = 0;

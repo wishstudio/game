@@ -80,9 +80,6 @@
     <ClInclude Include="src\Engine\IVideo.h">
       <Filter>Engine</Filter>
     </ClInclude>
-    <ClInclude Include="src\Engine\ITexture.h">
-      <Filter>Engine</Filter>
-    </ClInclude>
     <ClInclude Include="src\MathHelper.h">
       <Filter>Header</Filter>
     </ClInclude>
@@ -145,6 +142,12 @@
     </ClInclude>
     <ClInclude Include="src\Engine\IDevice.h">
       <Filter>Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Engine\Texture.h">
+      <Filter>Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Engine\D3D11\D3D11Texture.h">
+      <Filter>Engine\D3D11</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -225,6 +228,9 @@
     </ClCompile>
     <ClCompile Include="src\Engine\IDevice.cpp">
       <Filter>Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Engine\D3D11\D3D11Texture.cpp">
+      <Filter>Engine\D3D11</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

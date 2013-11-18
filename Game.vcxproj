@@ -19,6 +19,7 @@
     <ClInclude Include="src\Engine\AABB.h" />
     <ClInclude Include="src\Engine\Color.h" />
     <ClInclude Include="src\Engine\D3D11\D3D11IndexBuffer.h" />
+    <ClInclude Include="src\Engine\D3D11\D3D11Texture.h" />
     <ClInclude Include="src\Engine\D3D11\D3D11VertexBuffer.h" />
     <ClInclude Include="src\Engine\D3D11\D3D11VertexFormat.h" />
     <ClInclude Include="src\Engine\D3D11\D3D11Video.h" />
@@ -32,9 +33,9 @@
     <ClInclude Include="src\Engine\IVertexFormat.h" />
     <ClInclude Include="src\Engine\Material.h" />
     <ClInclude Include="src\Engine\Matrix4.h" />
-    <ClInclude Include="src\Engine\ITexture.h" />
     <ClInclude Include="src\Engine\IVideo.h" />
     <ClInclude Include="src\Engine\Ray3D.h" />
+    <ClInclude Include="src\Engine\Texture.h" />
     <ClInclude Include="src\Engine\Triangle3D.h" />
     <ClInclude Include="src\Engine\Types.h" />
     <ClInclude Include="src\Engine\Vector2D.h" />
@@ -60,6 +61,7 @@
     <ClCompile Include="src\Database.cpp" />
     <ClCompile Include="src\Deserializer.cpp" />
     <ClCompile Include="src\Engine\D3D11\D3D11IndexBuffer.cpp" />
+    <ClCompile Include="src\Engine\D3D11\D3D11Texture.cpp" />
     <ClCompile Include="src\Engine\D3D11\D3D11VertexBuffer.cpp" />
     <ClCompile Include="src\Engine\D3D11\D3D11VertexFormat.cpp" />
     <ClCompile Include="src\Engine\D3D11\D3D11Video.cpp" />

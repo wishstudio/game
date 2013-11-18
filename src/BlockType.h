@@ -18,7 +18,7 @@ public:
 	bool isSolid(const Block &block) const;
 	void drawBlock(TriangleCollector *collector, const Block &block) const;
 
-	ITexture* getTexture(u16 id) const;
+	PTexture getTexture(u16 id) const;
 
 private:
 	struct BlockTypeSpec

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint>
+#include <memory>
 
 typedef uint8_t u8;
 typedef uint16_t u16;
@@ -107,3 +108,7 @@ enum VertexElementType
 };
 
 u32 getTypeSize(VertexElementType type);
+
+/* Forward declaration and typedefs */
+class Texture;
+typedef std::shared_ptr<Texture> PTexture;
