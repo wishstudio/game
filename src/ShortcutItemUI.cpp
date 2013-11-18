@@ -27,7 +27,7 @@ void ShortcutItemUI::update()
 		currentItem = 8;
 	else if (device->isKeyPressed(KEY_9))
 		currentItem = 9;
-	currentItem = (currentItem + static_cast<u32>(device->getMouseWheel()) - 1) % 10 + 1;
+	currentItem = (currentItem - static_cast<u32>(device->getMouseWheel()) + 9) % 10 + 1;
 }
 
 void ShortcutItemUI::render()

@@ -116,20 +116,6 @@ int main()
 	vertexFormat->addElement(TYPE_UBYTE4_NORM, SEMANTIC_COLOR);
 	vertexFormat->addElement(TYPE_FLOAT2, SEMANTIC_TEXCOORD);
 
-	/*
-	irr::IrrlichtDevice *device = irr::createDevice(EDT_DIRECT3D9, dimension2d<u32>(1024, 768), 16, false, false, false, eventReceiver);
-	if (!device)
-		return 1;
-
-	device->setResizable(true);
-	
-	driver = device->getVideoDriver();
-	smgr = device->getSceneManager();
-	IFileSystem *fs = device->getFileSystem();
-
-	camera = smgr->addCameraSceneNode();
-	camera->setNearValue(0.2);
-	device->getCursorControl()->setVisible(false);*/
 	ShortcutItemUI shortcutItemUI;
 
 	camera = new Camera(video);
@@ -155,11 +141,6 @@ int main()
 			std::this_thread::yield();
 			continue;
 		}
-		/* In case of window size changes */
-		//auto renderTargetSize = driver->getCurrentRenderTargetSize();
-		//camera->setAspectRatio((f32) renderTargetSize.Width / (f32) renderTargetSize.Height);
-
-		//driver->beginScene(true, true, SColor(255, 127, 200, 251));
 
 		shortcutItemUI.update();
 		World::CameraIntersectionInfo *info = nullptr;
@@ -168,7 +149,7 @@ int main()
 			if (device->isMousePressed(MOUSE_BUTTON_LEFT))
 				info->block.setType(0);
 			if (device->isMousePressed(MOUSE_BUTTON_RIGHT))
-				info->block.getNeighbour(oppositeDirection(info->direction)).setType(1);//shortcutIUI.getCurrentItem()
+				info->block.getNeighbour(oppositeDirection(info->direction)).setType(shortcutItemUI.getCurrentItem());
 		}
 		while (device->tick())
 		{
