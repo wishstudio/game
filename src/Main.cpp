@@ -55,7 +55,7 @@ static PTexture whiteTexture = nullptr;
 
 static void draw3DBox(const AABB &box, Color color)
 {
-	static IVertexBuffer *buffer = video->createVertexBuffer(vertexFormat, 24);
+	static PVertexBuffer buffer = video->createVertexBuffer(vertexFormat, 24);
 
 	video->setTexture(whiteTexture);
 	video->setModelMatrix(Matrix4::identity());

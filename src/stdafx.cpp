@@ -10,4 +10,4 @@ Camera *camera;
 IDevice *device;
 IVideo *video;
 
-IVertexFormat *vertexFormat;
+PVertexFormat vertexFormat;

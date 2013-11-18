@@ -1,10 +1,10 @@
 #pragma once
 
-#include "../IIndexBuffer.h"
+#include "../IndexBuffer.h"
 
 class D3D11Video;
 class ID3D11Buffer;
-class D3D11IndexBuffer : public IIndexBuffer
+class D3D11IndexBuffer : public IndexBuffer
 {
 public:
 	D3D11IndexBuffer(D3D11Video *video, VertexElementType type, u32 size);

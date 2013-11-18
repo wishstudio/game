@@ -113,20 +113,11 @@
     <ClInclude Include="src\Engine\InputValue.h">
       <Filter>Engine</Filter>
     </ClInclude>
-    <ClInclude Include="src\Engine\IVertexFormat.h">
-      <Filter>Engine</Filter>
-    </ClInclude>
     <ClInclude Include="src\Engine\D3D11\D3D11VertexFormat.h">
       <Filter>Engine\D3D11</Filter>
     </ClInclude>
-    <ClInclude Include="src\Engine\IVertexBuffer.h">
-      <Filter>Engine</Filter>
-    </ClInclude>
     <ClInclude Include="src\Engine\D3D11\D3D11VertexBuffer.h">
       <Filter>Engine\D3D11</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Engine\IIndexBuffer.h">
-      <Filter>Engine</Filter>
     </ClInclude>
     <ClInclude Include="src\Engine\D3D11\D3D11IndexBuffer.h">
       <Filter>Engine\D3D11</Filter>
@@ -148,6 +139,15 @@
     </ClInclude>
     <ClInclude Include="src\Engine\D3D11\D3D11Texture.h">
       <Filter>Engine\D3D11</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Engine\IndexBuffer.h">
+      <Filter>Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Engine\VertexBuffer.h">
+      <Filter>Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Engine\VertexFormat.h">
+      <Filter>Engine</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

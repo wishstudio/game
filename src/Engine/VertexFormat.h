@@ -2,7 +2,7 @@
 
 #include <vector>
 
-class IVertexFormat
+class VertexFormat
 {
 public:
 	virtual u32 getSize() const = 0;

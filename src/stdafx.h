@@ -10,11 +10,10 @@
 #include "Engine/Camera.h"
 #include "Engine/Color.h"
 #include "Engine/IDevice.h"
-#include "Engine/IIndexBuffer.h"
 #include "Engine/IShader.h"
-#include "Engine/IVertexBuffer.h"
-#include "Engine/IVertexFormat.h"
 #include "Engine/IVideo.h"
+#include "Engine/IndexBuffer.h"
+#include "Engine/InputValue.h"
 #include "Engine/Material.h"
 #include "Engine/Matrix4.h"
 #include "Engine/Ray3D.h"
@@ -22,6 +21,8 @@
 #include "Engine/Triangle3D.h"
 #include "Engine/Vector2D.h"
 #include "Engine/Vector3D.h"
+#include "Engine/VertexBuffer.h"
+#include "Engine/VertexFormat.h"
 
 #include <atomic>
 #include <concurrent_queue.h>
@@ -67,4 +68,4 @@ struct Vertex
 	{}
 };
 
-extern IVertexFormat *vertexFormat;
+extern PVertexFormat vertexFormat;

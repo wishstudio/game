@@ -8,9 +8,7 @@ class IComputeShader;
 class IDomainShader;
 class IGeometryShader;
 class IHullShader;
-class IIndexBuffer;
 class IPixelShader;
-class IVertexBuffer;
 class IVertexShader;
 class IVideo
 {
@@ -19,9 +17,9 @@ public:
 	virtual PTexture createTexture(u32 width, u32 height, const void *data) = 0;
 	virtual PTexture createTexture(const std::string &path) = 0;
 
-	virtual IVertexFormat *createVertexFormat() = 0;
-	virtual IVertexBuffer *createVertexBuffer(IVertexFormat *format, u32 size) = 0;
-	virtual IIndexBuffer *createIndexBuffer(VertexElementType type, u32 size) = 0;
+	virtual PVertexFormat createVertexFormat() = 0;
+	virtual PVertexBuffer createVertexBuffer(PVertexFormat format, u32 size) = 0;
+	virtual PIndexBuffer createIndexBuffer(VertexElementType type, u32 size) = 0;
 
 	virtual IVertexShader *createVertexShader(const char *program, const char *entrypoint) = 0;
 	virtual IPixelShader *createPixelShader(const char *program, const char *entrypoint) = 0;
@@ -50,11 +48,11 @@ public:
 	virtual void beginDraw(Color clearColor) = 0;
 	virtual void endDraw() = 0;
 
-	virtual void draw(IVertexBuffer *vertexBuffer, u32 startVertex, u32 count, PrimitiveTopology topology) = 0;
+	virtual void draw(PVertexBuffer vertexBuffer, u32 startVertex, u32 count, PrimitiveTopology topology) = 0;
 	virtual void drawIndexed(
-		IVertexBuffer *vertexBuffer,
+		PVertexBuffer vertexBuffer,
 		u32 startVertex,
-		IIndexBuffer *indexBuffer,
+		PIndexBuffer indexBuffer,
 		u32 startIndex,
 		u32 count,
 		PrimitiveTopology topology

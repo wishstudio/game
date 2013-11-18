@@ -110,5 +110,12 @@ enum VertexElementType
 u32 getTypeSize(VertexElementType type);
 
 /* Forward declaration and typedefs */
+class IndexBuffer;
 class Texture;
+class VertexBuffer;
+class VertexFormat;
+
+typedef std::shared_ptr<IndexBuffer> PIndexBuffer;
 typedef std::shared_ptr<Texture> PTexture;
+typedef std::shared_ptr<VertexBuffer> PVertexBuffer;
+typedef std::shared_ptr<VertexFormat> PVertexFormat;

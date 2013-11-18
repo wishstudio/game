@@ -5,7 +5,7 @@
 #include "D3D11VertexBuffer.h"
 #include "D3D11Video.h"
 
-D3D11VertexBuffer::D3D11VertexBuffer(D3D11Video *_video, IVertexFormat *_format, u32 _size):
+D3D11VertexBuffer::D3D11VertexBuffer(D3D11Video *_video, PVertexFormat _format, u32 _size):
 	video(_video), format(_format), size(_size)
 {
 	ID3D11Device *device = video->getDevice();

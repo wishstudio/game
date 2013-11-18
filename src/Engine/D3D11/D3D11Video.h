@@ -20,9 +20,9 @@ public:
 	virtual PTexture createTexture(u32 width, u32 height, const void *data) override;
 	virtual PTexture createTexture(const std::string &path) override;
 
-	virtual IVertexFormat *createVertexFormat() override;
-	virtual IVertexBuffer *createVertexBuffer(IVertexFormat *format, u32 size) override;
-	virtual IIndexBuffer *createIndexBuffer(VertexElementType type, u32 size) override;
+	virtual PVertexFormat createVertexFormat() override;
+	virtual PVertexBuffer createVertexBuffer(PVertexFormat format, u32 size) override;
+	virtual PIndexBuffer createIndexBuffer(VertexElementType type, u32 size) override;
 
 	virtual IVertexShader *createVertexShader(const char *program, const char *entrypoint) override;
 	virtual IPixelShader *createPixelShader(const char *program, const char *entrypoint) override;
@@ -48,11 +48,11 @@ public:
 	virtual void beginDraw(Color clearColor) override;
 	virtual void endDraw() override;
 
-	virtual void draw(IVertexBuffer *vertexBuffer, u32 startVertex, u32 count, PrimitiveTopology topology) override;
+	virtual void draw(PVertexBuffer vertexBuffer, u32 startVertex, u32 count, PrimitiveTopology topology) override;
 	virtual void drawIndexed(
-		IVertexBuffer *vertexBuffer,
+		PVertexBuffer vertexBuffer,
 		u32 startVertex,
-		IIndexBuffer *indexBuffer,
+		PIndexBuffer indexBuffer,
 		u32 startIndex,
 		u32 count,
 		PrimitiveTopology topology

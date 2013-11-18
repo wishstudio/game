@@ -7,8 +7,8 @@
 
 struct MeshBuffer
 {
-	IVertexBuffer *vertexBuffer = nullptr;
-	IIndexBuffer *indexBuffer = nullptr;
+	PVertexBuffer vertexBuffer;
+	PIndexBuffer indexBuffer;
 	u32 indexCount = 0;
 	std::vector<Vertex> vertices;
 	std::vector<u16> indices;
@@ -47,7 +47,6 @@ void TriangleCollector::render()
 		PTexture texture = textures[i];
 		if (buffer->vertexBuffer == nullptr)
 		{
-			delete buffer->vertexBuffer;
 			buffer->vertexBuffer = video->createVertexBuffer(vertexFormat, buffer->vertices.size());
 			buffer->vertexBuffer->update(0, buffer->vertices.size(), buffer->vertices.data());
 			buffer->vertices.clear(); /* To save memory */
@@ -55,7 +54,6 @@ void TriangleCollector::render()
 		
 		if (buffer->indexBuffer == nullptr)
 		{
-			delete buffer->indexBuffer;
 			buffer->indexBuffer = video->createIndexBuffer(TYPE_USHORT, buffer->indices.size());
 			buffer->indexBuffer->update(0, buffer->indices.size(), buffer->indices.data());
 			buffer->indexCount = buffer->indices.size();
@@ -69,13 +67,7 @@ void TriangleCollector::render()
 void TriangleCollector::clear()
 {
 	for (MeshBuffer *buffer : buffers)
-	{
-		if (buffer->vertexBuffer)
-			delete buffer->vertexBuffer;
-		if (buffer->indexBuffer)
-			delete buffer->indexBuffer;
 		delete buffer;
-	}
 	buffers.clear();
 	textures.clear();
 	textureMap.clear();

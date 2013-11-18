@@ -1,7 +1,6 @@
 #pragma once
-#pragma once
 
-class IIndexBuffer
+class IndexBuffer
 {
 public:
 	virtual VertexElementType getType() const = 0;

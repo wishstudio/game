@@ -5,9 +5,9 @@
 
 #include <d3d11.h>
 
-#include "../IVertexFormat.h"
+#include "../VertexFormat.h"
 
-class D3D11VertexFormat final: public IVertexFormat
+class D3D11VertexFormat final: public VertexFormat
 {
 public:
 	D3D11VertexFormat();

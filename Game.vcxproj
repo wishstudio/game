@@ -26,11 +26,9 @@
     <ClInclude Include="src\Engine\Camera.h" />
     <ClInclude Include="src\Engine\Device\Win32Device.h" />
     <ClInclude Include="src\Engine\IDevice.h" />
-    <ClInclude Include="src\Engine\IIndexBuffer.h" />
+    <ClInclude Include="src\Engine\IndexBuffer.h" />
     <ClInclude Include="src\Engine\InputValue.h" />
     <ClInclude Include="src\Engine\IShader.h" />
-    <ClInclude Include="src\Engine\IVertexBuffer.h" />
-    <ClInclude Include="src\Engine\IVertexFormat.h" />
     <ClInclude Include="src\Engine\Material.h" />
     <ClInclude Include="src\Engine\Matrix4.h" />
     <ClInclude Include="src\Engine\IVideo.h" />
@@ -40,6 +38,8 @@
     <ClInclude Include="src\Engine\Types.h" />
     <ClInclude Include="src\Engine\Vector2D.h" />
     <ClInclude Include="src\Engine\Vector3D.h" />
+    <ClInclude Include="src\Engine\VertexBuffer.h" />
+    <ClInclude Include="src\Engine\VertexFormat.h" />
     <ClInclude Include="src\Hash.h" />
     <ClInclude Include="src\lz4\lz4.h" />
     <ClInclude Include="src\MathHelper.h" />
