@@ -3,11 +3,11 @@
 #include "InputValue.h"
 #include "Vector2D.h"
 
-class IDevice
+class Device
 {
 public:
-	IDevice();
-	virtual ~IDevice() {}
+	Device();
+	virtual ~Device() {}
 
 	virtual bool init(int width, int height) = 0;
 	virtual bool setWindowSize(int width, int height) = 0;

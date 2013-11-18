@@ -94,13 +94,13 @@ int main()
 	/* Create video device */
 	Win32Device *d = new Win32Device();
 	d->init(1024, 768);
-	device = d;
+	device.reset(d);
 	device->setMouseVisible(false);
 	device->setTicksPerSecond(20);
 
 	D3D11Video *v = new D3D11Video();
 	v->init(d);
-	video = v;
+	video.reset(v);
 
 	Material *defaultMaterial = new Material(video);
 	defaultMaterial->setShaders(SHADER_SRC, "VS_Main", "PS_Main");

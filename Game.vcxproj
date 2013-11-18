@@ -25,13 +25,12 @@
     <ClInclude Include="src\Engine\D3D11\D3D11VertexFormat.h" />
     <ClInclude Include="src\Engine\D3D11\D3D11Video.h" />
     <ClInclude Include="src\Engine\Camera.h" />
+    <ClInclude Include="src\Engine\Device.h" />
     <ClInclude Include="src\Engine\Device\Win32Device.h" />
-    <ClInclude Include="src\Engine\IDevice.h" />
     <ClInclude Include="src\Engine\IndexBuffer.h" />
     <ClInclude Include="src\Engine\InputValue.h" />
     <ClInclude Include="src\Engine\Material.h" />
     <ClInclude Include="src\Engine\Matrix4.h" />
-    <ClInclude Include="src\Engine\IVideo.h" />
     <ClInclude Include="src\Engine\Ray3D.h" />
     <ClInclude Include="src\Engine\Shader.h" />
     <ClInclude Include="src\Engine\Texture.h" />
@@ -41,6 +40,7 @@
     <ClInclude Include="src\Engine\Vector3D.h" />
     <ClInclude Include="src\Engine\VertexBuffer.h" />
     <ClInclude Include="src\Engine\VertexFormat.h" />
+    <ClInclude Include="src\Engine\Video.h" />
     <ClInclude Include="src\Hash.h" />
     <ClInclude Include="src\lz4\lz4.h" />
     <ClInclude Include="src\MathHelper.h" />
@@ -68,8 +68,8 @@
     <ClCompile Include="src\Engine\D3D11\D3D11VertexFormat.cpp" />
     <ClCompile Include="src\Engine\D3D11\D3D11Video.cpp" />
     <ClCompile Include="src\Engine\Camera.cpp" />
+    <ClCompile Include="src\Engine\Device.cpp" />
     <ClCompile Include="src\Engine\Device\Win32Device.cpp" />
-    <ClCompile Include="src\Engine\IDevice.cpp" />
     <ClCompile Include="src\Engine\Material.cpp" />
     <ClCompile Include="src\Engine\Matrix4.cpp" />
     <ClCompile Include="src\Engine\Types.cpp" />

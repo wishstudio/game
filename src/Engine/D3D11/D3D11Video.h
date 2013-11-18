@@ -1,14 +1,14 @@
 #pragma once
 
 #include "../Color.h"
-#include "../IVideo.h"
+#include "../Video.h"
 
 #include <d3d11_2.h>
 #include <wincodec.h>
 
 class D3D11VertexShader;
 class Win32Device;
-class D3D11Video: public IVideo
+class D3D11Video: public Video
 {
 public:
 	D3D11Video();

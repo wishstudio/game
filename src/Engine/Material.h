@@ -1,11 +1,9 @@
 #pragma once
 
-class IVideo;
-class IShader;
-class Material final
+class Material
 {
 public:
-	Material(IVideo *video);
+	Material(PVideo video);
 	Material(const Material &) = delete;
 
 	Material &operator= (const Material &) = delete;
@@ -14,7 +12,7 @@ public:
 	void apply(); /* TODO */
 
 private:
-	IVideo *video;
+	PVideo video;
 	PVertexShader vertexShader;
 	PPixelShader pixelShader;
 };

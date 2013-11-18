@@ -47,7 +47,7 @@ D3D11Video::~D3D11Video()
 		pBackBufferRenderTargetView->Release();
 	if (pRasterizerState)
 		pRasterizerState->Release();
-
+	
 	if (pMatrixBuffer)
 		pMatrixBuffer->Release();
 }

@@ -1,9 +1,9 @@
 #pragma once
 
 #include <Windows.h>
-#include "../IDevice.h"
+#include "../Device.h"
 
-class Win32Device: public IDevice
+class Win32Device: public Device
 {
 public:
 	Win32Device();

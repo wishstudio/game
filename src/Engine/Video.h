@@ -4,7 +4,7 @@
 #include "Vector3D.h"
 #include "Matrix4.h"
 
-class IVideo
+class Video
 {
 public:
 	/* Resource management */

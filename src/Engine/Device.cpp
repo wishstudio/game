@@ -1,39 +1,39 @@
 #include <stdafx.h>
 
 #include <cstring>
-#include "IDevice.h"
+#include "Device.h"
 
-IDevice::IDevice()
+Device::Device()
 {
 	memset(keyDownState, 0, sizeof keyDownState);
 	memset(keyPressState, 0, sizeof keyPressState);
 }
 
-void IDevice::onKeyDown(KeyValue key)
+void Device::onKeyDown(KeyValue key)
 {
 	keyDownState[key] = true;
 	keyPressState[key] = true;
 }
 
-void IDevice::onKeyUp(KeyValue key)
+void Device::onKeyUp(KeyValue key)
 {
 	keyDownState[key] = false;
 	keyPressState[key] = false;
 }
 
-void IDevice::onMouseDown(MouseButton button)
+void Device::onMouseDown(MouseButton button)
 {
 	mouseDownState[button] = true;
 	mousePressState[button] = true;
 }
 
-void IDevice::onMouseUp(MouseButton button)
+void Device::onMouseUp(MouseButton button)
 {
 	mouseDownState[button] = false;
 	mousePressState[button] = false;
 }
 
-void IDevice::onMouseMove(int x, int y)
+void Device::onMouseMove(int x, int y)
 {
 	int width, height;
 	getWindowSize(&width, &height);
@@ -42,7 +42,7 @@ void IDevice::onMouseMove(int x, int y)
 	normalizedMousePosition = Vector2D(nx, ny);
 }
 
-void IDevice::onLostFocus()
+void Device::onLostFocus()
 {
 	memset(keyDownState, 0, sizeof keyDownState);
 	memset(keyPressState, 0, sizeof keyPressState);
@@ -50,7 +50,7 @@ void IDevice::onLostFocus()
 	memset(mousePressState, 0, sizeof mousePressState);
 }
 
-void IDevice::onNewFrame(u64 _currentTimeMicroseconds)
+void Device::onNewFrame(u64 _currentTimeMicroseconds)
 {
 	memset(keyPressState, 0, sizeof keyPressState);
 	memset(mousePressState, 0, sizeof mousePressState);
@@ -74,7 +74,7 @@ void IDevice::onNewFrame(u64 _currentTimeMicroseconds)
 	}
 }
 
-void IDevice::setNormalizedMousePosition(f32 nx, f32 ny)
+void Device::setNormalizedMousePosition(f32 nx, f32 ny)
 {
 	int width, height;
 	getWindowSize(&width, &height);
@@ -83,7 +83,7 @@ void IDevice::setNormalizedMousePosition(f32 nx, f32 ny)
 	setMousePosition(x, y);
 }
 
-bool IDevice::tick()
+bool Device::tick()
 {
 	/* Calculate all things every time instead of accumulations to avoid cumulative error */
 	/* (currentTick + 1) / ticksPerSecond <= currentTimeMilliseconds / 1000000 */

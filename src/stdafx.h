@@ -9,8 +9,7 @@
 #include "Engine/AABB.h"
 #include "Engine/Camera.h"
 #include "Engine/Color.h"
-#include "Engine/IDevice.h"
-#include "Engine/IVideo.h"
+#include "Engine/Device.h"
 #include "Engine/IndexBuffer.h"
 #include "Engine/InputValue.h"
 #include "Engine/Material.h"
@@ -23,6 +22,7 @@
 #include "Engine/Vector3D.h"
 #include "Engine/VertexBuffer.h"
 #include "Engine/VertexFormat.h"
+#include "Engine/Video.h"
 
 #include <atomic>
 #include <concurrent_queue.h>
@@ -53,8 +53,6 @@ extern TileManager *tileManager;
 extern World *world;
 
 extern Camera *camera;
-extern IDevice *device;
-extern IVideo *video;
 
 struct Vertex
 {
@@ -68,4 +66,6 @@ struct Vertex
 	{}
 };
 
+extern PDevice device;
+extern PVideo video;
 extern PVertexFormat vertexFormat;

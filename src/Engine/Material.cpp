@@ -1,10 +1,10 @@
 #include <stdafx.h>
 
-#include "IVideo.h"
 #include "Material.h"
 #include "Shader.h"
+#include "Video.h"
 
-Material::Material(IVideo *_video):
+Material::Material(PVideo _video):
 	video(_video)
 {
 }

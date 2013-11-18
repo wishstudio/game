@@ -77,9 +77,6 @@
     <ClInclude Include="src\Engine\D3D11\D3D11Video.h">
       <Filter>Engine\D3D11</Filter>
     </ClInclude>
-    <ClInclude Include="src\Engine\IVideo.h">
-      <Filter>Engine</Filter>
-    </ClInclude>
     <ClInclude Include="src\MathHelper.h">
       <Filter>Header</Filter>
     </ClInclude>
@@ -128,9 +125,6 @@
     <ClInclude Include="src\Engine\Device\Win32Device.h">
       <Filter>Engine\Device</Filter>
     </ClInclude>
-    <ClInclude Include="src\Engine\IDevice.h">
-      <Filter>Engine</Filter>
-    </ClInclude>
     <ClInclude Include="src\Engine\Texture.h">
       <Filter>Engine</Filter>
     </ClInclude>
@@ -151,6 +145,12 @@
     </ClInclude>
     <ClInclude Include="src\Engine\D3D11\D3D11Shader.h">
       <Filter>Engine\D3D11</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Engine\Device.h">
+      <Filter>Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Engine\Video.h">
+      <Filter>Engine</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -229,14 +229,14 @@
     <ClCompile Include="src\Engine\Device\Win32Device.cpp">
       <Filter>Engine\Device</Filter>
     </ClCompile>
-    <ClCompile Include="src\Engine\IDevice.cpp">
-      <Filter>Engine</Filter>
-    </ClCompile>
     <ClCompile Include="src\Engine\D3D11\D3D11Texture.cpp">
       <Filter>Engine\D3D11</Filter>
     </ClCompile>
     <ClCompile Include="src\Engine\D3D11\D3D11Shader.cpp">
       <Filter>Engine\D3D11</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Engine\Device.cpp">
+      <Filter>Engine</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

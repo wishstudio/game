@@ -110,6 +110,9 @@ enum VertexElementType
 u32 getTypeSize(VertexElementType type);
 
 /* Forward declaration and typedefs */
+class Device;
+class Video;
+
 class Texture;
 
 class IndexBuffer;
@@ -122,6 +125,9 @@ class GeometryShader;
 class HullShader;
 class DomainShader;
 class ComputeShader;
+
+typedef std::shared_ptr<Device> PDevice;
+typedef std::shared_ptr<Video> PVideo;
 
 typedef std::shared_ptr<Texture> PTexture;
 

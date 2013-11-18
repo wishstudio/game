@@ -1,10 +1,9 @@
 #include <stdafx.h>
 
-#include "IVideo.h"
-
 #include "Camera.h"
+#include "Video.h"
 
-Camera::Camera(IVideo *_video):
+Camera::Camera(PVideo _video):
 	video(_video),
 	position(Vector3D(0, 0, 0)),
 	lookAt(Vector3D(0, 0, -100)),

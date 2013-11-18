@@ -2,11 +2,10 @@
 
 #include "Vector3D.h"
 
-class IVideo;
 class Camera
 {
 public:
-	Camera(IVideo *video);
+	Camera(PVideo video);
 
 	f32 getAspectRatio() const { return aspectRatio; }
 	void setAspectRatio(f32 aspectRatio) { this->aspectRatio = aspectRatio; updateProjectionMatrix(); }
@@ -40,7 +39,7 @@ private:
 	void updateViewMatrix();
 	void updateProjectionMatrix();
 
-	IVideo *video;
+	PVideo video;
 	f32 aspectRatio, farValue, nearValue, fovy;
 	Vector3D position, lookAt, upVector;
 	Matrix4 viewMatrix, projectionMatrix;
