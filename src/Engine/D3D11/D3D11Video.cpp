@@ -47,6 +47,8 @@ D3D11Video::~D3D11Video()
 		pBackBufferRenderTargetView->Release();
 	if (pRasterizerState)
 		pRasterizerState->Release();
+	if (pBlendState)
+		pBlendState->Release();
 	
 	if (pMatrixBuffer)
 		pMatrixBuffer->Release();
@@ -65,7 +67,6 @@ bool D3D11Video::init(Win32Device *device)
 		D3D_FEATURE_LEVEL_9_1,
 	};
 
-	int width, height;
 	device->getWindowSize(&width, &height);
 
 	DXGI_SWAP_CHAIN_DESC swapChainDesc;
@@ -140,7 +141,7 @@ bool D3D11Video::init(Win32Device *device)
 	D3D11_DEPTH_STENCIL_DESC depthStencilStateDesc;
 	depthStencilStateDesc.DepthEnable = true;
 	depthStencilStateDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
-	depthStencilStateDesc.DepthFunc = D3D11_COMPARISON_LESS;
+	depthStencilStateDesc.DepthFunc = D3D11_COMPARISON_LESS_EQUAL;
 	depthStencilStateDesc.StencilEnable = false;
 	pDevice->CreateDepthStencilState(&depthStencilStateDesc, &pDepthStencilState);
 	if (FAILED(hr))
@@ -161,6 +162,21 @@ bool D3D11Video::init(Win32Device *device)
 	rasterizerStateDesc.AntialiasedLineEnable = true;
 	pDevice->CreateRasterizerState(&rasterizerStateDesc, &pRasterizerState);
 	pContext->RSSetState(pRasterizerState);
+
+	/* Blend state */
+	D3D11_BLEND_DESC blendDesc;
+	ZeroMemory(&blendDesc, sizeof blendDesc);
+	blendDesc.RenderTarget[0].BlendEnable = true;
+	blendDesc.RenderTarget[0].SrcBlend = D3D11_BLEND_SRC_ALPHA;
+	blendDesc.RenderTarget[0].DestBlend = D3D11_BLEND_INV_SRC_ALPHA;
+	blendDesc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
+	blendDesc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ONE;
+	blendDesc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ZERO;
+	blendDesc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
+	blendDesc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
+	pDevice->CreateBlendState(&blendDesc, &pBlendState);
+	f32 blendFactor[4];
+	pContext->OMSetBlendState(pBlendState, blendFactor, 0xFFFFFFFF);
 
 	/* Set viewport */
 	setViewport(width, height);
@@ -509,6 +525,11 @@ void D3D11Video::setDomainShader(PDomainShader domainShader)
 void D3D11Video::setComputeShader(PComputeShader computeShader)
 {
 	pContext->CSSetShader(static_cast<D3D11ComputeShader *>(computeShader.get())->getComputeShader(), nullptr, 0);
+}
+
+Vector2DI D3D11Video::getBackBufferSize() const
+{
+	return Vector2DI(width, height);
 }
 
 void D3D11Video::beginDraw(Color clearColor)

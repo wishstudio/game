@@ -35,7 +35,7 @@ void Device::onMouseUp(MouseButton button)
 
 void Device::onMouseMove(int x, int y)
 {
-	int width, height;
+	u32 width, height;
 	getWindowSize(&width, &height);
 	f32 nx = 2.f * (f32)x / (f32)width - 1.f;
 	f32 ny = 2.f * (f32)(height - y) / (f32)height - 1.f;
@@ -76,7 +76,7 @@ void Device::onNewFrame(u64 _currentTimeMicroseconds)
 
 void Device::setNormalizedMousePosition(f32 nx, f32 ny)
 {
-	int width, height;
+	u32 width, height;
 	getWindowSize(&width, &height);
 	int x = (nx + 1.f) / 2.f * (f32)width;
 	int y = height - (ny + 1.f) / 2.f * (f32)height;

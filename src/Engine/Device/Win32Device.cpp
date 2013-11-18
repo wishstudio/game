@@ -75,7 +75,7 @@ Win32Device::~Win32Device()
 {
 }
 
-bool Win32Device::init(int width, int height)
+bool Win32Device::init(u32 width, u32 height)
 {
 	WNDCLASSEXW wcex;
 	wcex.cbSize             = sizeof(WNDCLASSEX);
@@ -108,7 +108,7 @@ bool Win32Device::init(int width, int height)
 	return true;
 }
 
-bool Win32Device::setWindowSize(int width, int height)
+bool Win32Device::setWindowSize(u32 width, u32 height)
 {
 	w = width, h = height;
 	if (width == 0 && height == 0)
@@ -132,7 +132,7 @@ bool Win32Device::setWindowSize(int width, int height)
 	return true;
 }
 
-void Win32Device::getWindowSize(int *width, int *height)
+void Win32Device::getWindowSize(u32 *width, u32 *height)
 {
 	*width = w;
 	*height = h;

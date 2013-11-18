@@ -152,6 +152,12 @@
     <ClInclude Include="src\Engine\Video.h">
       <Filter>Engine</Filter>
     </ClInclude>
+    <ClInclude Include="src\Engine\GUI.h">
+      <Filter>Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Engine\Vector2DI.h">
+      <Filter>Engine</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Block.cpp">
@@ -236,6 +242,9 @@
       <Filter>Engine\D3D11</Filter>
     </ClCompile>
     <ClCompile Include="src\Engine\Device.cpp">
+      <Filter>Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Engine\GUI.cpp">
       <Filter>Engine</Filter>
     </ClCompile>
   </ItemGroup>

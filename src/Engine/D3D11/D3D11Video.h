@@ -43,6 +43,7 @@ public:
 	virtual void setDomainShader(PDomainShader domainShader) override;
 	virtual void setComputeShader(PComputeShader computeShader) override;
 
+	virtual Vector2DI getBackBufferSize() const override;
 	virtual u32 getVertexCount() const override { return vertexCount; }
 
 	virtual void beginDraw(Color clearColor) override;
@@ -69,6 +70,7 @@ private:
 	PTexture createTexture(u32 width, u32 height, const void *initialData, D3D11_USAGE usage, UINT bindFlag);
 
 	u32 vertexCount;
+	u32 width, height;
 
 	IWICImagingFactory *pFactory;
 	
@@ -82,6 +84,7 @@ private:
 	ID3D11DepthStencilState *pDepthStencilState = nullptr;
 	ID3D11RenderTargetView *pBackBufferRenderTargetView = nullptr;
 	ID3D11RasterizerState *pRasterizerState = nullptr;
+	ID3D11BlendState *pBlendState = nullptr;
 	
 	ID3D11Buffer *pMatrixBuffer = nullptr;
 	Matrix4 modelMatrix, viewMatrix, projectionMatrix;

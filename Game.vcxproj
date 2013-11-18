@@ -27,6 +27,7 @@
     <ClInclude Include="src\Engine\Camera.h" />
     <ClInclude Include="src\Engine\Device.h" />
     <ClInclude Include="src\Engine\Device\Win32Device.h" />
+    <ClInclude Include="src\Engine\GUI.h" />
     <ClInclude Include="src\Engine\IndexBuffer.h" />
     <ClInclude Include="src\Engine\InputValue.h" />
     <ClInclude Include="src\Engine\Material.h" />
@@ -37,6 +38,7 @@
     <ClInclude Include="src\Engine\Triangle3D.h" />
     <ClInclude Include="src\Engine\Types.h" />
     <ClInclude Include="src\Engine\Vector2D.h" />
+    <ClInclude Include="src\Engine\Vector2DI.h" />
     <ClInclude Include="src\Engine\Vector3D.h" />
     <ClInclude Include="src\Engine\VertexBuffer.h" />
     <ClInclude Include="src\Engine\VertexFormat.h" />
@@ -70,6 +72,7 @@
     <ClCompile Include="src\Engine\Camera.cpp" />
     <ClCompile Include="src\Engine\Device.cpp" />
     <ClCompile Include="src\Engine\Device\Win32Device.cpp" />
+    <ClCompile Include="src\Engine\GUI.cpp" />
     <ClCompile Include="src\Engine\Material.cpp" />
     <ClCompile Include="src\Engine\Matrix4.cpp" />
     <ClCompile Include="src\Engine\Types.cpp" />

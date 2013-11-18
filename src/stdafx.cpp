@@ -10,4 +10,5 @@ Camera *camera;
 
 PDevice device;
 PVideo video;
+PGUI gui;
 PVertexFormat vertexFormat;

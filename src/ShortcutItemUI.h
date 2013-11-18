@@ -2,19 +2,15 @@
 
 #include "BlockType.h"
 
-class ShortcutItemUI {
+class ShortcutItemUI
+{
 public:
 	ShortcutItemUI();
-	void show();
-	u16 getCurrentItem() const {return handItemId;}
-	void getItemSelected();
-	void drawFrame();
-	void drawItem(u16 id);
-	void highLight();
+
+	u16 getCurrentItem() const { return currentItem; }
+	void update();
+	void render();
 
 private:
-	u16 handItemId;
-	u32 w;
-	u32 h;
-	int wheel;
+	u16 currentItem;
 };

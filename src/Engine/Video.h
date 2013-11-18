@@ -35,7 +35,8 @@ public:
 	virtual void setDomainShader(PDomainShader domainShader) = 0;
 	virtual void setComputeShader(PComputeShader computeShader) = 0;
 
-	/* Query functions */
+	/* Query states */
+	virtual Vector2DI getBackBufferSize() const = 0;
 	virtual u32 getVertexCount() const = 0;
 
 	/* Rendering functions */

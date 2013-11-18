@@ -102,6 +102,8 @@ int main()
 	v->init(d);
 	video.reset(v);
 
+	gui.reset(new GUI(video));
+
 	Material *defaultMaterial = new Material(video);
 	defaultMaterial->setShaders(SHADER_SRC, "VS_Main", "PS_Main");
 
@@ -121,7 +123,6 @@ int main()
 
 	device->setResizable(true);
 	
-	ShortcutItemUI shortcutIUI;
 	driver = device->getVideoDriver();
 	smgr = device->getSceneManager();
 	IFileSystem *fs = device->getFileSystem();
@@ -129,6 +130,8 @@ int main()
 	camera = smgr->addCameraSceneNode();
 	camera->setNearValue(0.2);
 	device->getCursorControl()->setVisible(false);*/
+	ShortcutItemUI shortcutItemUI;
+
 	camera = new Camera(video);
 	camera->setNearValue(-0.2);
 
@@ -157,7 +160,8 @@ int main()
 		//camera->setAspectRatio((f32) renderTargetSize.Width / (f32) renderTargetSize.Height);
 
 		//driver->beginScene(true, true, SColor(255, 127, 200, 251));
-		
+
+		shortcutItemUI.update();
 		World::CameraIntersectionInfo *info = nullptr;
 		if (world->getCameraIntersection(Ray3D(camera->getPosition(), camera->getLookAt() - camera->getPosition()), &info))
 		{
@@ -188,12 +192,10 @@ int main()
 			draw3DBox(box, Color(255, 0, 0, 255));
 		}
 
-		//eventReceiver->update();
-		/*shortcutIUI.show();
-		driver->draw2DLine(vector2d<s32>(driver->getScreenSize().Width / 2 - 10, driver->getScreenSize().Height / 2),
-		vector2d<s32>(driver->getScreenSize().Width / 2 + 10, driver->getScreenSize().Height / 2), SColor(255, 255, 255, 255));
-		driver->draw2DLine(vector2d<s32>(driver->getScreenSize().Width / 2, driver->getScreenSize().Height / 2 - 10),
-		vector2d<s32>(driver->getScreenSize().Width / 2, driver->getScreenSize().Height / 2 + 10), SColor(255, 255, 255, 255));*/
+		shortcutItemUI.render();
+		Vector2DI bbSize = video->getBackBufferSize();
+		gui->draw2DLine({ bbSize.x / 2 - 10, bbSize.y / 2 }, { bbSize.x / 2 + 10, bbSize.y / 2 }, Color(255, 255, 255, 255));
+		gui->draw2DLine({ bbSize.x / 2, bbSize.y / 2 - 10 }, { bbSize.x / 2, bbSize.y / 2 + 10 }, Color(255, 255, 255, 255));
 
 		Vector3D position = camera->getPosition();
 		std::wstringstream s;

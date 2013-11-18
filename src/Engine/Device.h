@@ -9,9 +9,9 @@ public:
 	Device();
 	virtual ~Device() {}
 
-	virtual bool init(int width, int height) = 0;
-	virtual bool setWindowSize(int width, int height) = 0;
-	virtual void getWindowSize(int *width, int *height) = 0;
+	virtual bool init(u32 width, u32 height) = 0;
+	virtual bool setWindowSize(u32 width, u32 height) = 0;
+	virtual void getWindowSize(u32 *width, u32 *height) = 0;
 	virtual void setWindowTitle(const wchar_t *title) = 0;
 	virtual bool isActive() const = 0;
 	virtual void showError(const wchar_t *error) = 0;

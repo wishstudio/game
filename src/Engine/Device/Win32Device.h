@@ -15,9 +15,9 @@ public:
 	HWND getWindowHandle() const { return windowHandle; }
 	
 	/* Generic window system functions */
-	virtual bool init(int width, int height) override;
-	virtual bool setWindowSize(int width, int height) override;
-	virtual void getWindowSize(int *width, int *height) override;
+	virtual bool init(u32 width, u32 height) override;
+	virtual bool setWindowSize(u32 width, u32 height) override;
+	virtual void getWindowSize(u32 *width, u32 *height) override;
 	virtual void setWindowTitle(const wchar_t *title) override;
 	virtual bool isActive() const override;
 	virtual void showError(const wchar_t *error) override;
