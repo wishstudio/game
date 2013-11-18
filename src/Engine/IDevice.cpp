@@ -1,39 +1,39 @@
 #include <stdafx.h>
 
 #include <cstring>
-#include "IWindowSystem.h"
+#include "IDevice.h"
 
-IWindowSystem::IWindowSystem()
+IDevice::IDevice()
 {
 	memset(keyDownState, 0, sizeof keyDownState);
 	memset(keyPressState, 0, sizeof keyPressState);
 }
 
-void IWindowSystem::onKeyDown(KeyValue key)
+void IDevice::onKeyDown(KeyValue key)
 {
 	keyDownState[key] = true;
 	keyPressState[key] = true;
 }
 
-void IWindowSystem::onKeyUp(KeyValue key)
+void IDevice::onKeyUp(KeyValue key)
 {
 	keyDownState[key] = false;
 	keyPressState[key] = false;
 }
 
-void IWindowSystem::onMouseDown(MouseButton button)
+void IDevice::onMouseDown(MouseButton button)
 {
 	mouseDownState[button] = true;
 	mousePressState[button] = true;
 }
 
-void IWindowSystem::onMouseUp(MouseButton button)
+void IDevice::onMouseUp(MouseButton button)
 {
 	mouseDownState[button] = false;
 	mousePressState[button] = false;
 }
 
-void IWindowSystem::onMouseMove(int x, int y)
+void IDevice::onMouseMove(int x, int y)
 {
 	int width, height;
 	getWindowSize(&width, &height);
@@ -42,7 +42,7 @@ void IWindowSystem::onMouseMove(int x, int y)
 	normalizedMousePosition = Vector2D(nx, ny);
 }
 
-void IWindowSystem::onLostFocus()
+void IDevice::onLostFocus()
 {
 	memset(keyDownState, 0, sizeof keyDownState);
 	memset(keyPressState, 0, sizeof keyPressState);
@@ -50,7 +50,7 @@ void IWindowSystem::onLostFocus()
 	memset(mousePressState, 0, sizeof mousePressState);
 }
 
-void IWindowSystem::onNewFrame(u64 _currentTimeMicroseconds)
+void IDevice::onNewFrame(u64 _currentTimeMicroseconds)
 {
 	memset(keyPressState, 0, sizeof keyPressState);
 	memset(mousePressState, 0, sizeof mousePressState);
@@ -74,7 +74,7 @@ void IWindowSystem::onNewFrame(u64 _currentTimeMicroseconds)
 	}
 }
 
-void IWindowSystem::setNormalizedMousePosition(f32 nx, f32 ny)
+void IDevice::setNormalizedMousePosition(f32 nx, f32 ny)
 {
 	int width, height;
 	getWindowSize(&width, &height);
@@ -83,7 +83,7 @@ void IWindowSystem::setNormalizedMousePosition(f32 nx, f32 ny)
 	setMousePosition(x, y);
 }
 
-bool IWindowSystem::tick()
+bool IDevice::tick()
 {
 	/* Calculate all things every time instead of accumulations to avoid cumulative error */
 	/* (currentTick + 1) / ticksPerSecond <= currentTimeMilliseconds / 1000000 */

@@ -68,6 +68,8 @@ const f64 PI64 = pi<f64>();
 const f32 EPSILON = epsilon<f32>();
 const f64 EPSILON64 = epsilon<f64>();
 
+/* Enumerations */
+
 enum PrimitiveTopology
 {
 	TOPOLOGY_POINTLIST,

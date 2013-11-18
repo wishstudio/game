@@ -1,13 +1,13 @@
 #pragma once
 
 #include <Windows.h>
-#include "../IWindowSystem.h"
+#include "../IDevice.h"
 
-class Win32WindowSystem: public IWindowSystem
+class Win32Device: public IDevice
 {
 public:
-	Win32WindowSystem();
-	virtual ~Win32WindowSystem();
+	Win32Device();
+	virtual ~Win32Device();
 
 	/* Win32 specific window system functions */
 	LPWSTR getWindowClassName() const { return L"dxlearn"; }

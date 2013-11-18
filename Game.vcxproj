@@ -23,6 +23,8 @@
     <ClInclude Include="src\Engine\D3D11\D3D11VertexFormat.h" />
     <ClInclude Include="src\Engine\D3D11\D3D11Video.h" />
     <ClInclude Include="src\Engine\Camera.h" />
+    <ClInclude Include="src\Engine\Device\Win32Device.h" />
+    <ClInclude Include="src\Engine\IDevice.h" />
     <ClInclude Include="src\Engine\IIndexBuffer.h" />
     <ClInclude Include="src\Engine\InputValue.h" />
     <ClInclude Include="src\Engine\IShader.h" />
@@ -32,13 +34,11 @@
     <ClInclude Include="src\Engine\Matrix4.h" />
     <ClInclude Include="src\Engine\ITexture.h" />
     <ClInclude Include="src\Engine\IVideo.h" />
-    <ClInclude Include="src\Engine\IWindowSystem.h" />
     <ClInclude Include="src\Engine\Ray3D.h" />
     <ClInclude Include="src\Engine\Triangle3D.h" />
     <ClInclude Include="src\Engine\Types.h" />
     <ClInclude Include="src\Engine\Vector2D.h" />
     <ClInclude Include="src\Engine\Vector3D.h" />
-    <ClInclude Include="src\Engine\WindowSystem\Win32WindowSystem.h" />
     <ClInclude Include="src\Hash.h" />
     <ClInclude Include="src\lz4\lz4.h" />
     <ClInclude Include="src\MathHelper.h" />
@@ -64,11 +64,11 @@
     <ClCompile Include="src\Engine\D3D11\D3D11VertexFormat.cpp" />
     <ClCompile Include="src\Engine\D3D11\D3D11Video.cpp" />
     <ClCompile Include="src\Engine\Camera.cpp" />
-    <ClCompile Include="src\Engine\IWindowSystem.cpp" />
+    <ClCompile Include="src\Engine\Device\Win32Device.cpp" />
+    <ClCompile Include="src\Engine\IDevice.cpp" />
     <ClCompile Include="src\Engine\Material.cpp" />
     <ClCompile Include="src\Engine\Matrix4.cpp" />
     <ClCompile Include="src\Engine\Types.cpp" />
-    <ClCompile Include="src\Engine\WindowSystem\Win32WindowSystem.cpp" />
     <ClCompile Include="src\lz4\lz4.c">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>

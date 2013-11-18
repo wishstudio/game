@@ -7,7 +7,7 @@ TileManager *tileManager;
 World *world;
 
 Camera *camera;
+IDevice *device;
 IVideo *video;
-IWindowSystem *windowSystem;
 
 IVertexFormat *vertexFormat;

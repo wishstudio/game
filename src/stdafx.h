@@ -9,13 +9,13 @@
 #include "Engine/AABB.h"
 #include "Engine/Camera.h"
 #include "Engine/Color.h"
+#include "Engine/IDevice.h"
 #include "Engine/IIndexBuffer.h"
 #include "Engine/IShader.h"
 #include "Engine/ITexture.h"
 #include "Engine/IVertexBuffer.h"
 #include "Engine/IVertexFormat.h"
 #include "Engine/IVideo.h"
-#include "Engine/IWindowSystem.h"
 #include "Engine/Material.h"
 #include "Engine/Matrix4.h"
 #include "Engine/Ray3D.h"
@@ -52,8 +52,8 @@ extern TileManager *tileManager;
 extern World *world;
 
 extern Camera *camera;
+extern IDevice *device;
 extern IVideo *video;
-extern IWindowSystem *windowSystem;
 
 struct Vertex
 {

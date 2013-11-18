@@ -1,7 +1,7 @@
 #include <stdafx.h>
 
 #include <d3dcompiler.h>
-#include "../WindowSystem/Win32WindowSystem.h"
+#include "../Device/Win32Device.h"
 #include "D3D11IndexBuffer.h"
 #include "D3D11VertexBuffer.h"
 #include "D3D11VertexFormat.h"
@@ -72,7 +72,7 @@ D3D11Video::~D3D11Video()
 		pMatrixBuffer->Release();
 }
 
-bool D3D11Video::init(Win32WindowSystem *windowSystem)
+bool D3D11Video::init(Win32Device *device)
 {
 	D3D_FEATURE_LEVEL featureLevels[] =
 	{
@@ -86,7 +86,7 @@ bool D3D11Video::init(Win32WindowSystem *windowSystem)
 	};
 
 	int width, height;
-	windowSystem->getWindowSize(&width, &height);
+	device->getWindowSize(&width, &height);
 
 	DXGI_SWAP_CHAIN_DESC swapChainDesc;
 	ZeroMemory(&swapChainDesc, sizeof swapChainDesc);
@@ -97,7 +97,7 @@ bool D3D11Video::init(Win32WindowSystem *windowSystem)
 	swapChainDesc.BufferDesc.RefreshRate.Denominator = 1;
 	swapChainDesc.BufferDesc.RefreshRate.Numerator = 60;
 	swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
-	swapChainDesc.OutputWindow = windowSystem->getWindowHandle();
+	swapChainDesc.OutputWindow = device->getWindowHandle();
 	swapChainDesc.Windowed = (width != 0) || (height != 0);
 	swapChainDesc.SampleDesc.Count = 1;
 	swapChainDesc.SampleDesc.Quality = 0;

@@ -7,7 +7,7 @@
 #include <wincodec.h>
 
 class ITexture;
-class Win32WindowSystem;
+class Win32Device;
 class D3D11Shader;
 class D3D11Video: public IVideo
 {
@@ -15,7 +15,7 @@ public:
 	D3D11Video();
 	virtual ~D3D11Video();
 
-	bool init(Win32WindowSystem *windowSystem);
+	bool init(Win32Device *device);
 	void resetBackBuffer();
 
 	virtual ITexture *createTexture(int width, int height, const void *data) override;

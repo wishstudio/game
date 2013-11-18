@@ -2,7 +2,7 @@
 
 #include <windowsx.h>
 
-#include "Win32WindowSystem.h"
+#include "Win32Device.h"
 
 static KeyValue Win32KeyCodes[256] = {
 			/* 0x00 */		/* 0x01 */		/* 0x02 */		/* 0x03 */		/* 0x04 */		/* 0x05	*/		/* 0x06 */		/* 0x07 */
@@ -59,11 +59,11 @@ static KeyValue Win32KeyCodes[256] = {
 
 static LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
-	Win32WindowSystem *windowSystem = (Win32WindowSystem *) GetWindowLongW(hWnd, GWLP_USERDATA);
-	return windowSystem->wndProc(hWnd, message, wParam, lParam);
+	Win32Device *device = (Win32Device *) GetWindowLongW(hWnd, GWLP_USERDATA);
+	return device->wndProc(hWnd, message, wParam, lParam);
 }
 
-Win32WindowSystem::Win32WindowSystem()
+Win32Device::Win32Device()
 {
 	hInstance = GetModuleHandleW(nullptr);
 	LARGE_INTEGER frequency;
@@ -71,11 +71,11 @@ Win32WindowSystem::Win32WindowSystem()
 	performanceFrequency = frequency.QuadPart;
 }
 
-Win32WindowSystem::~Win32WindowSystem()
+Win32Device::~Win32Device()
 {
 }
 
-bool Win32WindowSystem::init(int width, int height)
+bool Win32Device::init(int width, int height)
 {
 	WNDCLASSEXW wcex;
 	wcex.cbSize             = sizeof(WNDCLASSEX);
@@ -108,7 +108,7 @@ bool Win32WindowSystem::init(int width, int height)
 	return true;
 }
 
-bool Win32WindowSystem::setWindowSize(int width, int height)
+bool Win32Device::setWindowSize(int width, int height)
 {
 	w = width, h = height;
 	if (width == 0 && height == 0)
@@ -132,33 +132,33 @@ bool Win32WindowSystem::setWindowSize(int width, int height)
 	return true;
 }
 
-void Win32WindowSystem::getWindowSize(int *width, int *height)
+void Win32Device::getWindowSize(int *width, int *height)
 {
 	*width = w;
 	*height = h;
 }
 
-void Win32WindowSystem::setWindowTitle(const wchar_t *title)
+void Win32Device::setWindowTitle(const wchar_t *title)
 {
 	SetWindowTextW(windowHandle, title);
 }
 
-bool Win32WindowSystem::isActive() const
+bool Win32Device::isActive() const
 {
 	return GetActiveWindow() == windowHandle;
 }
 
-void Win32WindowSystem::showError(const wchar_t *error)
+void Win32Device::showError(const wchar_t *error)
 {
 	MessageBoxW(windowHandle, error, L"ERROR", MB_OK | MB_ICONERROR);
 }
 
-void Win32WindowSystem::showError(const char *error)
+void Win32Device::showError(const char *error)
 {
 	MessageBoxA(windowHandle, error, "ERROR", MB_OK | MB_ICONERROR);
 }
 
-bool Win32WindowSystem::processMessage()
+bool Win32Device::processMessage()
 {
 	LARGE_INTEGER currentCount;
 	QueryPerformanceCounter(&currentCount);
@@ -176,13 +176,13 @@ bool Win32WindowSystem::processMessage()
 	return true;
 }
 
-void Win32WindowSystem::setMouseVisible(bool isVisible)
+void Win32Device::setMouseVisible(bool isVisible)
 {
 	ShowCursor(isVisible);
 	mouseVisible = isVisible;
 }
 
-void Win32WindowSystem::setMousePosition(int x, int y)
+void Win32Device::setMousePosition(int x, int y)
 {
 	RECT rect;
 	GetClientRect(windowHandle, &rect);
@@ -193,7 +193,7 @@ void Win32WindowSystem::setMousePosition(int x, int y)
 	SetCursorPos(topLeft.x + x, topLeft.y + y);
 }
 
-LRESULT Win32WindowSystem::wndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+LRESULT Win32Device::wndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	switch (message)
 	{

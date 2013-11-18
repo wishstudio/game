@@ -28,7 +28,7 @@ void PlayerAnimator::tick()
 	bool currentFalling = nextFalling;
 
 	/* Update next velocity */
-	const f32 MOVE_SPEED = 6 * windowSystem->getTickInterval();
+	const f32 MOVE_SPEED = 6 * device->getTickInterval();
 	if (!currentFalling)
 	{
 		Vector3D forwardVec = (camera->getLookAt() - camera->getPosition());
@@ -36,13 +36,13 @@ void PlayerAnimator::tick()
 		forwardVec = forwardVec.getNormalized();
 		Vector3D leftVec = forwardVec.crossProduct({ 0, -1, 0 });
 
-		if (windowSystem->isKeyDown(KEY_W))
+		if (device->isKeyDown(KEY_W))
 			currentDistance += forwardVec * MOVE_SPEED;
-		if (windowSystem->isKeyDown(KEY_S))
+		if (device->isKeyDown(KEY_S))
 			currentDistance -= forwardVec * MOVE_SPEED;
-		if (windowSystem->isKeyDown(KEY_A))
+		if (device->isKeyDown(KEY_A))
 			currentDistance += leftVec * MOVE_SPEED;
-		if (windowSystem->isKeyDown(KEY_D))
+		if (device->isKeyDown(KEY_D))
 			currentDistance -= leftVec * MOVE_SPEED;
 
 		jumpDistance = currentDistance;
@@ -52,15 +52,15 @@ void PlayerAnimator::tick()
 
 	if (currentFalling)
 		/* Add gravity */
-		nextVerticalVelocity -= 9.8 * 2 * windowSystem->getTickInterval();
+		nextVerticalVelocity -= 9.8 * 2 * device->getTickInterval();
 	else
 	{
-		if (windowSystem->isKeyDown(KEY_SPACE))
+		if (device->isKeyDown(KEY_SPACE))
 			nextVerticalVelocity = 9.8;
 		else
 			nextVerticalVelocity = 0;
 	}
-	nextVerticalDistance = (currentVerticalVelocity + nextVerticalVelocity) * windowSystem->getTickInterval() / 2;
+	nextVerticalDistance = (currentVerticalVelocity + nextVerticalVelocity) * device->getTickInterval() / 2;
 
 	/* Collision detection */
 	bool collided;
@@ -217,12 +217,12 @@ void PlayerAnimator::update()
 	/* Interpolate camera position for smooth rendering */
 	Vector3D position(currentPosition);
 	Vector3D diffVec(nextPosition - currentPosition);
-	position += diffVec * (windowSystem->getElapsedTickTime() / windowSystem->getTickInterval());
+	position += diffVec * (device->getElapsedTickTime() / device->getTickInterval());
 	position += playerCameraOffset;
 	camera->setPosition(position);
 
 	/* Update rotation */
-	Vector2D mouseDelta = windowSystem->getNormalizedMousePosition();
+	Vector2D mouseDelta = device->getNormalizedMousePosition();
 	/* TODO: Aspect ratio */
 	f32 rotationHorizontalDelta = -mouseDelta.x * PI / 3;
 	f32 rotationVerticalDelta = mouseDelta.y * PI / 4;
@@ -233,5 +233,5 @@ void PlayerAnimator::update()
 	Vector3D lookDirection = Vector3D(std::sin(rotationHorizontal), std::sin(rotationVertical), std::cos(rotationHorizontal));
 	camera->setLookAt(position + lookDirection);
 
-	windowSystem->setNormalizedMousePosition(0, 0);
+	device->setNormalizedMousePosition(0, 0);
 }

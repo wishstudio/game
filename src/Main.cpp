@@ -10,7 +10,7 @@
 #include "World.h"
 
 #include "Engine/D3D11/D3D11Video.h"
-#include "Engine/WindowSystem/Win32WindowSystem.h"
+#include "Engine/Device/Win32Device.h"
 
 #pragma comment(lib, "sqlite3.lib")
 //#pragma comment(linker, "/subsystem:windows /ENTRY:mainCRTStartup")
@@ -92,14 +92,14 @@ static void draw3DBox(const AABB &box, Color color)
 int main()
 {
 	/* Create video device */
-	Win32WindowSystem *w = new Win32WindowSystem();
-	w->init(1024, 768);
-	windowSystem = w;
-	windowSystem->setMouseVisible(false);
-	windowSystem->setTicksPerSecond(20);
+	Win32Device *d = new Win32Device();
+	d->init(1024, 768);
+	device = d;
+	device->setMouseVisible(false);
+	device->setTicksPerSecond(20);
 
 	D3D11Video *v = new D3D11Video();
-	v->init(w);
+	v->init(d);
 	video = v;
 
 	Material *defaultMaterial = new Material(video);
@@ -145,9 +145,9 @@ int main()
 	PlayerAnimator *playerAnimator = new PlayerAnimator();
 	chunkSceneNode = new ChunkSceneNode();
 	
-	while (windowSystem->processMessage())
+	while (device->processMessage())
 	{
-		if (!windowSystem->isActive())
+		if (!device->isActive())
 		{
 			std::this_thread::yield();
 			continue;
@@ -161,12 +161,12 @@ int main()
 		World::CameraIntersectionInfo *info = nullptr;
 		if (world->getCameraIntersection(Ray3D(camera->getPosition(), camera->getLookAt() - camera->getPosition()), &info))
 		{
-			if (windowSystem->isMousePressed(MOUSE_BUTTON_LEFT))
+			if (device->isMousePressed(MOUSE_BUTTON_LEFT))
 				info->block.setType(0);
-			if (windowSystem->isMousePressed(MOUSE_BUTTON_RIGHT))
+			if (device->isMousePressed(MOUSE_BUTTON_RIGHT))
 				info->block.getNeighbour(oppositeDirection(info->direction)).setType(1);//shortcutIUI.getCurrentItem()
 		}
-		while (windowSystem->tick())
+		while (device->tick())
 		{
 			world->tick();
 			playerAnimator->tick();
@@ -201,12 +201,12 @@ int main()
 		s << "POS(" << position.x << "," << position.y << "," << position.z << ") ";
 		if (info)
 			s << "PICK(" << info->block.x() << "," << info->block.y() << "," << info->block.z() << ") ";
-		s << "FPS: " << windowSystem->getFPS() << " ";
-		s << "Frame Time: " << windowSystem->getAverageFrameTime() * 1000 << "ms ";
+		s << "FPS: " << device->getFPS() << " ";
+		s << "Frame Time: " << device->getAverageFrameTime() * 1000 << "ms ";
 		s << "Chunks: " << world->getLoadedChunkCount() << " ";
 		s << "Blocks: " << world->getLoadedChunkCount() * CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE << " ";
 		s << "Vertices: " << video->getVertexCount() / 1000 << "k";
-		windowSystem->setWindowTitle(s.str().c_str());
+		device->setWindowTitle(s.str().c_str());
 		
 		video->endDraw();
 	}

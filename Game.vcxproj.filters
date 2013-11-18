@@ -21,7 +21,7 @@
     <Filter Include="Engine\D3D11">
       <UniqueIdentifier>{977db717-4a26-4055-92be-4aa17319187c}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Engine\WindowSystem">
+    <Filter Include="Engine\Device">
       <UniqueIdentifier>{de3fe7f1-ede9-4b6e-90e3-1efe612ac93f}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
@@ -83,12 +83,6 @@
     <ClInclude Include="src\Engine\ITexture.h">
       <Filter>Engine</Filter>
     </ClInclude>
-    <ClInclude Include="src\Engine\IWindowSystem.h">
-      <Filter>Engine</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Engine\WindowSystem\Win32WindowSystem.h">
-      <Filter>Engine\WindowSystem</Filter>
-    </ClInclude>
     <ClInclude Include="src\MathHelper.h">
       <Filter>Header</Filter>
     </ClInclude>
@@ -146,6 +140,12 @@
     <ClInclude Include="src\Engine\IShader.h">
       <Filter>Engine</Filter>
     </ClInclude>
+    <ClInclude Include="src\Engine\Device\Win32Device.h">
+      <Filter>Engine\Device</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Engine\IDevice.h">
+      <Filter>Engine</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Block.cpp">
@@ -199,12 +199,6 @@
     <ClCompile Include="src\Engine\D3D11\D3D11Video.cpp">
       <Filter>Engine\D3D11</Filter>
     </ClCompile>
-    <ClCompile Include="src\Engine\WindowSystem\Win32WindowSystem.cpp">
-      <Filter>Engine\WindowSystem</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Engine\IWindowSystem.cpp">
-      <Filter>Engine</Filter>
-    </ClCompile>
     <ClCompile Include="src\Engine\Camera.cpp">
       <Filter>Engine</Filter>
     </ClCompile>
@@ -224,6 +218,12 @@
       <Filter>Engine</Filter>
     </ClCompile>
     <ClCompile Include="src\Engine\Material.cpp">
+      <Filter>Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Engine\Device\Win32Device.cpp">
+      <Filter>Engine\Device</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Engine\IDevice.cpp">
       <Filter>Engine</Filter>
     </ClCompile>
   </ItemGroup>
