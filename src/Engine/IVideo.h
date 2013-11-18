@@ -4,12 +4,6 @@
 #include "Vector3D.h"
 #include "Matrix4.h"
 
-class IComputeShader;
-class IDomainShader;
-class IGeometryShader;
-class IHullShader;
-class IPixelShader;
-class IVertexShader;
 class IVideo
 {
 public:
@@ -21,12 +15,12 @@ public:
 	virtual PVertexBuffer createVertexBuffer(PVertexFormat format, u32 size) = 0;
 	virtual PIndexBuffer createIndexBuffer(VertexElementType type, u32 size) = 0;
 
-	virtual IVertexShader *createVertexShader(const char *program, const char *entrypoint) = 0;
-	virtual IPixelShader *createPixelShader(const char *program, const char *entrypoint) = 0;
-	virtual IGeometryShader *createGeometryShader(const char *program, const char *entrypoint) = 0;
-	virtual IHullShader *createHullShader(const char *program, const char *entrypoint) = 0;
-	virtual IDomainShader *createDomainShader(const char *program, const char *entrypoint) = 0;
-	virtual IComputeShader *createComputeShader(const char *program, const char *entrypoint) = 0;
+	virtual PVertexShader createVertexShader(const char *program, const char *entrypoint) = 0;
+	virtual PPixelShader createPixelShader(const char *program, const char *entrypoint) = 0;
+	virtual PGeometryShader createGeometryShader(const char *program, const char *entrypoint) = 0;
+	virtual PHullShader createHullShader(const char *program, const char *entrypoint) = 0;
+	virtual PDomainShader createDomainShader(const char *program, const char *entrypoint) = 0;
+	virtual PComputeShader createComputeShader(const char *program, const char *entrypoint) = 0;
 
 	/* Render state manipulation */
 	virtual void setViewport(s32 width, s32 height) = 0;
@@ -34,12 +28,12 @@ public:
 	virtual void setModelMatrix(const Matrix4 &matrix) = 0;
 	virtual void setViewMatrix(const Matrix4 &matrix) = 0;
 	virtual void setProjectionMatrix(const Matrix4 &matrix) = 0;
-	virtual void setVertexShader(IVertexShader *shader) = 0;
-	virtual void setPixelShader(IPixelShader *shader) = 0;
-	virtual void setGeometryShader(IGeometryShader *shader) = 0;
-	virtual void setHullShader(IHullShader *shader) = 0;
-	virtual void setDomainShader(IDomainShader *shader) = 0;
-	virtual void setComputeShader(IComputeShader *shader) = 0;
+	virtual void setVertexShader(PVertexShader vertexShader) = 0;
+	virtual void setPixelShader(PPixelShader pixelShader) = 0;
+	virtual void setGeometryShader(PGeometryShader geometryShader) = 0;
+	virtual void setHullShader(PHullShader hullShader) = 0;
+	virtual void setDomainShader(PDomainShader domainShader) = 0;
+	virtual void setComputeShader(PComputeShader computeShader) = 0;
 
 	/* Query functions */
 	virtual u32 getVertexCount() const = 0;

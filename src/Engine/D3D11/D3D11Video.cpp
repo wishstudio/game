@@ -3,25 +3,11 @@
 #include <d3dcompiler.h>
 #include "../Device/Win32Device.h"
 #include "D3D11IndexBuffer.h"
+#include "D3D11Shader.h"
 #include "D3D11Texture.h"
 #include "D3D11VertexBuffer.h"
 #include "D3D11VertexFormat.h"
 #include "D3D11Video.h"
-
-struct D3D11Shader
-{
-	union
-	{
-		IUnknown *pShader;
-		ID3D11VertexShader *pVertexShader;
-		ID3D11PixelShader *pPixelShader;
-		ID3D11GeometryShader *pGeometryShader;
-		ID3D11HullShader *pHullShader;
-		ID3D11DomainShader *pDomainShader;
-		ID3D11ComputeShader *pComputeShader;
-	};
-	ID3DBlob *pShaderBlob;
-};
 
 typedef HRESULT(_stdcall * PWICCBS)(REFWICPixelFormatGUID, IWICBitmapSource *, IWICBitmapSource **ppIDst);
 static PWICCBS _WICConvertBitmapSource;
@@ -393,70 +379,70 @@ ID3DBlob *D3D11Video::createShader(const char *program, const char *entrypoint, 
 	return shaderBlob;
 }
 
-IVertexShader *D3D11Video::createVertexShader(const char *program, const char *entrypoint)
+PVertexShader D3D11Video::createVertexShader(const char *program, const char *entrypoint)
 {
-	ID3DBlob *blob = createShader(program, entrypoint, "vs_5_0");
-	if (blob == nullptr)
+	ID3DBlob *pBytecode = createShader(program, entrypoint, "vs_5_0");
+	if (pBytecode == nullptr)
 		return nullptr;
-	D3D11Shader *shader = new D3D11Shader();
-	shader->pShaderBlob = blob;
-	pDevice->CreateVertexShader(blob->GetBufferPointer(), blob->GetBufferSize(), nullptr, &shader->pVertexShader);
-	return (IVertexShader *) shader;
+
+	ID3D11VertexShader *pVertexShader = nullptr;
+	pDevice->CreateVertexShader(pBytecode->GetBufferPointer(), pBytecode->GetBufferSize(), nullptr, &pVertexShader);
+	return std::make_shared<D3D11VertexShader>(pVertexShader, pBytecode);
 }
 
-IPixelShader *D3D11Video::createPixelShader(const char *program, const char *entrypoint)
+PPixelShader D3D11Video::createPixelShader(const char *program, const char *entrypoint)
 {
-	ID3DBlob *blob = createShader(program, entrypoint, "ps_5_0");
-	if (blob == nullptr)
+	ID3DBlob *pBytecode = createShader(program, entrypoint, "ps_5_0");
+	if (pBytecode == nullptr)
 		return nullptr;
-	D3D11Shader *shader = new D3D11Shader();
-	shader->pShaderBlob = blob;
-	pDevice->CreatePixelShader(blob->GetBufferPointer(), blob->GetBufferSize(), nullptr, &shader->pPixelShader);
-	return (IPixelShader *) shader;
+
+	ID3D11PixelShader *pPixelShader = nullptr;
+	pDevice->CreatePixelShader(pBytecode->GetBufferPointer(), pBytecode->GetBufferSize(), nullptr, &pPixelShader);
+	return std::make_shared<D3D11PixelShader>(pPixelShader);
 }
 
-IGeometryShader *D3D11Video::createGeometryShader(const char *program, const char *entrypoint)
+PGeometryShader D3D11Video::createGeometryShader(const char *program, const char *entrypoint)
 {
-	ID3DBlob *blob = createShader(program, entrypoint, "gs_5_0");
-	if (blob == nullptr)
+	ID3DBlob *pBytecode = createShader(program, entrypoint, "gs_5_0");
+	if (pBytecode == nullptr)
 		return nullptr;
-	D3D11Shader *shader = new D3D11Shader();
-	shader->pShaderBlob = blob;
-	pDevice->CreateGeometryShader(blob->GetBufferPointer(), blob->GetBufferSize(), nullptr, &shader->pGeometryShader);
-	return (IGeometryShader *) shader;
+
+	ID3D11GeometryShader *pGeometryShader = nullptr;
+	pDevice->CreateGeometryShader(pBytecode->GetBufferPointer(), pBytecode->GetBufferSize(), nullptr, &pGeometryShader);
+	return std::make_shared<D3D11GeometryShader>(pGeometryShader);
 }
 
-IHullShader *D3D11Video::createHullShader(const char *program, const char *entrypoint)
+PHullShader D3D11Video::createHullShader(const char *program, const char *entrypoint)
 {
-	ID3DBlob *blob = createShader(program, entrypoint, "hs_5_0");
-	if (blob == nullptr)
+	ID3DBlob *pBytecode = createShader(program, entrypoint, "hs_5_0");
+	if (pBytecode == nullptr)
 		return nullptr;
-	D3D11Shader *shader = new D3D11Shader();
-	shader->pShaderBlob = blob;
-	pDevice->CreateHullShader(blob->GetBufferPointer(), blob->GetBufferSize(), nullptr, &shader->pHullShader);
-	return (IHullShader *) shader;
+
+	ID3D11HullShader *pHullShader = nullptr;
+	pDevice->CreateHullShader(pBytecode->GetBufferPointer(), pBytecode->GetBufferSize(), nullptr, &pHullShader);
+	return std::make_shared<D3D11HullShader>(pHullShader);
 }
 
-IDomainShader *D3D11Video::createDomainShader(const char *program, const char *entrypoint)
+PDomainShader D3D11Video::createDomainShader(const char *program, const char *entrypoint)
 {
-	ID3DBlob *blob = createShader(program, entrypoint, "ds_5_0");
-	if (blob == nullptr)
+	ID3DBlob *pBytecode = createShader(program, entrypoint, "ds_5_0");
+	if (pBytecode == nullptr)
 		return nullptr;
-	D3D11Shader *shader = new D3D11Shader();
-	shader->pShaderBlob = blob;
-	pDevice->CreateDomainShader(blob->GetBufferPointer(), blob->GetBufferSize(), nullptr, &shader->pDomainShader);
-	return (IDomainShader *) shader;
+
+	ID3D11DomainShader *pDomainShader = nullptr;
+	pDevice->CreateDomainShader(pBytecode->GetBufferPointer(), pBytecode->GetBufferSize(), nullptr, &pDomainShader);
+	return std::make_shared<D3D11DomainShader>(pDomainShader);
 }
 
-IComputeShader *D3D11Video::createComputeShader(const char *program, const char *entrypoint)
+PComputeShader D3D11Video::createComputeShader(const char *program, const char *entrypoint)
 {
-	ID3DBlob *blob = createShader(program, entrypoint, "cs_5_0");
-	if (blob == nullptr)
+	ID3DBlob *pBytecode = createShader(program, entrypoint, "cs_5_0");
+	if (pBytecode == nullptr)
 		return nullptr;
-	D3D11Shader *shader = new D3D11Shader();
-	shader->pShaderBlob = blob;
-	pDevice->CreateComputeShader(blob->GetBufferPointer(), blob->GetBufferSize(), nullptr, &shader->pComputeShader);
-	return (IComputeShader *) shader;
+
+	ID3D11ComputeShader *pComputeShader = nullptr;
+	pDevice->CreateComputeShader(pBytecode->GetBufferPointer(), pBytecode->GetBufferSize(), nullptr, &pComputeShader);
+	return std::make_shared<D3D11ComputeShader>(pComputeShader);
 }
 
 void D3D11Video::setViewport(s32 width, s32 height)
@@ -493,42 +479,41 @@ void D3D11Video::setProjectionMatrix(const Matrix4 &matrix)
 	projectionMatrix = matrix;
 }
 
-void D3D11Video::setVertexShader(IVertexShader *shader)
+void D3D11Video::setVertexShader(PVertexShader _vertexShader)
 {
-	pContext->VSSetShader(((D3D11Shader *)shader)->pVertexShader, nullptr, 0);
-	currentVertexShader = (D3D11Shader *)shader;
+	std::shared_ptr<D3D11VertexShader> vertexShader = std::static_pointer_cast<D3D11VertexShader>(_vertexShader);
+	pContext->VSSetShader(vertexShader->getVertexShader(), nullptr, 0);
+	currentVertexShader = std::weak_ptr<D3D11VertexShader>(vertexShader);
 }
 
-void D3D11Video::setPixelShader(IPixelShader *shader)
+void D3D11Video::setPixelShader(PPixelShader pixelShader)
 {
-	pContext->PSSetShader(((D3D11Shader *)shader)->pPixelShader, nullptr, 0);
+	pContext->PSSetShader(static_cast<D3D11PixelShader *>(pixelShader.get())->getPixelShader(), nullptr, 0);
 }
 
-void D3D11Video::setGeometryShader(IGeometryShader *shader)
+void D3D11Video::setGeometryShader(PGeometryShader geometryShader)
 {
-	pContext->GSSetShader(((D3D11Shader *)shader)->pGeometryShader, nullptr, 0);
+	pContext->GSSetShader(static_cast<D3D11GeometryShader *>(geometryShader.get())->getGeometryShader(), nullptr, 0);
 }
 
-void D3D11Video::setHullShader(IHullShader *shader)
+void D3D11Video::setHullShader(PHullShader hullShader)
 {
-	pContext->HSSetShader(((D3D11Shader *)shader)->pHullShader, nullptr, 0);
+	pContext->HSSetShader(static_cast<D3D11HullShader *>(hullShader.get())->getHullShader(), nullptr, 0);
 }
 
-void D3D11Video::setDomainShader(IDomainShader *shader)
+void D3D11Video::setDomainShader(PDomainShader domainShader)
 {
-	pContext->DSSetShader(((D3D11Shader *)shader)->pDomainShader, nullptr, 0);
+	pContext->DSSetShader(static_cast<D3D11DomainShader *>(domainShader.get())->getDomainShader(), nullptr, 0);
 }
 
-void D3D11Video::setComputeShader(IComputeShader *shader)
+void D3D11Video::setComputeShader(PComputeShader computeShader)
 {
-	pContext->CSSetShader(((D3D11Shader *)shader)->pComputeShader, nullptr, 0);
+	pContext->CSSetShader(static_cast<D3D11ComputeShader *>(computeShader.get())->getComputeShader(), nullptr, 0);
 }
 
 void D3D11Video::beginDraw(Color clearColor)
 {
 	vertexCount = 0;
-	//float clearColor[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
-	//float clearColor[4] = { 127.0 / 255.0f, 200 / 255.0f, 251 / 255.0f, 255.0 / 255.0f };
 	pContext->ClearRenderTargetView(pBackBufferRenderTargetView, (const FLOAT *) &Colorf(clearColor));
 	pContext->ClearDepthStencilView(pDepthStencilView, D3D11_CLEAR_DEPTH, 1.0f, 0);
 }
@@ -540,7 +525,13 @@ void D3D11Video::endDraw()
 
 void D3D11Video::draw(PVertexBuffer _vertexBuffer, u32 startVertex, u32 count, PrimitiveTopology topology)
 {
-	D3D11VertexBuffer *vertexBuffer = (D3D11VertexBuffer *)_vertexBuffer.get();
+	D3D11VertexBuffer *vertexBuffer = static_cast<D3D11VertexBuffer *>(_vertexBuffer.get());
+
+	/* Set input layout */
+	std::shared_ptr<D3D11VertexShader> vertexShader = currentVertexShader.lock();
+	if (!vertexShader) /* TODO: Add trace */
+		return;
+	pContext->IASetInputLayout(((D3D11VertexFormat *)vertexBuffer->getVertexFormat().get())->getInputLayout(pDevice, vertexShader->getBytecode()));
 
 	/* Set matrix */
 	D3D11_MAPPED_SUBRESOURCE pResource;
@@ -548,9 +539,6 @@ void D3D11Video::draw(PVertexBuffer _vertexBuffer, u32 startVertex, u32 count, P
 	*(Matrix4 *)pResource.pData = modelMatrix * viewMatrix * projectionMatrix;
 	pContext->Unmap(pMatrixBuffer, 0);
 	pContext->VSSetConstantBuffers(0, 1, &pMatrixBuffer);
-
-	/* Set input layout */
-	pContext->IASetInputLayout(((D3D11VertexFormat *)vertexBuffer->getVertexFormat().get())->getInputLayout(pDevice, currentVertexShader->pShaderBlob));
 
 	/* Set buffers */
 	UINT stride = vertexBuffer->getVertexFormat()->getSize();
@@ -574,18 +562,21 @@ void D3D11Video::drawIndexed(
 	PrimitiveTopology topology
 	)
 {
-	D3D11VertexBuffer *vertexBuffer = (D3D11VertexBuffer *)_vertexBuffer.get();
-	D3D11IndexBuffer *indexBuffer = (D3D11IndexBuffer *) _indexBuffer.get();
+	D3D11VertexBuffer *vertexBuffer = static_cast<D3D11VertexBuffer *>(_vertexBuffer.get());
+	D3D11IndexBuffer *indexBuffer = static_cast<D3D11IndexBuffer *>(_indexBuffer.get());
+
+	/* Set input layout */
+	std::shared_ptr<D3D11VertexShader> vertexShader = currentVertexShader.lock();
+	if (!vertexShader) /* TODO: Add trace */
+		return;
+	pContext->IASetInputLayout(((D3D11VertexFormat *)vertexBuffer->getVertexFormat().get())->getInputLayout(pDevice, vertexShader->getBytecode()));
 
 	/* Set matrix */
 	D3D11_MAPPED_SUBRESOURCE pResource;
 	pContext->Map(pMatrixBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &pResource);
-	*(Matrix4 *) pResource.pData = modelMatrix * viewMatrix * projectionMatrix;
+	*(Matrix4 *)pResource.pData = modelMatrix * viewMatrix * projectionMatrix;
 	pContext->Unmap(pMatrixBuffer, 0);
 	pContext->VSSetConstantBuffers(0, 1, &pMatrixBuffer);
-
-	/* Set input layout */
-	pContext->IASetInputLayout(((D3D11VertexFormat *)vertexBuffer->getVertexFormat().get())->getInputLayout(pDevice, currentVertexShader->pShaderBlob));
 
 	/* Set buffers */
 	UINT stride = vertexBuffer->getVertexFormat()->getSize();

@@ -125,9 +125,6 @@
     <ClInclude Include="src\Engine\Material.h">
       <Filter>Engine</Filter>
     </ClInclude>
-    <ClInclude Include="src\Engine\IShader.h">
-      <Filter>Engine</Filter>
-    </ClInclude>
     <ClInclude Include="src\Engine\Device\Win32Device.h">
       <Filter>Engine\Device</Filter>
     </ClInclude>
@@ -148,6 +145,12 @@
     </ClInclude>
     <ClInclude Include="src\Engine\VertexFormat.h">
       <Filter>Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Engine\Shader.h">
+      <Filter>Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Engine\D3D11\D3D11Shader.h">
+      <Filter>Engine\D3D11</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -230,6 +233,9 @@
       <Filter>Engine</Filter>
     </ClCompile>
     <ClCompile Include="src\Engine\D3D11\D3D11Texture.cpp">
+      <Filter>Engine\D3D11</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Engine\D3D11\D3D11Shader.cpp">
       <Filter>Engine\D3D11</Filter>
     </ClCompile>
   </ItemGroup>

@@ -6,8 +6,8 @@
 #include <d3d11_2.h>
 #include <wincodec.h>
 
+class D3D11VertexShader;
 class Win32Device;
-class D3D11Shader;
 class D3D11Video: public IVideo
 {
 public:
@@ -24,24 +24,24 @@ public:
 	virtual PVertexBuffer createVertexBuffer(PVertexFormat format, u32 size) override;
 	virtual PIndexBuffer createIndexBuffer(VertexElementType type, u32 size) override;
 
-	virtual IVertexShader *createVertexShader(const char *program, const char *entrypoint) override;
-	virtual IPixelShader *createPixelShader(const char *program, const char *entrypoint) override;
-	virtual IGeometryShader *createGeometryShader(const char *program, const char *entrypoint) override;
-	virtual IHullShader *createHullShader(const char *program, const char *entrypoint) override;
-	virtual IDomainShader *createDomainShader(const char *program, const char *entrypoint) override;
-	virtual IComputeShader *createComputeShader(const char *program, const char *entrypoint) override;
+	virtual PVertexShader createVertexShader(const char *program, const char *entrypoint) override;
+	virtual PPixelShader createPixelShader(const char *program, const char *entrypoint) override;
+	virtual PGeometryShader createGeometryShader(const char *program, const char *entrypoint) override;
+	virtual PHullShader createHullShader(const char *program, const char *entrypoint) override;
+	virtual PDomainShader createDomainShader(const char *program, const char *entrypoint) override;
+	virtual PComputeShader createComputeShader(const char *program, const char *entrypoint) override;
 
 	virtual void setViewport(s32 width, s32 height) override;
 	virtual void setTexture(PTexture texture) override;
 	virtual void setModelMatrix(const Matrix4 &matrix) override;
 	virtual void setViewMatrix(const Matrix4 &matrix) override;
 	virtual void setProjectionMatrix(const Matrix4 &matrix) override;
-	virtual void setVertexShader(IVertexShader *shader) override;
-	virtual void setPixelShader(IPixelShader *shader) override;
-	virtual void setGeometryShader(IGeometryShader *shader) override;
-	virtual void setHullShader(IHullShader *shader) override;
-	virtual void setDomainShader(IDomainShader *shader) override;
-	virtual void setComputeShader(IComputeShader *shader) override;
+	virtual void setVertexShader(PVertexShader vertexShader) override;
+	virtual void setPixelShader(PPixelShader pixelShader) override;
+	virtual void setGeometryShader(PGeometryShader geometryShader) override;
+	virtual void setHullShader(PHullShader hullShader) override;
+	virtual void setDomainShader(PDomainShader domainShader) override;
+	virtual void setComputeShader(PComputeShader computeShader) override;
 
 	virtual u32 getVertexCount() const override { return vertexCount; }
 
@@ -85,5 +85,6 @@ private:
 	
 	ID3D11Buffer *pMatrixBuffer = nullptr;
 	Matrix4 modelMatrix, viewMatrix, projectionMatrix;
-	D3D11Shader *currentVertexShader = nullptr;
+
+	std::weak_ptr<D3D11VertexShader> currentVertexShader;
 };

@@ -1,8 +1,8 @@
 #include <stdafx.h>
 
-#include "IShader.h"
 #include "IVideo.h"
 #include "Material.h"
+#include "Shader.h"
 
 Material::Material(IVideo *_video):
 	video(_video)

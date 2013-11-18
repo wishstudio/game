@@ -15,6 +15,6 @@ public:
 
 private:
 	IVideo *video;
-	IVertexShader *vertexShader = nullptr;
-	IPixelShader *pixelShader = nullptr;
+	PVertexShader vertexShader;
+	PPixelShader pixelShader;
 };
