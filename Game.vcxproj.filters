@@ -1,20 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Header">
-      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
-      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
-    </Filter>
-    <Filter Include="Source">
-      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
-    </Filter>
-    <Filter Include="Header\lz4">
-      <UniqueIdentifier>{4d3dfaeb-f87e-4e23-9ec0-ec2a445d9d51}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\lz4">
-      <UniqueIdentifier>{e1bbc05c-2240-4c95-aaf7-2685ea7a1637}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Engine">
       <UniqueIdentifier>{0ebf30c0-2aa9-4ea2-b5b3-c6678e8f71b1}</UniqueIdentifier>
     </Filter>
@@ -24,61 +10,68 @@
     <Filter Include="Engine\Device">
       <UniqueIdentifier>{de3fe7f1-ede9-4b6e-90e3-1efe612ac93f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Source\lz4">
+      <UniqueIdentifier>{4d3dfaeb-f87e-4e23-9ec0-ec2a445d9d51}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Block.h">
-      <Filter>Header</Filter>
+      <Filter>Source</Filter>
     </ClInclude>
     <ClInclude Include="src\Chunk.h">
-      <Filter>Header</Filter>
+      <Filter>Source</Filter>
     </ClInclude>
     <ClInclude Include="src\Serialization.h">
-      <Filter>Header</Filter>
+      <Filter>Source</Filter>
     </ClInclude>
     <ClInclude Include="src\stdafx.h">
-      <Filter>Header</Filter>
+      <Filter>Source</Filter>
     </ClInclude>
     <ClInclude Include="src\World.h">
-      <Filter>Header</Filter>
+      <Filter>Source</Filter>
     </ClInclude>
     <ClInclude Include="src\TileManager.h">
-      <Filter>Header</Filter>
+      <Filter>Source</Filter>
     </ClInclude>
     <ClInclude Include="src\BlockType.h">
-      <Filter>Header</Filter>
+      <Filter>Source</Filter>
     </ClInclude>
     <ClInclude Include="src\TriangleCollector.h">
-      <Filter>Header</Filter>
+      <Filter>Source</Filter>
     </ClInclude>
     <ClInclude Include="src\Noise.h">
-      <Filter>Header</Filter>
+      <Filter>Source</Filter>
     </ClInclude>
     <ClInclude Include="src\ShortcutItemUI.h">
-      <Filter>Header</Filter>
+      <Filter>Source</Filter>
     </ClInclude>
     <ClInclude Include="src\Queue.h">
-      <Filter>Header</Filter>
+      <Filter>Source</Filter>
     </ClInclude>
     <ClInclude Include="src\Database.h">
-      <Filter>Header</Filter>
+      <Filter>Source</Filter>
     </ClInclude>
     <ClInclude Include="src\lz4\lz4.h">
-      <Filter>Header\lz4</Filter>
+      <Filter>Source\lz4</Filter>
     </ClInclude>
     <ClInclude Include="src\Hash.h">
-      <Filter>Header</Filter>
+      <Filter>Source</Filter>
     </ClInclude>
     <ClInclude Include="src\PlayerAnimator.h">
-      <Filter>Header</Filter>
+      <Filter>Source</Filter>
     </ClInclude>
     <ClInclude Include="src\ChunkSceneNode.h">
-      <Filter>Header</Filter>
+      <Filter>Source</Filter>
     </ClInclude>
     <ClInclude Include="src\Engine\D3D11\D3D11Video.h">
       <Filter>Engine\D3D11</Filter>
     </ClInclude>
     <ClInclude Include="src\MathHelper.h">
-      <Filter>Header</Filter>
+      <Filter>Source</Filter>
     </ClInclude>
     <ClInclude Include="src\Engine\Camera.h">
       <Filter>Engine</Filter>
@@ -160,54 +153,6 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\Block.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Chunk.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Deserializer.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Main.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Serializer.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="src\stdafx.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="src\World.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="src\TileManager.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="src\BlockType.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="src\TriangleCollector.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Noise.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="src\ShortcutItemUI.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Database.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lz4\lz4.c">
-      <Filter>Source\lz4</Filter>
-    </ClCompile>
-    <ClCompile Include="src\PlayerAnimator.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="src\ChunkSceneNode.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
     <ClCompile Include="src\Engine\D3D11\D3D11Video.cpp">
       <Filter>Engine\D3D11</Filter>
     </ClCompile>
@@ -246,6 +191,54 @@
     </ClCompile>
     <ClCompile Include="src\Engine\GUI.cpp">
       <Filter>Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lz4\lz4.c">
+      <Filter>Source\lz4</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Block.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="src\BlockType.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Chunk.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ChunkSceneNode.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Database.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Deserializer.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Main.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Noise.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PlayerAnimator.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Serializer.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ShortcutItemUI.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="src\stdafx.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TileManager.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TriangleCollector.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="src\World.cpp">
+      <Filter>Source</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
