@@ -14,8 +14,8 @@ static f32 linearInterpolation(f32 p0, f32 p1, f32 t)
 
 static f32 bilinearInterpolation(f32 p00, f32 p01, f32 p10, f32 p11, f32 x, f32 y)
 {
-	float r1 = linearInterpolation(p00, p10, x);
-	float r2 = linearInterpolation(p01, p11, x);
+	f32 r1 = linearInterpolation(p00, p10, x);
+	f32 r2 = linearInterpolation(p01, p11, x);
 	return linearInterpolation(r1, r2, y);
 }
 
@@ -99,7 +99,7 @@ void Noise2D::generate(int x, int y, int _sx, int _sy)
 	current.reset(new f32[size]);
 
 	/* Calculate perlin octaves */
-	memset(result.get(), 0, sizeof(float) * sx * sy);
+	memset(result.get(), 0, sizeof(f32) * sx * sy);
 	f32 frequency = 1, amplitude = 1;
 	for (int oct = 0; oct < octaveCount; oct++)
 	{
@@ -205,8 +205,8 @@ void Noise3D::generate(int x, int y, int z, int _sx, int _sy, int _sz)
 	current.reset(new f32[size]);
 
 	/* Calculate perlin octaves */
-	memset(result.get(), 0, sizeof(float) * sx * sy * sz);
-	float frequency = 1, amplitude = 1;
+	memset(result.get(), 0, sizeof(f32) * sx * sy * sz);
+	f32 frequency = 1, amplitude = 1;
 	for (int oct = 0; oct < octaveCount; oct++)
 	{
 		/* Calculate and apply current octave */

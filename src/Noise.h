@@ -8,7 +8,7 @@ public:
 	void setSpread(f32 spreadX, f32 spreadY);
 	
 	void generate(int x, int y, int sx, int sy);
-	inline float getNoise(int x, int y) const { return result[x * sy + y]; }
+	inline f32 getNoise(int x, int y) const { return result[x * sy + y]; }
 
 private:
 	f32 noise(int seed, int x, int y) const;
@@ -30,7 +30,7 @@ public:
 	void setSpread(f32 spreadX, f32 spreadY, f32 spreadZ);
 
 	void generate(int x, int y, int z, int sx, int sy, int sz);
-	inline float getNoise(int x, int y, int z) const { return result[x * sy * sz + y * sz + z]; }
+	inline f32 getNoise(int x, int y, int z) const { return result[x * sy * sz + y * sz + z]; }
 
 private:
 	f32 noise(int seed, int x, int y, int z) const;

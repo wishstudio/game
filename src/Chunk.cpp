@@ -22,8 +22,6 @@ Deserializer &operator >> (Deserializer &deserializer, BlockData &data)
 Chunk::Chunk(int _chunk_x, int _chunk_y, int _chunk_z)
 	: chunk_x(_chunk_x), chunk_y(_chunk_y), chunk_z(_chunk_z), boundingBox({0, 0, 0})
 {
-	if (chunk_x < -100 || chunk_x > 100 || chunk_y < -100 || chunk_y > 100 || chunk_z < -100 || chunk_z > 100)
-		DebugBreak();
 	status = Status::Nothing;
 	inQueue = false;
 	triangleCollector = nullptr;
