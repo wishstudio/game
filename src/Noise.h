@@ -1,43 +1,45 @@
 #pragma once
 
-class Noise
+class Noise2D final
 {
 public:
-	Noise(int seed, int octaveCount, float scale, float persistence);
-	virtual ~Noise();
+	Noise2D(int seed, int octaveCount, f32 scale, f32 persistence);
 
-	void setSize2D(int sx, int sy);
-	void setSize3D(int sx, int sy, int sz);
-	void setSpread2D(float spreadX, float spreadY);
-	void setSpread3D(float spreadX, float spreadY, float spreadZ);
-
-	/* Perlin noise generators */
-	void generatePerlin2D(int x, int y);
-	void generatePerlin3D(int x, int y, int z);
-
-	inline float getNoise2D(int x, int y) const { return result[x * sy + y]; }
-	inline float getNoise3D(int x, int y, int z) const { return result[x * sy * sz + y * sz + z]; }
+	void setSpread(f32 spreadX, f32 spreadY);
+	
+	void generate(int x, int y, int sx, int sy);
+	inline float getNoise(int x, int y) const { return result[x * sy + y]; }
 
 private:
-	/* Interpolaton */
-	float linearInterpolation(float p0, float p1, float t) const;
-	float bilinearInterpolation(float p00, float p01, float p10, float p11, float x, float y) const;
-	float trilinearInterpolation(
-		float p000, float p001, float p010, float p011,
-		float p100, float p101, float p110, float p111,
-		float x, float y, float z) const;
+	f32 noise(int seed, int x, int y) const;
 
-	/* Noise functions */
-	float noise2D(int seed, int x, int y) const;
-	float noise3D(int seed, int x, int y, int z) const;
+	void generateOctave(int seed, f32 x, f32 y, f32 stepX, f32 stepY);
 
-	/* Octave functions */
-	void generateOctave2D(int seed, float x, float y, float stepX, float stepY);
-	void generateOctave3D(int seed, float x, float y, float z, float stepX, float stepY, float stepZ);
-
-	float *result, *current;
-	int sx, sy, sz;
+	std::unique_ptr<f32[]> result, current;
+	int sx, sy;
+	f32 spreadX, spreadY;
 	int seed, octaveCount;
-	float persistence, scale;
-	float spreadX, spreadY, spreadZ;
+	f32 persistence, scale;
+};
+
+class Noise3D final
+{
+public:
+	Noise3D(int seed, int octaveCount, f32 scale, f32 persistence);
+
+	void setSpread(f32 spreadX, f32 spreadY, f32 spreadZ);
+
+	void generate(int x, int y, int z, int sx, int sy, int sz);
+	inline float getNoise(int x, int y, int z) const { return result[x * sy * sz + y * sz + z]; }
+
+private:
+	f32 noise(int seed, int x, int y, int z) const;
+
+	void generateOctave(int seed, f32 x, f32 y, f32 z, f32 stepX, f32 stepY, f32 stepZ);
+	
+	std::unique_ptr<f32[]> result, current;
+	int sx, sy, sz;
+	f32 spreadX, spreadY, spreadZ;
+	int seed, octaveCount;
+	f32 persistence, scale;
 };
