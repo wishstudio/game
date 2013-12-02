@@ -5,7 +5,10 @@
 #include "Database.h"
 #include "Noise.h"
 #include "Serialization.h"
+#include "TriangleCollector.h"
 #include "World.h"
+#include "WorldGenerator/WorldGenerator.h"
+#include "WorldGenerator/WorldManipulator.h"
 
 Serializer &operator << (Serializer &serializer, const BlockData &data)
 {
@@ -23,21 +26,22 @@ Chunk::Chunk(int _chunk_x, int _chunk_y, int _chunk_z)
 	: chunk_x(_chunk_x), chunk_y(_chunk_y), chunk_z(_chunk_z), boundingBox({0, 0, 0})
 {
 	status = Status::Nothing;
+	generationPhase = 0;
 	inQueue = false;
 	triangleCollector = nullptr;
 
-	dirty = true;
+	dirty = false;
 
 	boundingBox.merge(Vector3D(CHUNK_SIZE, CHUNK_SIZE, CHUNK_SIZE));
 	modelTransform = Matrix4::translation(chunk_x * CHUNK_SIZE, chunk_y * CHUNK_SIZE, chunk_z * CHUNK_SIZE);
 }
 
-Chunk::~Chunk()
-{
-}
-
 Serializer &operator << (Serializer &serializer, const Chunk &data)
 {
+	if (data.getStatus() == Chunk::Status::Generating)
+		serializer << data.generationPhase;
+	else
+		serializer << 0;
 	for (int i = 0; i < CHUNK_SIZE; i++)
 		for (int j = 0; j < CHUNK_SIZE; j++)
 			for (int k = 0; k < CHUNK_SIZE; k++)
@@ -47,6 +51,18 @@ Serializer &operator << (Serializer &serializer, const Chunk &data)
 
 Deserializer &operator >> (Deserializer &deserializer, Chunk &data)
 {
+	int generationPhase;
+	deserializer >> generationPhase;
+	if (generationPhase != 0)
+	{
+		data.status = Chunk::Status::Generating;
+		data.generationPhase = generationPhase;
+	}
+	else
+	{
+		data.status = Chunk::Status::Data;
+		data.generationPhase = WorldGenerator::getPhaseCount() + 1;
+	}
 	for (int i = 0; i < CHUNK_SIZE; i++)
 		for (int j = 0; j < CHUNK_SIZE; j++)
 			for (int k = 0; k < CHUNK_SIZE; k++)
@@ -54,28 +70,60 @@ Deserializer &operator >> (Deserializer &deserializer, Chunk &data)
 	return deserializer;
 }
 
-void Chunk::generate()
+void Chunk::generate(int phase)
 {
-	memset(blocks, 0, sizeof blocks);
-	Noise2D heightmap(1, 4, 20, 0.6);
-	heightmap.setSpread(180, 180);
-	heightmap.generate(chunk_x * CHUNK_SIZE, chunk_z * CHUNK_SIZE, CHUNK_SIZE, CHUNK_SIZE);
-
-	Noise3D noise(1, 4, 1, 0.4);
-	noise.setSpread(5, 5, 5);
-	noise.generate(chunk_x * CHUNK_SIZE, chunk_y * CHUNK_SIZE, chunk_z * CHUNK_SIZE, CHUNK_SIZE, CHUNK_SIZE, CHUNK_SIZE);
-	for (int x = 0; x < CHUNK_SIZE; x++)
-		for (int y = 0; y < CHUNK_SIZE; y++)
-			for (int z = 0; z < CHUNK_SIZE; z++)
-			{
-				int yy = chunk_y * CHUNK_SIZE + y;
-				int h = heightmap.getNoise(x, z);
-				if (yy < h)
+	if (generationPhase > phase)
+		return;
+	if (phase > 0)
+	{
+		/* Ensure surrounding chunks are all done [phase - 1] at least */
+		WorldGenerator *generator = WorldGenerator::getGenerator(phase - 1);
+		Vector3DI spanMin = generator->getSpanMin();
+		Vector3DI spanMax = generator->getSpanMax();
+		for (int x = spanMin.x; x <= spanMax.x; x++)
+			for (int y = spanMin.y; y <= spanMax.y; y++)
+				for (int z = spanMin.z; z <= spanMax.z; z++)
 				{
-					float density = noise.getNoise(x, y, z);
-					blocks[x][y][z].type = density > -0.4;
+					Chunk *chunk = world->rawGetChunk(chunk_x + x, chunk_y + y, chunk_z + z);
+					chunk->loadRawData();
+					if (chunk->generationPhase < phase)
+						chunk->generate(phase - 1);
 				}
+	}
+
+	if (phase == WorldGenerator::getPhaseCount())
+	{
+		/* We've done */
+		std::lock_guard<std::mutex> lock(accessMutex);
+		if (status == Status::Generating)
+		{
+			generationPhase = WorldGenerator::getPhaseCount() + 1;
+			status = Status::Data;
+		}
+		return;
+	}
+
+	/* Lock related chunks for current phase */
+	std::vector<std::unique_lock<std::mutex>> locks;
+	WorldGenerator *generator = WorldGenerator::getGenerator(phase);
+	Vector3DI spanMin = generator->getSpanMin();
+	Vector3DI spanMax = generator->getSpanMax();
+	WorldManipulator worldManipulator(spanMin.x, spanMin.y, spanMin.z, spanMax.x, spanMax.y, spanMax.z);
+	for (int x = spanMin.x; x <= spanMax.x; x++)
+		for (int y = spanMin.y; y <= spanMax.y; y++)
+			for (int z = spanMin.z; z <= spanMax.z; z++)
+			{
+				Chunk *chunk = world->rawGetChunk(chunk_x + x, chunk_y + y, chunk_z + z);
+				locks.push_back(std::unique_lock<std::mutex>(chunk->accessMutex));
+				worldManipulator.addChunk(x, y, z, &chunk->blocks);
 			}
+	if (generationPhase > phase) /* Double check */
+		return;
+
+	/* Generate current phase */
+	/* TODO: Seeding */
+	generator->generate(1, chunk_x, chunk_y, chunk_z, worldManipulator);
+	generationPhase = phase + 1;
 }
 
 void Chunk::setDirty(int x, int y, int z)
@@ -132,23 +180,34 @@ void Chunk::save()
 	dirty = false;
 }
 
-void Chunk::loadData()
+/* Load chunk data from database, don't do anything else */
+void Chunk::loadRawData()
 {
-	if (status >= Status::Data)
+	if (status >= Status::Generating)
 		return;
 
 	std::lock_guard<std::mutex> lock(accessMutex);
-	if (status >= Status::Data) /* Double check */
+	if (status >= Status::Generating) /* Double check */
 		return;
 
-	if (database->loadChunk(this))
-		dirty = false;
-	else
+	if (!database->loadChunk(this))
 	{
-		/* Not found in database, generate now */
-		generate();
+		/* Not found in database */
+		status = Status::Generating;
+		generationPhase = 0;
 	}
-	status = Status::Data;
+}
+
+void Chunk::loadData()
+{
+	if (status == Status::Generating)
+	{
+		generate(WorldGenerator::getPhaseCount());
+		return;
+	}
+	loadRawData();
+	if (status == Status::Generating)
+		generate(WorldGenerator::getPhaseCount());
 }
 
 void Chunk::loadLight()

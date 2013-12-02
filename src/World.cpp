@@ -85,7 +85,7 @@ Block World::tryGetBlock(int x, int y, int z)
 
 Chunk *World::getChunk(int chunk_x, int chunk_y, int chunk_z)
 {
-	Chunk *chunk = preloadChunk(chunk_x, chunk_y, chunk_z);
+	Chunk *chunk = rawGetChunk(chunk_x, chunk_y, chunk_z);
 	if (chunk->getStatus() < Chunk::Status::Data)
 		chunk->loadData();
 	return chunk;
@@ -125,6 +125,24 @@ Chunk *World::preloadChunk(int chunk_x, int chunk_y, int chunk_z)
 	chunk = new Chunk(chunk_x, chunk_y, chunk_z);
 	chunks.insert(std::make_pair(std::make_tuple(chunk_x, chunk_y, chunk_z), chunk));
 	asyncLoadChunk(chunk);
+	return chunk;
+}
+
+Chunk *World::rawGetChunk(int chunk_x, int chunk_y, int chunk_z)
+{
+	Chunk *chunk = tryGetChunk(chunk_x, chunk_y, chunk_z);
+	if (chunk)
+		return chunk;
+
+	/* Lock chunks hash */
+	std::lock_guard<std::mutex> lock(chunksHashMutex);
+	/* Double check */
+	chunk = tryGetChunk(chunk_x, chunk_y, chunk_z);
+	if (chunk)
+		return chunk;
+
+	chunk = new Chunk(chunk_x, chunk_y, chunk_z);
+	chunks.insert(std::make_pair(std::make_tuple(chunk_x, chunk_y, chunk_z), chunk));
 	return chunk;
 }
 

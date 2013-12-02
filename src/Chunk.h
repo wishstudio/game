@@ -1,11 +1,10 @@
 #pragma once
 
-#include "TriangleCollector.h"
-
 class Serializer;
 class Deserializer;
+class TriangleCollector;
 
-struct BlockData
+struct BlockData final
 {
 	u16 type;
 	u8 param1, param2;
@@ -15,15 +14,12 @@ struct BlockData
 	friend Deserializer &operator >> (Deserializer &deserializer, BlockData &data);
 };
 
-class Chunk
+class Chunk final
 {
 public:
-	enum class Status : int { Nothing, Data, Light, Buffer };
+	enum class Status : int { Nothing, Generating, Data, Light, Buffer };
 	/* Represents what has been loaded so far */
 	Chunk(int chunk_x, int chunk_y, int chunk_z);
-	virtual ~Chunk();
-
-	static void initDatabase();
 
 	Status getStatus() const volatile { return status; }
 	void setStatus(Status _status) { status = _status; }
@@ -50,12 +46,14 @@ public:
 	friend Deserializer &operator >> (Deserializer &deserializer, Chunk &data);
 
 private:
-	void generate();
+	void generate(int phase);
+	void loadRawData();
 	void invalidateLight();
 
 	const int chunk_x, chunk_y, chunk_z;
 	std::mutex accessMutex;
 	std::atomic<Status> status;
+	std::atomic<int> generationPhase; /* Current phase to be done */
 	std::atomic<bool> inQueue;
 	std::atomic<bool> dirty;
 	std::atomic<TriangleCollector *> triangleCollector;

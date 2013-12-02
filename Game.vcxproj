@@ -40,6 +40,7 @@
     <ClInclude Include="src\Engine\Vector2D.h" />
     <ClInclude Include="src\Engine\Vector2DI.h" />
     <ClInclude Include="src\Engine\Vector3D.h" />
+    <ClInclude Include="src\Engine\Vector3DI.h" />
     <ClInclude Include="src\Engine\VertexBuffer.h" />
     <ClInclude Include="src\Engine\VertexFormat.h" />
     <ClInclude Include="src\Engine\Video.h" />
@@ -55,6 +56,9 @@
     <ClInclude Include="src\TileManager.h" />
     <ClInclude Include="src\TriangleCollector.h" />
     <ClInclude Include="src\World.h" />
+    <ClInclude Include="src\WorldGenerator\TerrainGenerator.h" />
+    <ClInclude Include="src\WorldGenerator\WorldGenerator.h" />
+    <ClInclude Include="src\WorldGenerator\WorldManipulator.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Block.cpp" />
@@ -92,6 +96,7 @@
     <ClCompile Include="src\TileManager.cpp" />
     <ClCompile Include="src\TriangleCollector.cpp" />
     <ClCompile Include="src\World.cpp" />
+    <ClCompile Include="src\WorldGenerator\WorldGenerator.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{04D9FA1D-92EE-4E91-8000-DCA7E9405E41}</ProjectGuid>

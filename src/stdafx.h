@@ -13,6 +13,7 @@
 #include "Engine/Vector2D.h"
 #include "Engine/Vector2DI.h"
 #include "Engine/Vector3D.h"
+#include "Engine/Vector3DI.h"
 
 #include "Engine/Camera.h"
 #include "Engine/Color.h"

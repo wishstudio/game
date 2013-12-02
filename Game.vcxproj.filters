@@ -17,6 +17,9 @@
     <Filter Include="Source\lz4">
       <UniqueIdentifier>{4d3dfaeb-f87e-4e23-9ec0-ec2a445d9d51}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source\WorldGenerator">
+      <UniqueIdentifier>{bd7af3ce-456b-41a7-94dd-3c9e5db3f1f6}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Block.h">
@@ -151,6 +154,18 @@
     <ClInclude Include="src\Engine\Vector2DI.h">
       <Filter>Engine</Filter>
     </ClInclude>
+    <ClInclude Include="src\WorldGenerator\WorldManipulator.h">
+      <Filter>Source\WorldGenerator</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Engine\Vector3DI.h">
+      <Filter>Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="src\WorldGenerator\TerrainGenerator.h">
+      <Filter>Source\WorldGenerator</Filter>
+    </ClInclude>
+    <ClInclude Include="src\WorldGenerator\WorldGenerator.h">
+      <Filter>Source\WorldGenerator</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Engine\D3D11\D3D11Video.cpp">
@@ -239,6 +254,9 @@
     </ClCompile>
     <ClCompile Include="src\World.cpp">
       <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="src\WorldGenerator\WorldGenerator.cpp">
+      <Filter>Source\WorldGenerator</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
