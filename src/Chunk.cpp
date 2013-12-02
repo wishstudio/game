@@ -3,7 +3,6 @@
 #include "BlockType.h"
 #include "Chunk.h"
 #include "Database.h"
-#include "Noise.h"
 #include "Serialization.h"
 #include "TriangleCollector.h"
 #include "World.h"

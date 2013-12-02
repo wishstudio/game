@@ -3,7 +3,6 @@
 #include "WorldGenerator.h"
 
 #include "WorldManipulator.h"
-#include <Noise.h>
 
 class TerrainGenerator final: public WorldGenerator
 {
@@ -16,8 +15,7 @@ public:
 
 	virtual void generate(int seed, int chunk_x, int chunk_y, int chunk_z, const WorldManipulator &w) const override
 	{
-		Noise2D heightmap(1, 4, 20, 0.6);
-		heightmap.setSpread(180, 180);
+		Noise2D heightmap = getHeightMap();
 		heightmap.generate(chunk_x * CHUNK_SIZE, chunk_z * CHUNK_SIZE, CHUNK_SIZE, CHUNK_SIZE);
 
 		Noise3D noise(1, 4, 1, 0.4);

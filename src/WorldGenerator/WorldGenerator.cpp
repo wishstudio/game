@@ -24,3 +24,10 @@ WorldGenerator *WorldGenerator::getGenerator(int phase)
 {
 	return getGenerators()[phase].get();
 }
+
+Noise2D WorldGenerator::getHeightMap() const
+{
+	Noise2D heightmap(1, 4, 20, 0.6);
+	heightmap.setSpread(180, 180);
+	return heightmap;
+}

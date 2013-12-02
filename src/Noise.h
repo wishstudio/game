@@ -4,6 +4,14 @@ class Noise2D final
 {
 public:
 	Noise2D(int seed, int octaveCount, f32 scale, f32 persistence);
+	Noise2D(Noise2D &noise):
+		sx(noise.sx), sy(noise.sy),
+		spreadX(noise.spreadX), spreadY(noise.spreadY),
+		seed(noise.seed), octaveCount(noise.octaveCount),
+		persistence(noise.persistence), scale(noise.scale)
+	{}
+
+	Noise2D &operator= (const Noise2D &) = delete;
 
 	void setSpread(f32 spreadX, f32 spreadY);
 	
@@ -26,6 +34,14 @@ class Noise3D final
 {
 public:
 	Noise3D(int seed, int octaveCount, f32 scale, f32 persistence);
+	Noise3D(Noise3D &noise):
+		sx(noise.sx), sy(noise.sy), sz(noise.sz),
+		spreadX(noise.spreadX), spreadY(noise.spreadY), spreadZ(noise.spreadZ),
+		seed(noise.seed), octaveCount(noise.octaveCount),
+		persistence(noise.persistence), scale(noise.scale)
+	{}
+
+	Noise3D &operator= (const Noise3D &) = delete;
 
 	void setSpread(f32 spreadX, f32 spreadY, f32 spreadZ);
 
