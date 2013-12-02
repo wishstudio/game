@@ -21,7 +21,7 @@ public:
 	class PlaneAccessor;
 	inline const PlaneAccessor operator[] (int rel_x) const
 	{
-		return PlaneAccessor(this, rel_x * sizeY * sizeZ);
+		return PlaneAccessor(this, rel_x);
 	}
 
 private:

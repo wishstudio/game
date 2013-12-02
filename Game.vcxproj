@@ -57,6 +57,7 @@
     <ClInclude Include="src\TriangleCollector.h" />
     <ClInclude Include="src\World.h" />
     <ClInclude Include="src\WorldGenerator\TerrainGenerator.h" />
+    <ClInclude Include="src\WorldGenerator\TreeGenerator.h" />
     <ClInclude Include="src\WorldGenerator\WorldGenerator.h" />
     <ClInclude Include="src\WorldGenerator\WorldManipulator.h" />
   </ItemGroup>

@@ -166,6 +166,9 @@
     <ClInclude Include="src\WorldGenerator\WorldGenerator.h">
       <Filter>Source\WorldGenerator</Filter>
     </ClInclude>
+    <ClInclude Include="src\WorldGenerator\TreeGenerator.h">
+      <Filter>Source\WorldGenerator</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Engine\D3D11\D3D11Video.cpp">
