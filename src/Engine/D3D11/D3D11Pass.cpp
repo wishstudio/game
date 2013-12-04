@@ -40,7 +40,7 @@ void D3D11Pass::apply()
 		desc.FillMode = fillModeMap[getFillMode()];
 		desc.CullMode = cullModeMap[getCullMode()];
 		desc.FrontCounterClockwise = (getFrontMode() == FRONTMODE_COUNTERCLOCKWISE);
-		desc.DepthBias = getDepthBias();
+		desc.DepthBias = getDepthBias() * (float)(1 << 23);
 		desc.DepthBiasClamp = getDepthBiasClamp();
 		desc.SlopeScaledDepthBias = getSlopeScaledDepthBias();
 		desc.DepthClipEnable = getDepthClipEnabled();

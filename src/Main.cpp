@@ -55,7 +55,7 @@ static PTexture whiteTexture = nullptr;
 
 static void draw3DBox(const AABB &box, Color color)
 {
-	static PVertexBuffer buffer = video->createVertexBuffer(vertexFormat, 24);
+	static PVertexBuffer buffer = video->createVertexBuffer(vertexFormat, 36);
 
 	video->setTexture(whiteTexture);
 	video->setModelMatrix(Matrix4::identity());
@@ -68,25 +68,25 @@ static void draw3DBox(const AABB &box, Color color)
 	Vector3D p101(box.maxPoint.x, box.minPoint.y, box.maxPoint.z);
 	Vector3D p110(box.maxPoint.x, box.maxPoint.y, box.minPoint.z);
 	Vector3D p111(box.maxPoint.x, box.maxPoint.y, box.maxPoint.z);
-	Vertex vertices[24] =
+	Vertex vertices[36] =
 	{
-		{ p000, color, 0.f, 0.f }, { p001, color, 0.f, 0.f },
-		{ p001, color, 0.f, 0.f }, { p011, color, 0.f, 0.f },
-		{ p011, color, 0.f, 0.f }, { p010, color, 0.f, 0.f },
-		{ p010, color, 0.f, 0.f }, { p000, color, 0.f, 0.f },
+		{ p000, color, 0.f, 0.f }, { p001, color, 0.f, 0.f }, { p001, color, 0.f, 0.f },
+		{ p001, color, 0.f, 0.f }, { p011, color, 0.f, 0.f }, { p011, color, 0.f, 0.f },
+		{ p011, color, 0.f, 0.f }, { p010, color, 0.f, 0.f }, { p010, color, 0.f, 0.f },
+		{ p010, color, 0.f, 0.f }, { p000, color, 0.f, 0.f }, { p000, color, 0.f, 0.f },
 
-		{ p100, color, 0.f, 0.f }, { p101, color, 0.f, 0.f },
-		{ p101, color, 0.f, 0.f }, { p111, color, 0.f, 0.f },
-		{ p111, color, 0.f, 0.f }, { p110, color, 0.f, 0.f },
-		{ p110, color, 0.f, 0.f }, { p100, color, 0.f, 0.f },
+		{ p100, color, 0.f, 0.f }, { p101, color, 0.f, 0.f }, { p101, color, 0.f, 0.f },
+		{ p101, color, 0.f, 0.f }, { p111, color, 0.f, 0.f }, { p111, color, 0.f, 0.f },
+		{ p111, color, 0.f, 0.f }, { p110, color, 0.f, 0.f }, { p110, color, 0.f, 0.f },
+		{ p110, color, 0.f, 0.f }, { p100, color, 0.f, 0.f }, { p100, color, 0.f, 0.f },
 
-		{ p000, color, 0.f, 0.f }, { p100, color, 0.f, 0.f },
-		{ p001, color, 0.f, 0.f }, { p101, color, 0.f, 0.f },
-		{ p010, color, 0.f, 0.f }, { p110, color, 0.f, 0.f },
-		{ p011, color, 0.f, 0.f }, { p111, color, 0.f, 0.f },
+		{ p000, color, 0.f, 0.f }, { p100, color, 0.f, 0.f }, { p100, color, 0.f, 0.f },
+		{ p001, color, 0.f, 0.f }, { p101, color, 0.f, 0.f }, { p101, color, 0.f, 0.f },
+		{ p010, color, 0.f, 0.f }, { p110, color, 0.f, 0.f }, { p110, color, 0.f, 0.f },
+		{ p011, color, 0.f, 0.f }, { p111, color, 0.f, 0.f }, { p111, color, 0.f, 0.f },
 	};
-	buffer->update(0, 24, vertices);
-	video->draw(buffer, 0, 24, TOPOLOGY_LINELIST);
+	buffer->update(0, 36, vertices);
+	video->draw(buffer, 0, 36, TOPOLOGY_TRIANGLELIST);
 }
 
 int main()
@@ -104,10 +104,24 @@ int main()
 
 	gui.reset(new GUI(video));
 
+	PVertexShader vertexShader = video->createVertexShader(SHADER_SRC, "VS_Main");
+	PPixelShader pixelShader = video->createPixelShader(SHADER_SRC, "PS_Main");
 	PMaterial defaultMaterial = video->createMaterial();
-	PPass pass = defaultMaterial->createPass();
-	pass->setVertexShader(video->createVertexShader(SHADER_SRC, "VS_Main"));
-	pass->setPixelShader(video->createPixelShader(SHADER_SRC, "PS_Main"));
+	{
+		PPass pass = defaultMaterial->createPass();
+		pass->setVertexShader(vertexShader);
+		pass->setPixelShader(pixelShader);
+	}
+
+	PMaterial boxMaterial = video->createMaterial();
+	{
+		PPass pass = boxMaterial->createPass();
+		pass->setVertexShader(vertexShader);
+		pass->setPixelShader(pixelShader);
+		pass->setFillMode(FILLMODE_WIREFRAME);
+		pass->setCullMode(CULLMODE_NONE);
+		pass->setDepthBias(-0.0003);
+	}
 
 	Color whiteData(255, 255, 255, 255);
 	whiteTexture = video->createTexture(1, 1, &whiteData);
@@ -172,6 +186,7 @@ int main()
 		if (world->getCameraIntersection(Ray3D(camera->getPosition(), camera->getLookAt() - camera->getPosition()), &info))
 		{
 			AABB box = info->block.getBoundingBox().translate(info->block.x(), info->block.y(), info->block.z());
+			video->setMaterial(boxMaterial);
 			draw3DBox(box, Color(255, 0, 0, 255));
 		}
 
