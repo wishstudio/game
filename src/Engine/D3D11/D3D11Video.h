@@ -31,6 +31,9 @@ public:
 	virtual PDomainShader createDomainShader(const char *program, const char *entrypoint) override;
 	virtual PComputeShader createComputeShader(const char *program, const char *entrypoint) override;
 
+	virtual PMaterial createMaterial() override;
+	virtual PPass createPass() override;
+
 	virtual void setViewport(s32 width, s32 height) override;
 	virtual void setTexture(PTexture texture) override;
 	virtual void setModelMatrix(const Matrix4 &matrix) override;
@@ -42,6 +45,7 @@ public:
 	virtual void setHullShader(PHullShader hullShader) override;
 	virtual void setDomainShader(PDomainShader domainShader) override;
 	virtual void setComputeShader(PComputeShader computeShader) override;
+	virtual void setMaterial(PMaterial material) override;
 
 	virtual Vector2DI getBackBufferSize() const override;
 	virtual u32 getVertexCount() const override { return vertexCount; }
@@ -49,7 +53,11 @@ public:
 	virtual void beginDraw(Color clearColor) override;
 	virtual void endDraw() override;
 
-	virtual void draw(PVertexBuffer vertexBuffer, u32 startVertex, u32 count, PrimitiveTopology topology) override;
+	virtual void draw(
+		PVertexBuffer vertexBuffer,
+		u32 startVertex,
+		u32 count,
+		PrimitiveTopology topology) override;
 	virtual void drawIndexed(
 		PVertexBuffer vertexBuffer,
 		u32 startVertex,

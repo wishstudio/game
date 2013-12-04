@@ -169,6 +169,12 @@
     <ClInclude Include="src\WorldGenerator\TreeGenerator.h">
       <Filter>Source\WorldGenerator</Filter>
     </ClInclude>
+    <ClInclude Include="src\Engine\Pass.h">
+      <Filter>Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Engine\D3D11\D3D11Pass.h">
+      <Filter>Engine\D3D11</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Engine\D3D11\D3D11Video.cpp">
@@ -260,6 +266,12 @@
     </ClCompile>
     <ClCompile Include="src\WorldGenerator\WorldGenerator.cpp">
       <Filter>Source\WorldGenerator</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Engine\Pass.cpp">
+      <Filter>Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Engine\D3D11\D3D11Pass.cpp">
+      <Filter>Engine\D3D11</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

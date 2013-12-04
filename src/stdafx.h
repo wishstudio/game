@@ -22,6 +22,7 @@
 #include "Engine/IndexBuffer.h"
 #include "Engine/InputValue.h"
 #include "Engine/Material.h"
+#include "Engine/Pass.h"
 #include "Engine/Shader.h"
 #include "Engine/Texture.h"
 #include "Engine/VertexBuffer.h"
@@ -38,6 +39,7 @@
 #include <sstream>
 #include <thread>
 #include <unordered_map>
+#include <vector>
 
 #include "Hash.h"
 #include "MathHelper.h"

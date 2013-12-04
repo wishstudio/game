@@ -16,9 +16,6 @@ private:
 	PVideo video;
 	PTexture whiteTexture;
 
-	Material *material = nullptr;
-	PVertexShader vertexShader;
-	PPixelShader pixelShader;
-
+	PMaterial material;
 	PVertexBuffer vertexBuffer;
 };

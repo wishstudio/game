@@ -1,18 +1,20 @@
 #pragma once
 
+#include <vector>
+
 class Material
 {
 public:
-	Material(PVideo video);
+	Material(Video *video);
 	Material(const Material &) = delete;
 
 	Material &operator= (const Material &) = delete;
-	void setShaders(const char *program, const char *vertexShaderEntrypoint, const char *pixelShaderEntrypoint);
 
-	void apply(); /* TODO */
+	PPass createPass();
+	u32 getPassCount() const { return passes.size(); }
+	PPass getPass(u32 i) const { return passes[i]; }
 
 private:
-	PVideo video;
-	PVertexShader vertexShader;
-	PPixelShader pixelShader;
+	Video *video;
+	std::vector<PPass> passes;
 };

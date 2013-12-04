@@ -22,6 +22,9 @@ public:
 	virtual PDomainShader createDomainShader(const char *program, const char *entrypoint) = 0;
 	virtual PComputeShader createComputeShader(const char *program, const char *entrypoint) = 0;
 
+	virtual PMaterial createMaterial() = 0;
+	virtual PPass createPass() = 0;
+
 	/* Render state manipulation */
 	virtual void setViewport(s32 width, s32 height) = 0;
 	virtual void setTexture(PTexture texture) = 0;
@@ -34,6 +37,7 @@ public:
 	virtual void setHullShader(PHullShader hullShader) = 0;
 	virtual void setDomainShader(PDomainShader domainShader) = 0;
 	virtual void setComputeShader(PComputeShader computeShader) = 0;
+	virtual void setMaterial(PMaterial material) = 0;
 
 	/* Query states */
 	virtual Vector2DI getBackBufferSize() const = 0;
@@ -43,7 +47,11 @@ public:
 	virtual void beginDraw(Color clearColor) = 0;
 	virtual void endDraw() = 0;
 
-	virtual void draw(PVertexBuffer vertexBuffer, u32 startVertex, u32 count, PrimitiveTopology topology) = 0;
+	virtual void draw(
+		PVertexBuffer vertexBuffer,
+		u32 startVertex,
+		u32 count,
+		PrimitiveTopology topology) = 0;
 	virtual void drawIndexed(
 		PVertexBuffer vertexBuffer,
 		u32 startVertex,

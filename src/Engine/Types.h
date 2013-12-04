@@ -109,6 +109,25 @@ enum VertexElementType
 
 u32 getTypeSize(VertexElementType type);
 
+enum FillMode
+{
+	FILLMODE_WIREFRAME,
+	FILLMODE_SOLID
+};
+
+enum CullMode
+{
+	CULLMODE_NONE,
+	CULLMODE_FRONT,
+	CULLMODE_BACK
+};
+
+enum FrontMode
+{
+	FRONTMODE_CLOCKWISE,
+	FRONTMODE_COUNTERCLOCKWISE
+};
+
 /* Forward declaration and typedefs */
 class Device;
 class Video;
@@ -127,6 +146,9 @@ class HullShader;
 class DomainShader;
 class ComputeShader;
 
+class Material;
+class Pass;
+
 typedef std::shared_ptr<Device> PDevice;
 typedef std::shared_ptr<Video> PVideo;
 typedef std::shared_ptr<GUI> PGUI;
@@ -143,3 +165,6 @@ typedef std::shared_ptr<GeometryShader> PGeometryShader;
 typedef std::shared_ptr<HullShader> PHullShader;
 typedef std::shared_ptr<DomainShader> PDomainShader;
 typedef std::shared_ptr<ComputeShader> PComputeShader;
+
+typedef std::shared_ptr<Material> PMaterial;
+typedef std::shared_ptr<Pass> PPass;

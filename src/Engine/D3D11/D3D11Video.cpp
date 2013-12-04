@@ -3,6 +3,7 @@
 #include <d3dcompiler.h>
 #include "../Device/Win32Device.h"
 #include "D3D11IndexBuffer.h"
+#include "D3D11Pass.h"
 #include "D3D11Shader.h"
 #include "D3D11Texture.h"
 #include "D3D11VertexBuffer.h"
@@ -461,6 +462,16 @@ PComputeShader D3D11Video::createComputeShader(const char *program, const char *
 	return std::make_shared<D3D11ComputeShader>(pComputeShader);
 }
 
+PMaterial D3D11Video::createMaterial()
+{
+	return std::make_shared<Material>(this);
+}
+
+PPass D3D11Video::createPass()
+{
+	return std::make_shared<D3D11Pass>(this);
+}
+
 void D3D11Video::setViewport(s32 width, s32 height)
 {
 	D3D11_VIEWPORT viewport;
@@ -544,7 +555,18 @@ void D3D11Video::endDraw()
 	pSwapChain->Present(0, 0);
 }
 
-void D3D11Video::draw(PVertexBuffer _vertexBuffer, u32 startVertex, u32 count, PrimitiveTopology topology)
+void D3D11Video::setMaterial(PMaterial material)
+{
+	/* TODO: Multi-pass */
+	D3D11Pass *pass = static_cast<D3D11Pass *>(material->getPass(0).get());
+	pass->apply();
+}
+
+void D3D11Video::draw(
+	PVertexBuffer _vertexBuffer,
+	u32 startVertex,
+	u32 count,
+	PrimitiveTopology topology)
 {
 	D3D11VertexBuffer *vertexBuffer = static_cast<D3D11VertexBuffer *>(_vertexBuffer.get());
 

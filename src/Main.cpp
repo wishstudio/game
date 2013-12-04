@@ -104,8 +104,10 @@ int main()
 
 	gui.reset(new GUI(video));
 
-	Material *defaultMaterial = new Material(video);
-	defaultMaterial->setShaders(SHADER_SRC, "VS_Main", "PS_Main");
+	PMaterial defaultMaterial = video->createMaterial();
+	PPass pass = defaultMaterial->createPass();
+	pass->setVertexShader(video->createVertexShader(SHADER_SRC, "VS_Main"));
+	pass->setPixelShader(video->createPixelShader(SHADER_SRC, "PS_Main"));
 
 	Color whiteData(255, 255, 255, 255);
 	whiteTexture = video->createTexture(1, 1, &whiteData);
@@ -165,7 +167,7 @@ int main()
 		video->setViewMatrix(camera->getViewMatrix());
 		video->setProjectionMatrix(camera->getProjectionMatrix());
 
-		defaultMaterial->apply();/* TODO */
+		video->setMaterial(defaultMaterial);
 		chunkSceneNode->render();
 		if (world->getCameraIntersection(Ray3D(camera->getPosition(), camera->getLookAt() - camera->getPosition()), &info))
 		{

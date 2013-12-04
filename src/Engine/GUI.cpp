@@ -2,6 +2,7 @@
 
 #include "GUI.h"
 #include "Material.h"
+#include "Video.h"
 
 static const char SHADER2D_SRC[] = R"DELIM(
 cbuffer MatrixBuffer /* TODO: This is kept to be compatible with normal shaders */
@@ -50,8 +51,10 @@ GUI::GUI(PVideo _video):
 {
 	Color whiteData(255, 255, 255, 255);
 	whiteTexture = video->createTexture(1, 1, &whiteData);
-	material = new Material(video);
-	material->setShaders(SHADER2D_SRC, "VS_Main", "PS_Main");
+	material = video->createMaterial();
+	PPass pass = material->createPass();
+	pass->setVertexShader(video->createVertexShader(SHADER2D_SRC, "VS_Main"));
+	pass->setPixelShader(video->createPixelShader(SHADER2D_SRC, "PS_Main"));
 
 	PVertexFormat vertexFormat = video->createVertexFormat();
 	vertexFormat->addElement(TYPE_FLOAT2, SEMANTIC_POSITION);
@@ -73,8 +76,8 @@ void GUI::draw2DLine(const Vector2DI &start, const Vector2DI &end, Color color)
 	};
 	vertexBuffer->update(0, 2, vertices);
 
+	video->setMaterial(material);
 	video->setTexture(whiteTexture);
-	material->apply(); /* TODO */
 	video->draw(vertexBuffer, 0, 2, TOPOLOGY_LINELIST);
 }
 
@@ -91,8 +94,8 @@ void GUI::draw2DRect(const Vector2DI &topLeft, const Vector2DI &bottomRight, Col
 	};
 	vertexBuffer->update(0, 5, vertices);
 
+	video->setMaterial(material);
 	video->setTexture(whiteTexture);
-	material->apply(); /* TODO */
 	video->draw(vertexBuffer, 0, 5, TOPOLOGY_LINESTRIP);
 }
 
@@ -111,8 +114,8 @@ void GUI::draw2DTexture(const Vector2DI &pos, const Vector2DI &size, PTexture te
 	};
 	vertexBuffer->update(0, 6, vertices);
 
+	video->setMaterial(material);
 	video->setTexture(texture);
-	material->apply(); /* TODO */
 	video->draw(vertexBuffer, 0, 6, TOPOLOGY_TRIANGLELIST);
 }
 
@@ -131,7 +134,7 @@ void GUI::fill2DRect(const Vector2DI &topLeft, const Vector2DI &bottomRight, Col
 	};
 	vertexBuffer->update(0, 6, vertices);
 
+	video->setMaterial(material);
 	video->setTexture(whiteTexture);
-	material->apply(); /* TODO */
 	video->draw(vertexBuffer, 0, 6, TOPOLOGY_TRIANGLELIST);
 }

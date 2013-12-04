@@ -19,6 +19,7 @@
     <ClInclude Include="src\Engine\AABB.h" />
     <ClInclude Include="src\Engine\Color.h" />
     <ClInclude Include="src\Engine\D3D11\D3D11IndexBuffer.h" />
+    <ClInclude Include="src\Engine\D3D11\D3D11Pass.h" />
     <ClInclude Include="src\Engine\D3D11\D3D11Shader.h" />
     <ClInclude Include="src\Engine\D3D11\D3D11Texture.h" />
     <ClInclude Include="src\Engine\D3D11\D3D11VertexBuffer.h" />
@@ -32,6 +33,7 @@
     <ClInclude Include="src\Engine\InputValue.h" />
     <ClInclude Include="src\Engine\Material.h" />
     <ClInclude Include="src\Engine\Matrix4.h" />
+    <ClInclude Include="src\Engine\Pass.h" />
     <ClInclude Include="src\Engine\Ray3D.h" />
     <ClInclude Include="src\Engine\Shader.h" />
     <ClInclude Include="src\Engine\Texture.h" />
@@ -69,6 +71,7 @@
     <ClCompile Include="src\Database.cpp" />
     <ClCompile Include="src\Deserializer.cpp" />
     <ClCompile Include="src\Engine\D3D11\D3D11IndexBuffer.cpp" />
+    <ClCompile Include="src\Engine\D3D11\D3D11Pass.cpp" />
     <ClCompile Include="src\Engine\D3D11\D3D11Shader.cpp" />
     <ClCompile Include="src\Engine\D3D11\D3D11Texture.cpp" />
     <ClCompile Include="src\Engine\D3D11\D3D11VertexBuffer.cpp" />
@@ -80,6 +83,7 @@
     <ClCompile Include="src\Engine\GUI.cpp" />
     <ClCompile Include="src\Engine\Material.cpp" />
     <ClCompile Include="src\Engine\Matrix4.cpp" />
+    <ClCompile Include="src\Engine\Pass.cpp" />
     <ClCompile Include="src\Engine\Types.cpp" />
     <ClCompile Include="src\lz4\lz4.c">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
