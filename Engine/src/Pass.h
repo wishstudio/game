@@ -34,7 +34,7 @@ public:
 	bool getMultisampleEnabled() const { return multisampleEnabled; }
 	void setMultisampleEnabled(bool multisampleEnabled) { this->multisampleEnabled = multisampleEnabled; rasterizerDirty = true; }
 	bool getAntialiasedLineEnabled() const { return antialiasedLineEnabled; }
-	void setAntialiasedLineEnabled(bool antialisedLineEnabled) { this->antialiasedLineEnabled = antialiasedLineEnabled; rasterizerDirty = true; }
+	void setAntialiasedLineEnabled(bool antialiasedLineEnabled) { this->antialiasedLineEnabled = antialiasedLineEnabled; rasterizerDirty = true; }
 
 protected:
 	Pass() {}

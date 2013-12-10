@@ -18,7 +18,7 @@ typedef double f64;
 template <typename T>
 struct pi
 {
-	T operator ();
+	operator T();
 };
 
 template <>
@@ -37,7 +37,7 @@ struct pi<f64>
 template <typename T>
 struct epsilon
 {
-	T operator ();
+	operator T();
 };
 
 template <>
