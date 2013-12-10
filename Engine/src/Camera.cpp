@@ -11,7 +11,7 @@ Camera::Camera(PVideo _video):
 	nearValue(-1.0f),
 	farValue(-3000.0f)
 {
-	fovy = 3.1415926 / 2.5f; /* Field of view in radians */
+	fovy = 3.1415926f / 2.5f; /* Field of view in radians */
 	aspectRatio = 4.0f / 3.0f; /* TODO */
 
 	updateViewMatrix();

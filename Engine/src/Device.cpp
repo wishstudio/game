@@ -75,8 +75,8 @@ void Device::onNewFrame(u64 _currentTimeMicroseconds)
 		fpsFrameCount++;
 		if (currentTimeMicroseconds - fpsLastTimeMicroseconds >= 1000000)
 		{
-			averageFrameTimeMicroseconds = (currentTimeMicroseconds - fpsLastTimeMicroseconds) / fpsFrameCount;
-			fpsLastTimeMicroseconds = currentTimeMicroseconds;
+			averageFrameTimeMicroseconds = (u32)((currentTimeMicroseconds - fpsLastTimeMicroseconds) / fpsFrameCount);
+			fpsLastTimeMicroseconds = (u32)currentTimeMicroseconds;
 			fpsFrameCount = 0;
 		}
 	}
@@ -86,8 +86,8 @@ void Device::setNormalizedMousePosition(f32 nx, f32 ny)
 {
 	u32 width, height;
 	getWindowSize(&width, &height);
-	int x = (nx + 1.f) / 2.f * (f32)width;
-	int y = height - (ny + 1.f) / 2.f * (f32)height;
+	s32 x = (s32)((nx + 1.f) / 2.f * (f32)width);
+	s32 y = (s32)(height - (ny + 1.f) / 2.f * (f32)height);
 	setMousePosition(x, y);
 }
 

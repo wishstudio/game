@@ -162,7 +162,7 @@ bool Win32Device::processMessage()
 {
 	LARGE_INTEGER currentCount;
 	QueryPerformanceCounter(&currentCount);
-	u64 currentTimeMicroseconds = ((double) currentCount.QuadPart / (double) performanceFrequency) * 1000000;
+	u64 currentTimeMicroseconds = (u64)(((double) currentCount.QuadPart / (double) performanceFrequency) * 1000000);
 	onNewFrame(currentTimeMicroseconds);
 	MSG msg;
 	ZeroMemory(&msg, sizeof msg);

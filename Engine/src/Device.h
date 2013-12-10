@@ -27,7 +27,7 @@ public:
 	virtual void setMouseVisible(bool isVisible) = 0;
 	virtual bool isMouseVisible() const = 0;
 	Vector2D getNormalizedMousePosition() const { return normalizedMousePosition; }
-	virtual void setMousePosition(int x, int y) = 0;
+	virtual void setMousePosition(s32 x, s32 y) = 0;
 	void setNormalizedMousePosition(f32 x, f32 y);
 	void setNormalizedMousePosition(Vector2D position) { setNormalizedMousePosition(position.x, position.y); }
 
