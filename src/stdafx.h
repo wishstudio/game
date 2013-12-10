@@ -4,30 +4,7 @@
 #include <Windows.h>
 #undef NOMINMAX
 
-#include "Engine/Types.h"
-
-#include "Engine/AABB.h"
-#include "Engine/Matrix4.h"
-#include "Engine/Ray3D.h"
-#include "Engine/Triangle3D.h"
-#include "Engine/Vector2D.h"
-#include "Engine/Vector2DI.h"
-#include "Engine/Vector3D.h"
-#include "Engine/Vector3DI.h"
-
-#include "Engine/Camera.h"
-#include "Engine/Color.h"
-#include "Engine/Device.h"
-#include "Engine/GUI.h"
-#include "Engine/IndexBuffer.h"
-#include "Engine/InputValue.h"
-#include "Engine/Material.h"
-#include "Engine/Pass.h"
-#include "Engine/Shader.h"
-#include "Engine/Texture.h"
-#include "Engine/VertexBuffer.h"
-#include "Engine/VertexFormat.h"
-#include "Engine/Video.h"
+#include <Engine.h>
 
 #include <atomic>
 #include <concurrent_queue.h>

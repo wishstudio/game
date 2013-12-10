@@ -136,9 +136,12 @@ int main()
 	world = new World();
 	tileManager = new TileManager();
 	blockType = new BlockType();
-	blockType->registerCube(1, "stonepile.png");
-	blockType->registerCube(2, "magickaland.png");
-	blockType->registerCube(3, "dirtroad.png");
+	blockType->registerCube(1, "dirt.png");
+	blockType->registerCube(2, "trunk.png");
+	blockType->registerCube(3, "leaf.png");
+	//blockType->registerCube(1, "stonepile.png");
+	//blockType->registerCube(2, "magickaland.png");
+	//blockType->registerCube(3, "dirtroad.png");
 	PlayerAnimator *playerAnimator = new PlayerAnimator();
 	chunkSceneNode = new ChunkSceneNode();
 	

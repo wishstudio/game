@@ -1,0 +1,163 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClInclude Include="src\D3D11\D3D11IndexBuffer.h">
+      <Filter>Source\D3D11</Filter>
+    </ClInclude>
+    <ClInclude Include="src\D3D11\D3D11Pass.h">
+      <Filter>Source\D3D11</Filter>
+    </ClInclude>
+    <ClInclude Include="src\D3D11\D3D11Shader.h">
+      <Filter>Source\D3D11</Filter>
+    </ClInclude>
+    <ClInclude Include="src\D3D11\D3D11Texture.h">
+      <Filter>Source\D3D11</Filter>
+    </ClInclude>
+    <ClInclude Include="src\D3D11\D3D11VertexBuffer.h">
+      <Filter>Source\D3D11</Filter>
+    </ClInclude>
+    <ClInclude Include="src\D3D11\D3D11VertexFormat.h">
+      <Filter>Source\D3D11</Filter>
+    </ClInclude>
+    <ClInclude Include="src\D3D11\D3D11Video.h">
+      <Filter>Source\D3D11</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Camera.h">
+      <Filter>Source</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Device.h">
+      <Filter>Source</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GUI.h">
+      <Filter>Source</Filter>
+    </ClInclude>
+    <ClInclude Include="src\IndexBuffer.h">
+      <Filter>Source</Filter>
+    </ClInclude>
+    <ClInclude Include="src\InputValue.h">
+      <Filter>Source</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Material.h">
+      <Filter>Source</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Pass.h">
+      <Filter>Source</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Shader.h">
+      <Filter>Source</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Texture.h">
+      <Filter>Source</Filter>
+    </ClInclude>
+    <ClInclude Include="src\VertexBuffer.h">
+      <Filter>Source</Filter>
+    </ClInclude>
+    <ClInclude Include="src\VertexFormat.h">
+      <Filter>Source</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Video.h">
+      <Filter>Source</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Device\Win32Device.h">
+      <Filter>Source\Device</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\AABB.h">
+      <Filter>Source\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\Color.h">
+      <Filter>Source\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\Matrix4.h">
+      <Filter>Source\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\Ray3D.h">
+      <Filter>Source\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\Types.h">
+      <Filter>Source\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\Vector2D.h">
+      <Filter>Source\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\Vector2DI.h">
+      <Filter>Source\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\Vector3D.h">
+      <Filter>Source\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\Vector3DI.h">
+      <Filter>Source\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core.h">
+      <Filter>Source</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Engine.h" />
+    <ClInclude Include="src\Core\Triangle3D.h">
+      <Filter>Source\Core</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\D3D11\D3D11IndexBuffer.cpp">
+      <Filter>Source\D3D11</Filter>
+    </ClCompile>
+    <ClCompile Include="src\D3D11\D3D11Pass.cpp">
+      <Filter>Source\D3D11</Filter>
+    </ClCompile>
+    <ClCompile Include="src\D3D11\D3D11Shader.cpp">
+      <Filter>Source\D3D11</Filter>
+    </ClCompile>
+    <ClCompile Include="src\D3D11\D3D11Texture.cpp">
+      <Filter>Source\D3D11</Filter>
+    </ClCompile>
+    <ClCompile Include="src\D3D11\D3D11VertexBuffer.cpp">
+      <Filter>Source\D3D11</Filter>
+    </ClCompile>
+    <ClCompile Include="src\D3D11\D3D11VertexFormat.cpp">
+      <Filter>Source\D3D11</Filter>
+    </ClCompile>
+    <ClCompile Include="src\D3D11\D3D11Video.cpp">
+      <Filter>Source\D3D11</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Camera.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Device.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GUI.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Material.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Pass.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Video.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Device\Win32Device.cpp">
+      <Filter>Source\Device</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\Matrix4.cpp">
+      <Filter>Source\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\Types.cpp">
+      <Filter>Source\Core</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source">
+      <UniqueIdentifier>{d1f9eb70-23c7-487f-8ff2-61cc05cbd899}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\D3D11">
+      <UniqueIdentifier>{3b0e0f2c-7d0d-4d3c-b8b1-cdb1c5740ed5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Device">
+      <UniqueIdentifier>{fa1aa2c9-dcb5-48ca-a1f4-83b508de6417}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Core">
+      <UniqueIdentifier>{a5484652-e9c0-4e12-a967-2905d2a50ce4}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

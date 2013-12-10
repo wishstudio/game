@@ -1,15 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Engine">
-      <UniqueIdentifier>{0ebf30c0-2aa9-4ea2-b5b3-c6678e8f71b1}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Engine\D3D11">
-      <UniqueIdentifier>{977db717-4a26-4055-92be-4aa17319187c}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Engine\Device">
-      <UniqueIdentifier>{de3fe7f1-ede9-4b6e-90e3-1efe612ac93f}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source">
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
@@ -70,95 +61,11 @@
     <ClInclude Include="src\ChunkSceneNode.h">
       <Filter>Source</Filter>
     </ClInclude>
-    <ClInclude Include="src\Engine\D3D11\D3D11Video.h">
-      <Filter>Engine\D3D11</Filter>
-    </ClInclude>
     <ClInclude Include="src\MathHelper.h">
       <Filter>Source</Filter>
     </ClInclude>
-    <ClInclude Include="src\Engine\Camera.h">
-      <Filter>Engine</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Engine\Color.h">
-      <Filter>Engine</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Engine\Matrix4.h">
-      <Filter>Engine</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Engine\AABB.h">
-      <Filter>Engine</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Engine\Triangle3D.h">
-      <Filter>Engine</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Engine\Ray3D.h">
-      <Filter>Engine</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Engine\Types.h">
-      <Filter>Engine</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Engine\Vector3D.h">
-      <Filter>Engine</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Engine\Vector2D.h">
-      <Filter>Engine</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Engine\InputValue.h">
-      <Filter>Engine</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Engine\D3D11\D3D11VertexFormat.h">
-      <Filter>Engine\D3D11</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Engine\D3D11\D3D11VertexBuffer.h">
-      <Filter>Engine\D3D11</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Engine\D3D11\D3D11IndexBuffer.h">
-      <Filter>Engine\D3D11</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Engine\Material.h">
-      <Filter>Engine</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Engine\Device\Win32Device.h">
-      <Filter>Engine\Device</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Engine\Texture.h">
-      <Filter>Engine</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Engine\D3D11\D3D11Texture.h">
-      <Filter>Engine\D3D11</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Engine\IndexBuffer.h">
-      <Filter>Engine</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Engine\VertexBuffer.h">
-      <Filter>Engine</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Engine\VertexFormat.h">
-      <Filter>Engine</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Engine\Shader.h">
-      <Filter>Engine</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Engine\D3D11\D3D11Shader.h">
-      <Filter>Engine\D3D11</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Engine\Device.h">
-      <Filter>Engine</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Engine\Video.h">
-      <Filter>Engine</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Engine\GUI.h">
-      <Filter>Engine</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Engine\Vector2DI.h">
-      <Filter>Engine</Filter>
-    </ClInclude>
     <ClInclude Include="src\WorldGenerator\WorldManipulator.h">
       <Filter>Source\WorldGenerator</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Engine\Vector3DI.h">
-      <Filter>Engine</Filter>
     </ClInclude>
     <ClInclude Include="src\WorldGenerator\TerrainGenerator.h">
       <Filter>Source\WorldGenerator</Filter>
@@ -169,53 +76,8 @@
     <ClInclude Include="src\WorldGenerator\TreeGenerator.h">
       <Filter>Source\WorldGenerator</Filter>
     </ClInclude>
-    <ClInclude Include="src\Engine\Pass.h">
-      <Filter>Engine</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Engine\D3D11\D3D11Pass.h">
-      <Filter>Engine\D3D11</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\Engine\D3D11\D3D11Video.cpp">
-      <Filter>Engine\D3D11</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Engine\Camera.cpp">
-      <Filter>Engine</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Engine\Matrix4.cpp">
-      <Filter>Engine</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Engine\D3D11\D3D11VertexFormat.cpp">
-      <Filter>Engine\D3D11</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Engine\D3D11\D3D11VertexBuffer.cpp">
-      <Filter>Engine\D3D11</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Engine\D3D11\D3D11IndexBuffer.cpp">
-      <Filter>Engine\D3D11</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Engine\Types.cpp">
-      <Filter>Engine</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Engine\Material.cpp">
-      <Filter>Engine</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Engine\Device\Win32Device.cpp">
-      <Filter>Engine\Device</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Engine\D3D11\D3D11Texture.cpp">
-      <Filter>Engine\D3D11</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Engine\D3D11\D3D11Shader.cpp">
-      <Filter>Engine\D3D11</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Engine\Device.cpp">
-      <Filter>Engine</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Engine\GUI.cpp">
-      <Filter>Engine</Filter>
-    </ClCompile>
     <ClCompile Include="src\lz4\lz4.c">
       <Filter>Source\lz4</Filter>
     </ClCompile>
@@ -266,15 +128,6 @@
     </ClCompile>
     <ClCompile Include="src\WorldGenerator\WorldGenerator.cpp">
       <Filter>Source\WorldGenerator</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Engine\Pass.cpp">
-      <Filter>Engine</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Engine\D3D11\D3D11Pass.cpp">
-      <Filter>Engine\D3D11</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Engine\Video.cpp">
-      <Filter>Engine</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
