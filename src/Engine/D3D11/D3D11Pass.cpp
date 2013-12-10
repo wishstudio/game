@@ -29,8 +29,8 @@ D3D11Pass::~D3D11Pass()
 
 void D3D11Pass::apply()
 {
-	ID3D11Device *device = video->getDevice();
-	ID3D11DeviceContext *context = video->getDeviceContext();
+	ID3D11Device *device = video->getD3D11Device();
+	ID3D11DeviceContext *context = video->getD3D11DeviceContext();
 	if (isRasterizerDirty())
 	{
 		if (rasterizerState)

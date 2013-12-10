@@ -9,9 +9,6 @@
 #include "TileManager.h"
 #include "World.h"
 
-#include "Engine/D3D11/D3D11Video.h"
-#include "Engine/Device/Win32Device.h"
-
 #pragma comment(lib, "sqlite3.lib")
 //#pragma comment(linker, "/subsystem:windows /ENTRY:mainCRTStartup")
 
@@ -92,17 +89,12 @@ static void draw3DBox(const AABB &box, Color color)
 int main()
 {
 	/* Create video device */
-	Win32Device *d = new Win32Device();
-	d->init(1024, 768);
-	device.reset(d);
+	video = Video::createVideo(1024, 768);
+	device = video->getDevice();
+	gui.reset(new GUI(video));
+
 	device->setMouseVisible(false);
 	device->setTicksPerSecond(20);
-
-	D3D11Video *v = new D3D11Video();
-	v->init(d);
-	video.reset(v);
-
-	gui.reset(new GUI(video));
 
 	PVertexShader vertexShader = video->createVertexShader(SHADER_SRC, "VS_Main");
 	PPixelShader pixelShader = video->createPixelShader(SHADER_SRC, "PS_Main");

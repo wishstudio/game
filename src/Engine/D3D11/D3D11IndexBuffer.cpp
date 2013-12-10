@@ -8,7 +8,7 @@
 D3D11IndexBuffer::D3D11IndexBuffer(D3D11Video *_video, VertexElementType _type, u32 _size):
 	video(_video), type(_type), size(_size)
 {
-	ID3D11Device *device = video->getDevice();
+	ID3D11Device *device = video->getD3D11Device();
 	D3D11_BUFFER_DESC indexBufferDesc;
 	indexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
 	indexBufferDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
@@ -27,7 +27,7 @@ D3D11IndexBuffer::~D3D11IndexBuffer()
 
 void D3D11IndexBuffer::update(u32 startIndex, u32 count, const void *data)
 {
-	ID3D11DeviceContext *context = video->getDeviceContext();
+	ID3D11DeviceContext *context = video->getD3D11DeviceContext();
 	D3D11_BOX box;
 	box.left = startIndex * getTypeSize(type);
 	box.right = (startIndex + count) * getTypeSize(type);

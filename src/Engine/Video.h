@@ -7,6 +7,10 @@
 class Video
 {
 public:
+	/* Create video device */
+	static PVideo createVideo(u32 width, u32 height);
+	virtual PDevice getDevice() const = 0;
+
 	/* Resource management */
 	virtual PTexture createTexture(u32 width, u32 height, const void *data) = 0;
 	virtual PTexture createTexture(const std::string &path) = 0;

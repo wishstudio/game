@@ -14,8 +14,10 @@ public:
 	D3D11Video();
 	virtual ~D3D11Video();
 
-	bool init(Win32Device *device);
+	bool init(std::shared_ptr<Win32Device> device);
 	void resetBackBuffer();
+
+	virtual PDevice getDevice() const override;
 
 	virtual PTexture createTexture(u32 width, u32 height, const void *data) override;
 	virtual PTexture createTexture(const std::string &path) override;
@@ -68,8 +70,8 @@ public:
 		) override;
 
 	/* INTERNAL INTERFACE */
-	ID3D11Device *getDevice() const { return pDevice; };
-	ID3D11DeviceContext *getDeviceContext() const { return pContext; }
+	ID3D11Device *getD3D11Device() const { return pDevice; };
+	ID3D11DeviceContext *getD3D11DeviceContext() const { return pContext; }
 
 private:
 	ID3DBlob *createShader(const char *program, const char *entrypoint, const char *target);
@@ -83,6 +85,8 @@ private:
 	IWICImagingFactory *pFactory;
 	
 	D3D_FEATURE_LEVEL featureLevel;
+
+	std::shared_ptr<Win32Device> device;
 
 	ID3D11Device *pDevice = nullptr;
 	ID3D11DeviceContext *pContext = nullptr;

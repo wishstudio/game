@@ -55,8 +55,15 @@ D3D11Video::~D3D11Video()
 		pMatrixBuffer->Release();
 }
 
-bool D3D11Video::init(Win32Device *device)
+PDevice D3D11Video::getDevice() const
 {
+	return device;
+}
+
+bool D3D11Video::init(std::shared_ptr<Win32Device> _device)
+{
+	device = _device;
+
 	D3D_FEATURE_LEVEL featureLevels[] =
 	{
 		D3D_FEATURE_LEVEL_11_1,

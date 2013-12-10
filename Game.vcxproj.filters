@@ -273,5 +273,8 @@
     <ClCompile Include="src\Engine\D3D11\D3D11Pass.cpp">
       <Filter>Engine\D3D11</Filter>
     </ClCompile>
+    <ClCompile Include="src\Engine\Video.cpp">
+      <Filter>Engine</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

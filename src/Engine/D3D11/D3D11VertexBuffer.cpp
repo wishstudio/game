@@ -8,7 +8,7 @@
 D3D11VertexBuffer::D3D11VertexBuffer(D3D11Video *_video, PVertexFormat _format, u32 _size):
 	video(_video), format(_format), size(_size)
 {
-	ID3D11Device *device = video->getDevice();
+	ID3D11Device *device = video->getD3D11Device();
 	D3D11_BUFFER_DESC vertexBufferDesc;
 	vertexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
 	vertexBufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
@@ -27,7 +27,7 @@ D3D11VertexBuffer::~D3D11VertexBuffer()
 
 void D3D11VertexBuffer::update(u32 startIndex, u32 count, const void *data)
 {
-	ID3D11DeviceContext *context = video->getDeviceContext();
+	ID3D11DeviceContext *context = video->getD3D11DeviceContext();
 	D3D11_BOX box;
 	box.left = startIndex * format->getSize();
 	box.right = (startIndex + count) * format->getSize();
