@@ -14,7 +14,7 @@ public:
 
 	void registerCube(u16 id, const std::string &tilePath);
 	bool isLightTransparent(u16 type) const;
-	AABB getBoundingBox(const Block &block) const;
+	AABB3D getBoundingBox(const Block &block) const;
 	bool isSolid(const Block &block) const;
 	void drawBlock(TriangleCollector *collector, const Block &block) const;
 

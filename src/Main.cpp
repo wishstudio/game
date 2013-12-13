@@ -50,7 +50,7 @@ float4 PS_Main(PS_InputType input): SV_TARGET
 
 static PTexture whiteTexture = nullptr;
 
-static void draw3DBox(const AABB &box, Color color)
+static void draw3DBox(const AABB3D &box, Color color)
 {
 	static PVertexBuffer buffer = video->createVertexBuffer(vertexFormat, 36);
 
@@ -180,7 +180,7 @@ int main()
 		chunkSceneNode->render();
 		if (world->getCameraIntersection(Ray3D(camera->getPosition(), camera->getLookAt() - camera->getPosition()), &info))
 		{
-			AABB box = info->block.getBoundingBox().translate(info->block.x(), info->block.y(), info->block.z());
+			AABB3D box = info->block.getBoundingBox().translate(info->block.x(), info->block.y(), info->block.z());
 			video->setMaterial(boxMaterial);
 			draw3DBox(box, Color(255, 0, 0, 255));
 		}

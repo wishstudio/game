@@ -92,7 +92,7 @@ Vector3D PlayerAnimator::collideEllipsoidWithWorld(Vector3D position, Vector3D m
 	* For axis x, if our x coordinate is less than 50% of current chunk,
 	* we test for chunk [x - 1] and [x], otherwise we test [x] and [x + 1].
 	* The same applies for axis y and z. */
-	AABB box(position - playerRadius, position + playerRadius);
+	AABB3D box(position - playerRadius, position + playerRadius);
 	box.merge(position + moveVector - playerRadius);
 	box.merge(position + moveVector + playerRadius);
 

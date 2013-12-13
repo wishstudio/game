@@ -359,7 +359,7 @@ void Chunk::loadBuffer()
 }
 
 /* Gets all triangles which have or may have contact within a specific bounding box */
-void Chunk::getTriangles(std::vector<Triangle3D> &triangles, const AABB &box, const Matrix4 &transform)
+void Chunk::getTriangles(std::vector<Triangle3D> &triangles, const AABB3D &box, const Matrix4 &transform)
 {
 	loadData();
 	loadLight();
@@ -368,7 +368,7 @@ void Chunk::getTriangles(std::vector<Triangle3D> &triangles, const AABB &box, co
 	TriangleCollector *collector = triangleCollector.load();
 
 	Matrix4 mat = modelTransform.getInverse();
-	AABB tBox = box.transform(mat);
+	AABB3D tBox = box.transform(mat);
 
 	mat = modelTransform * transform;
 

@@ -61,7 +61,7 @@ Block Block::tryGetNeighbour(Direction direction) const
 	return tryGetNeighbour(dirX[direction], dirY[direction], dirZ[direction]);
 }
 
-AABB Block::getBoundingBox() const
+AABB3D Block::getBoundingBox() const
 {
 	return blockType->getBoundingBox(*this);
 }

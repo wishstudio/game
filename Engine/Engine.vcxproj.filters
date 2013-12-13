@@ -61,9 +61,6 @@
     <ClInclude Include="src\Device\Win32Device.h">
       <Filter>Source\Device</Filter>
     </ClInclude>
-    <ClInclude Include="src\Core\AABB.h">
-      <Filter>Source\Core</Filter>
-    </ClInclude>
     <ClInclude Include="src\Core\Color.h">
       <Filter>Source\Core</Filter>
     </ClInclude>
@@ -93,6 +90,9 @@
     </ClInclude>
     <ClInclude Include="src\Engine.h" />
     <ClInclude Include="src\Core\Triangle3D.h">
+      <Filter>Source\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\AABB3D.h">
       <Filter>Source\Core</Filter>
     </ClInclude>
   </ItemGroup>

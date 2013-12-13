@@ -55,7 +55,7 @@ inline T divide(const T &a, const T &b)
 		return a / b;
 }
 
-inline bool rayIntersectsWithBox(const Ray3D &ray, const AABB &box)
+inline bool rayIntersectsWithBox(const Ray3D &ray, const AABB3D &box)
 {
 	/* MinX <= Xt + x0 <= MaxX
 	   MinY <= Yt + y0 <= MaxY

@@ -39,7 +39,7 @@ void ChunkSceneNode::render()
 					p = preloadChunk[x + PRELOAD_DISTANCE][y + PRELOAD_DISTANCE][z + PRELOAD_DISTANCE] = world->preloadChunk(current_x + x, current_y + y, current_z + z);
 
 				/* View frustum culling */
-				/*aabbox3df box(p->x() * CHUNK_SIZE, p->y() * CHUNK_SIZE, p->z() * CHUNK_SIZE,
+				/*AABB3Dox3df box(p->x() * CHUNK_SIZE, p->y() * CHUNK_SIZE, p->z() * CHUNK_SIZE,
 					(p->x() + 1) * CHUNK_SIZE, (p->y() + 1) * CHUNK_SIZE, (p->z() + 1) * CHUNK_SIZE);
 				bool visible = true;
 				for (u32 i = 0; i < SViewFrustum::VF_PLANE_COUNT; i++)

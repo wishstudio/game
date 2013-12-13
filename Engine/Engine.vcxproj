@@ -70,7 +70,7 @@
   <ItemGroup>
     <ClInclude Include="src\Camera.h" />
     <ClInclude Include="src\Core.h" />
-    <ClInclude Include="src\Core\AABB.h" />
+    <ClInclude Include="src\Core\AABB3D.h" />
     <ClInclude Include="src\Core\Color.h" />
     <ClInclude Include="src\Core\Matrix4.h" />
     <ClInclude Include="src\Core\Ray3D.h" />

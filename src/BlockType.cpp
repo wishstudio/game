@@ -25,12 +25,12 @@ bool BlockType::isLightTransparent(u16 type) const
 	return blockTypeSpec[type].type == Type_Air;
 }
 
-AABB BlockType::getBoundingBox(const Block &block) const
+AABB3D BlockType::getBoundingBox(const Block &block) const
 {
 	if (blockTypeSpec[block.getType()].type == Type_Cube)
-		return AABB(0, 0, 0, 1, 1, 1);
+		return AABB3D(0, 0, 0, 1, 1, 1);
 	else
-		return AABB(0, 0, 0, 0, 0, 0);
+		return AABB3D(0, 0, 0, 0, 0, 0);
 }
 
 bool BlockType::isSolid(const Block &block) const

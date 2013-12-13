@@ -39,7 +39,7 @@ public:
 	Block tryGetNeighbour(Direction direction) const;
 
 	Chunk *getChunk() const { return chunk; }
-	AABB getBoundingBox() const;
+	AABB3D getBoundingBox() const;
 	bool isSolid() const;
 
 	u16 getType() const;

@@ -3,7 +3,7 @@
 /* Include all core headers */
 
 #include "Core/Types.h"
-#include "Core/AABB.h"
+#include "Core/AABB3D.h"
 #include "Core/Color.h"
 #include "Core/Matrix4.h"
 #include "Core/Ray3D.h"

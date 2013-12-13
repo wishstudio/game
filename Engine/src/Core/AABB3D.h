@@ -3,18 +3,18 @@
 #include "Matrix4.h"
 #include "Vector3D.h"
 
-class AABB
+class AABB3D
 {
 public:
 	Vector3D minPoint, maxPoint;
 
-	AABB() = delete;
-	AABB(const AABB &) = default;
-	AABB(const Vector3D &point): minPoint(point), maxPoint(point) {}
-	AABB(const Vector3D &_minPoint, const Vector3D &_maxPoint): minPoint(_minPoint), maxPoint(_maxPoint) {}
-	AABB(f32 xMin, f32 yMin, f32 zMin, f32 xMax, f32 yMax, f32 zMax): minPoint(xMin, yMin, zMin), maxPoint(xMax, yMax, zMax) {}
+	AABB3D() = delete;
+	AABB3D(const AABB3D &) = default;
+	AABB3D(const Vector3D &point): minPoint(point), maxPoint(point) {}
+	AABB3D(const Vector3D &_minPoint, const Vector3D &_maxPoint): minPoint(_minPoint), maxPoint(_maxPoint) {}
+	AABB3D(f32 xMin, f32 yMin, f32 zMin, f32 xMax, f32 yMax, f32 zMax): minPoint(xMin, yMin, zMin), maxPoint(xMax, yMax, zMax) {}
 
-	AABB &operator= (const AABB &) = default;
+	AABB3D &operator= (const AABB3D &) = default;
 
 	void merge(const Vector3D &point)
 	{
@@ -34,13 +34,13 @@ public:
 			minPoint.z = point.z;
 	}
 
-	void merge(const AABB &aabb)
+	void merge(const AABB3D &AABB3D)
 	{
-		merge(aabb.minPoint);
-		merge(aabb.maxPoint);
+		merge(AABB3D.minPoint);
+		merge(AABB3D.maxPoint);
 	}
 
-	AABB transform(const Matrix4 &matrix) const
+	AABB3D transform(const Matrix4 &matrix) const
 	{
 		Vector3D rMin(matrix._41, matrix._42, matrix._43);
 		Vector3D rMax(matrix._41, matrix._42, matrix._43);
@@ -62,11 +62,11 @@ public:
 				}
 			}
 		}
-		return AABB(rMin, rMax);
+		return AABB3D(rMin, rMax);
 	}
 
-	AABB translate(f32 offsetX, f32 offsetY, f32 offsetZ) const
+	AABB3D translate(f32 offsetX, f32 offsetY, f32 offsetZ) const
 	{
-		return AABB(minPoint + Vector3D(offsetX, offsetY, offsetZ), maxPoint + Vector3D(offsetX, offsetY, offsetZ));
+		return AABB3D(minPoint + Vector3D(offsetX, offsetY, offsetZ), maxPoint + Vector3D(offsetX, offsetY, offsetZ));
 	}
 };
