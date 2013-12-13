@@ -70,10 +70,12 @@
   <ItemGroup>
     <ClInclude Include="src\Camera.h" />
     <ClInclude Include="src\Core.h" />
+    <ClInclude Include="src\Core\AABB2DI.h" />
     <ClInclude Include="src\Core\AABB3D.h" />
     <ClInclude Include="src\Core\Color.h" />
     <ClInclude Include="src\Core\Matrix4.h" />
     <ClInclude Include="src\Core\Ray3D.h" />
+    <ClInclude Include="src\Core\Size2DI.h" />
     <ClInclude Include="src\Core\Triangle3D.h" />
     <ClInclude Include="src\Core\Types.h" />
     <ClInclude Include="src\Core\Vector2D.h" />
