@@ -145,10 +145,10 @@ public:
 
 	friend Vector3D operator* (const Vector3D &vec, const Matrix4 &mat)
 	{
-		f32 _x = vec.x * mat._11 + vec.y * mat._21 + vec.z * mat._31 + mat._41;
-		f32 _y = vec.x * mat._12 + vec.y * mat._22 + vec.z * mat._32 + mat._42;
-		f32 _z = vec.x * mat._13 + vec.y * mat._23 + vec.z * mat._33 + mat._43;
-		return Vector3D(_x, _y, _z);
+		f32 x = vec.x * mat._11 + vec.y * mat._21 + vec.z * mat._31 + mat._41;
+		f32 y = vec.x * mat._12 + vec.y * mat._22 + vec.z * mat._32 + mat._42;
+		f32 z = vec.x * mat._13 + vec.y * mat._23 + vec.z * mat._33 + mat._43;
+		return Vector3D(x, y, z);
 	}
 
 	/* Matrix utilities */

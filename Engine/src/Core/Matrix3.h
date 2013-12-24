@@ -1,8 +1,8 @@
 #pragma once
 
 #include <cmath>
+#include "Vector2D.h"
 
-class Vector2D;
 class Matrix3
 {
 public:
@@ -45,6 +45,13 @@ public:
 			m11, m12, m13,
 			m21, m22, m23,
 			m31, m32, m33);
+	}
+
+	friend Vector2D operator* (const Vector2D &vec, const Matrix3 &mat)
+	{
+		f32 x = vec.x * mat._11 + vec.y * mat._21 + mat._31;
+		f32 y = vec.x * mat._12 + vec.y * mat._22 + mat._32;
+		return Vector2D(x, y);
 	}
 
 	Matrix3 getTranspose()
