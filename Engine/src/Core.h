@@ -7,6 +7,7 @@
 #include "Core/AABB2DI.h"
 #include "Core/AABB3D.h"
 #include "Core/Color.h"
+#include "Core/Matrix3.h"
 #include "Core/Matrix4.h"
 #include "Core/Ray3D.h"
 #include "Core/Size2D.h"
