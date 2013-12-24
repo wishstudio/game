@@ -1,8 +1,8 @@
 #pragma once
 
 #include <cmath>
+#include "Vector3D.h"
 
-class Vector3D;
 class Matrix4
 {
 public:
@@ -143,6 +143,14 @@ public:
 			m41 * det, m42 * det, m43 * det, m44 * det);
 	}
 
+	friend Vector3D operator* (const Vector3D &vec, const Matrix4 &mat)
+	{
+		f32 _x = vec.x * mat._11 + vec.y * mat._21 + vec.z * mat._31 + mat._41;
+		f32 _y = vec.x * mat._12 + vec.y * mat._22 + vec.z * mat._32 + mat._42;
+		f32 _z = vec.x * mat._13 + vec.y * mat._23 + vec.z * mat._33 + mat._43;
+		return Vector3D(_x, _y, _z);
+	}
+
 	/* Matrix utilities */
 	static Matrix4 identity()
 	{
@@ -162,7 +170,10 @@ public:
 			offsetX, offsetY, offsetZ, 1);
 	}
 
-	static Matrix4 translation(const Vector3D &offset);
+	static Matrix4 translation(const Vector3D &offset)
+	{
+		return translation(offset.x, offset.y, offset.z);
+	}
 
 	static Matrix4 inverseTranslation(f32 offsetX, f32 offsetY, f32 offsetZ)
 	{
@@ -173,7 +184,10 @@ public:
 			-offsetX, -offsetY, -offsetZ, 1);
 	}
 
-	static Matrix4 inverseTranslation(const Vector3D &offset);
+	static Matrix4 inverseTranslation(const Vector3D &offset)
+	{
+		return inverseTranslation(offset.x, offset.y, offset.z);
+	}
 
 	static Matrix4 scale(f32 scaleX, f32 scaleY, f32 scaleZ)
 	{
@@ -238,6 +252,29 @@ public:
 			0, 0, -q * znearPlane, 0);
 	}
 
-	static Matrix4 lookAtLH(const Vector3D &eye, const Vector3D &at, const Vector3D &up);
-	static Matrix4 lookAtRH(const Vector3D &eye, const Vector3D &at, const Vector3D &up);
+	static Matrix4 lookAtLH(const Vector3D &eye, const Vector3D &at, const Vector3D &up)
+	{
+		Vector3D zaxis = (at - eye).getNormalized();
+		Vector3D xaxis = up.crossProduct(zaxis).getNormalized();
+		Vector3D yaxis = zaxis.crossProduct(xaxis);
+
+		return Matrix4(
+			xaxis.x, yaxis.x, zaxis.x, 0,
+			xaxis.y, yaxis.y, zaxis.y, 0,
+			xaxis.z, yaxis.z, zaxis.z, 0,
+			-xaxis.dotProduct(eye), -yaxis.dotProduct(eye), -zaxis.dotProduct(eye), 1);
+	}
+
+	static Matrix4 lookAtRH(const Vector3D &eye, const Vector3D &at, const Vector3D &up)
+	{
+		Vector3D zaxis = (eye - at).getNormalized();
+		Vector3D xaxis = up.crossProduct(zaxis).getNormalized();
+		Vector3D yaxis = zaxis.crossProduct(xaxis);
+
+		return Matrix4(
+			xaxis.x, yaxis.x, zaxis.x, 0,
+			xaxis.y, yaxis.y, zaxis.y, 0,
+			xaxis.z, yaxis.z, zaxis.z, 0,
+			-xaxis.dotProduct(eye), -yaxis.dotProduct(eye), -zaxis.dotProduct(eye), 1);
+	}
 };

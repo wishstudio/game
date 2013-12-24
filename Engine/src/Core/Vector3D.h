@@ -1,7 +1,5 @@
 #pragma once
 
-#include "Matrix4.h"
-
 class Vector3D
 {
 public:
@@ -77,14 +75,6 @@ public:
 		y /= scalar;
 		z /= scalar;
 		return *this;
-	}
-
-	Vector3D Vector3D::operator* (const Matrix4 &mat) const
-	{
-		f32 _x = x * mat._11 + y * mat._21 + z * mat._31 + mat._41;
-		f32 _y = x * mat._12 + y * mat._22 + z * mat._32 + mat._42;
-		f32 _z = x * mat._13 + y * mat._23 + z * mat._33 + mat._43;
-		return Vector3D(_x, _y, _z);
 	}
 
 	f32 getLength() const
