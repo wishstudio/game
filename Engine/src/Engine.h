@@ -13,6 +13,7 @@
 #include "Pass.h"
 #include "Shader.h"
 #include "Texture.h"
+#include "UI.h"
 #include "VertexBuffer.h"
 #include "VertexFormat.h"
 #include "Video.h"

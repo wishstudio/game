@@ -70,11 +70,14 @@
   <ItemGroup>
     <ClInclude Include="src\Camera.h" />
     <ClInclude Include="src\Core.h" />
+    <ClInclude Include="src\Core\AABB2D.h" />
     <ClInclude Include="src\Core\AABB2DI.h" />
     <ClInclude Include="src\Core\AABB3D.h" />
     <ClInclude Include="src\Core\Color.h" />
+    <ClInclude Include="src\Core\Matrix3.h" />
     <ClInclude Include="src\Core\Matrix4.h" />
     <ClInclude Include="src\Core\Ray3D.h" />
+    <ClInclude Include="src\Core\Size2D.h" />
     <ClInclude Include="src\Core\Size2DI.h" />
     <ClInclude Include="src\Core\Triangle3D.h" />
     <ClInclude Include="src\Core\Types.h" />
@@ -99,13 +102,18 @@
     <ClInclude Include="src\Pass.h" />
     <ClInclude Include="src\Shader.h" />
     <ClInclude Include="src\Texture.h" />
+    <ClInclude Include="src\UI.h" />
+    <ClInclude Include="src\UI\UIEvents.h" />
+    <ClInclude Include="src\UI\Events\UIEvent.h" />
+    <ClInclude Include="src\UI\Events\UIMouseEvent.h" />
+    <ClInclude Include="src\UI\UIElement.h" />
+    <ClInclude Include="src\UI\UIEventSource.h" />
     <ClInclude Include="src\VertexBuffer.h" />
     <ClInclude Include="src\VertexFormat.h" />
     <ClInclude Include="src\Video.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Camera.cpp" />
-    <ClCompile Include="src\Core\Matrix4.cpp" />
     <ClCompile Include="src\Core\Types.cpp" />
     <ClCompile Include="src\D3D11\D3D11IndexBuffer.cpp" />
     <ClCompile Include="src\D3D11\D3D11Pass.cpp" />
@@ -119,6 +127,7 @@
     <ClCompile Include="src\GUI.cpp" />
     <ClCompile Include="src\Material.cpp" />
     <ClCompile Include="src\Pass.cpp" />
+    <ClCompile Include="src\UI\UIElement.cpp" />
     <ClCompile Include="src\Video.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

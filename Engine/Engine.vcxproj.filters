@@ -101,6 +101,33 @@
     <ClInclude Include="src\Core\Size2DI.h">
       <Filter>Source\Core</Filter>
     </ClInclude>
+    <ClInclude Include="src\UI\UIElement.h">
+      <Filter>Source\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="src\UI.h">
+      <Filter>Source</Filter>
+    </ClInclude>
+    <ClInclude Include="src\UI\UIEventSource.h">
+      <Filter>Source\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="src\UI\UIEvents.h">
+      <Filter>Source\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="src\UI\Events\UIEvent.h">
+      <Filter>Source\UI\Events</Filter>
+    </ClInclude>
+    <ClInclude Include="src\UI\Events\UIMouseEvent.h">
+      <Filter>Source\UI\Events</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\AABB2D.h">
+      <Filter>Source\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\Size2D.h">
+      <Filter>Source\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\Matrix3.h">
+      <Filter>Source\Core</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\D3D11\D3D11IndexBuffer.cpp">
@@ -145,11 +172,11 @@
     <ClCompile Include="src\Device\Win32Device.cpp">
       <Filter>Source\Device</Filter>
     </ClCompile>
-    <ClCompile Include="src\Core\Matrix4.cpp">
-      <Filter>Source\Core</Filter>
-    </ClCompile>
     <ClCompile Include="src\Core\Types.cpp">
       <Filter>Source\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\UI\UIElement.cpp">
+      <Filter>Source\UI</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -164,6 +191,12 @@
     </Filter>
     <Filter Include="Source\Core">
       <UniqueIdentifier>{a5484652-e9c0-4e12-a967-2905d2a50ce4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\UI">
+      <UniqueIdentifier>{9ba3a1c4-4e40-4535-bd5f-55037dcd312f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\UI\Events">
+      <UniqueIdentifier>{3bcde8e3-81fb-442d-b9da-2cfe458fae1d}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>
