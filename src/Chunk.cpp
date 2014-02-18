@@ -304,7 +304,7 @@ void Chunk::loadLight()
 	while (!queue.empty())
 	{
 		Block block = queue.pop();
-		u8 light = block.data->sunlight - 1;
+		u8 light = block.data->sunlight - 2;
 		for (int i = 0; i < DIRECTION_COUNT; i++)
 		{
 			Block dest = block.tryGetNeighbour((Direction) i);
@@ -315,7 +315,7 @@ void Chunk::loadLight()
 				light > dest.data->sunlight)
 			{
 				dest.data->sunlight = light;
-				if (light > 1)
+				if (light > 2)
 					queue.push(dest);
 			}
 		}
