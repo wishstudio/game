@@ -310,7 +310,7 @@ void Chunk::loadLight()
 			Block dest = block.tryGetNeighbour((Direction) i);
 			/* Ensure destination chunk has been lighted */
 			if (dest.isValid() &&
-				dest.getChunk()->getStatus() >= Status::Light &&
+				(dest.getChunk() == this || dest.getChunk()->getStatus() >= Status::Light) &&
 				blockType->isLightTransparent(dest.getType()) &&
 				light > dest.data->sunlight)
 			{
