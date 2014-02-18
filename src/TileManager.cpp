@@ -12,9 +12,13 @@ TileManager::~TileManager()
 
 Tile TileManager::registerTile(const std::string &resourcePath)
 {
+	return registerTile(video->createTexture("resources/" + resourcePath));
+}
+
+Tile TileManager::registerTile(PTexture texture)
+{
 	Tile tile;
-	//tile.texture = driver->getTexture(stringw("resources/") + resourcePath);
-	tile.texture = video->createTexture("resources/" + resourcePath);
+	tile.texture = texture;
 	tile.u1 = 0.f;
 	tile.v1 = 0.f;
 	tile.u2 = 1.f;

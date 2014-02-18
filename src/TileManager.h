@@ -19,4 +19,5 @@ public:
 	virtual ~TileManager();
 
 	Tile registerTile(const std::string &resourcePath);
+	Tile registerTile(PTexture texture);
 };

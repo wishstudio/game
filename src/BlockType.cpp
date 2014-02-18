@@ -20,6 +20,12 @@ void BlockType::registerCube(u16 id, const std::string &tilePath)
 	blockTypeSpec[id].tile = tileManager->registerTile(tilePath);
 }
 
+void BlockType::registerCube(u16 id, Color color)
+{
+	blockTypeSpec[id].type = Type_Cube;
+	blockTypeSpec[id].tile = tileManager->registerTile(video->createTexture(1, 1, &color));
+}
+
 bool BlockType::isLightTransparent(u16 type) const
 {
 	return blockTypeSpec[type].type == Type_Air;

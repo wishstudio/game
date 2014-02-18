@@ -13,6 +13,7 @@ public:
 	virtual ~BlockType();
 
 	void registerCube(u16 id, const std::string &tilePath);
+	void registerCube(u16 id, Color color);
 	bool isLightTransparent(u16 type) const;
 	AABB3D getBoundingBox(const Block &block) const;
 	bool isSolid(const Block &block) const;
