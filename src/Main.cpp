@@ -18,13 +18,6 @@ cbuffer MatrixBuffer
 	float4x4 mvpMatrix;
 };
 
-struct VS_InputType
-{
-	float4 pos : SV_POSITION;
-	float4 color : COLOR;
-	float2 tex : TEXCOORD;
-};
-
 struct PS_InputType
 {
 	float4 pos : SV_POSITION;
@@ -32,10 +25,12 @@ struct PS_InputType
 	float2 tex : TEXCOORD;
 };
 
-PS_InputType VS_Main(VS_InputType input)
+PS_InputType VS_Main(float4 pos : SV_POSITION, float4 color : COLOR, float2 tex : TEXCOORD)
 {
-	PS_InputType output = input;
-	output.pos = mul(output.pos, mvpMatrix);
+	PS_InputType output;
+	output.pos = mul(pos, mvpMatrix);
+	output.color = color;
+	output.tex = tex;
 	return output;
 }
 
