@@ -12,7 +12,7 @@ Camera::Camera(PVideo _video):
 	farValue(-3000.0f)
 {
 	fovy = 3.1415926f / 2.5f; /* Field of view in radians */
-	aspectRatio = 4.0f / 3.0f; /* TODO */
+	aspectRatio = 16.0f / 9.0f; /* TODO */
 
 	updateViewMatrix();
 	updateProjectionMatrix();

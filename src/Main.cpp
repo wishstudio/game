@@ -89,7 +89,7 @@ static void draw3DBox(const AABB3D &box, Color color)
 int main()
 {
 	/* Create video device */
-	video = Video::createVideo(1024, 768);
+	video = Video::createVideo(1366, 768);
 	device = video->getDevice();
 	gui.reset(new GUI(video));
 
