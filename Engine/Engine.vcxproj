@@ -101,6 +101,9 @@
     <ClInclude Include="src\Material.h" />
     <ClInclude Include="src\Pass.h" />
     <ClInclude Include="src\Shader.h" />
+    <ClInclude Include="src\ShaderCore\IR\IRNode.h" />
+    <ClInclude Include="src\ShaderCore\IR\IRType.h" />
+    <ClInclude Include="src\ShaderCore\Phases\Parser.h" />
     <ClInclude Include="src\Texture.h" />
     <ClInclude Include="src\UI.h" />
     <ClInclude Include="src\UI\UIEvents.h" />
@@ -127,6 +130,9 @@
     <ClCompile Include="src\GUI.cpp" />
     <ClCompile Include="src\Material.cpp" />
     <ClCompile Include="src\Pass.cpp" />
+    <ClCompile Include="src\ShaderCore\IR\IRNode.cpp" />
+    <ClCompile Include="src\ShaderCore\IR\IRType.cpp" />
+    <ClCompile Include="src\ShaderCore\Phases\Parser.cpp" />
     <ClCompile Include="src\UI\UIElement.cpp" />
     <ClCompile Include="src\Video.cpp" />
   </ItemGroup>

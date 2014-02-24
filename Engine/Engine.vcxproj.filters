@@ -128,6 +128,15 @@
     <ClInclude Include="src\Core\Matrix3.h">
       <Filter>Source\Core</Filter>
     </ClInclude>
+    <ClInclude Include="src\ShaderCore\Phases\Parser.h">
+      <Filter>Source\ShaderCore\Phases</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ShaderCore\IR\IRType.h">
+      <Filter>Source\ShaderCore\IR</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ShaderCore\IR\IRNode.h">
+      <Filter>Source\ShaderCore\IR</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\D3D11\D3D11IndexBuffer.cpp">
@@ -178,6 +187,15 @@
     <ClCompile Include="src\UI\UIElement.cpp">
       <Filter>Source\UI</Filter>
     </ClCompile>
+    <ClCompile Include="src\ShaderCore\Phases\Parser.cpp">
+      <Filter>Source\ShaderCore\Phases</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ShaderCore\IR\IRType.cpp">
+      <Filter>Source\ShaderCore\IR</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ShaderCore\IR\IRNode.cpp">
+      <Filter>Source\ShaderCore\IR</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Source">
@@ -197,6 +215,15 @@
     </Filter>
     <Filter Include="Source\UI\Events">
       <UniqueIdentifier>{3bcde8e3-81fb-442d-b9da-2cfe458fae1d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\ShaderCore">
+      <UniqueIdentifier>{abb50639-63d8-4b7f-a530-781651f88ca4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\ShaderCore\Phases">
+      <UniqueIdentifier>{efff30fb-a636-44a5-b8b8-b8bc1fd403d3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\ShaderCore\IR">
+      <UniqueIdentifier>{007b3183-4dbe-442c-bb6f-8054c971ffa4}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>
