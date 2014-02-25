@@ -137,6 +137,9 @@
     <ClInclude Include="src\ShaderCore\IR\IRNode.h">
       <Filter>Source\ShaderCore\IR</Filter>
     </ClInclude>
+    <ClInclude Include="src\ShaderCore\Context.h">
+      <Filter>Source\ShaderCore</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\D3D11\D3D11IndexBuffer.cpp">
@@ -195,6 +198,9 @@
     </ClCompile>
     <ClCompile Include="src\ShaderCore\IR\IRNode.cpp">
       <Filter>Source\ShaderCore\IR</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ShaderCore\Context.cpp">
+      <Filter>Source\ShaderCore</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

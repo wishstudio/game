@@ -37,29 +37,29 @@ private:
 class IRVectorType: public IRType
 {
 public:
-	IRVectorType(PrimitiveKind _kind, int _dim): IRType(IRType::Vector), kind(_kind), dim(_dim) {}
+	IRVectorType(IRPrimitiveType *_base, int _dim): IRType(IRType::Vector), base(_base), dim(_dim) {}
 	virtual ~IRVectorType() override {}
 
-	PrimitiveKind getPrimitiveKind() const { return kind; }
+	IRPrimitiveType *getBaseType() const { return base; }
 	int getDimension() const { return dim; }
 
 private:
-	PrimitiveKind kind;
+	IRPrimitiveType *base;
 	int dim;
 };
 
 class IRMatrixType: public IRType
 {
 public:
-	IRMatrixType(PrimitiveKind _kind, int _rowdim, int _coldim): IRType(IRType::Matrix), kind(_kind), rowdim(_rowdim), coldim(_coldim) {}
+	IRMatrixType(IRPrimitiveType *_base, int _rowdim, int _coldim): IRType(IRType::Matrix), base(_base), rowdim(_rowdim), coldim(_coldim) {}
 	virtual ~IRMatrixType() override {}
 
-	PrimitiveKind getPrimitiveKind() const { return kind; }
+	IRPrimitiveType *getBase() const { return base; }
 	int getRowDimension() const { return rowdim; }
 	int getColumnDimension() const { return coldim; }
 
 private:
-	PrimitiveKind kind;
+	IRPrimitiveType *base;
 	int rowdim, coldim;
 };
 
