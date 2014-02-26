@@ -4,35 +4,9 @@
 #include <string>
 #include <vector>
 
+#include "IRBase.h"
+
 class IRType;
-class IRNode
-{
-public:
-	enum NodeKind
-	{
-		VariableDef,
-		Constant,
-		Variable,
-		Unary,
-		Binary,
-		Field,
-		Invoke,
-		Assign,
-		Return,
-		List,
-		Function,
-	};
-	IRNode(NodeKind _kind): kind(_kind) {}
-	virtual ~IRNode() {}
-
-	inline bool getIsConstant() const { return kind == Constant; }
-	inline bool getIsUnary() const { return kind == Unary; }
-	inline bool getIsBinary() const { return kind == Binary; }
-
-private:
-	NodeKind kind;
-};
-
 class IRVariableDef: public IRNode
 {
 public:

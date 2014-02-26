@@ -5,12 +5,14 @@
 #include <utility>
 #include <vector>
 
-class IRType
+#include "IRBase.h"
+
+class IRType: public IRNode
 {
 public:
 	enum TypeKind { Primitive, Vector, Matrix, Struct };
 	enum PrimitiveKind { Float };
-	IRType(TypeKind _kind): kind(_kind) {}
+	IRType(TypeKind _kind): IRNode(IRNode::Type), kind(_kind) {}
 	virtual ~IRType() {}
 
 	bool getIsPrimitive() const { return kind == Primitive; }

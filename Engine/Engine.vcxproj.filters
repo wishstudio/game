@@ -143,6 +143,12 @@
     <ClInclude Include="src\ShaderCore\Phases\Lexer.h">
       <Filter>Source\ShaderCore\Phases</Filter>
     </ClInclude>
+    <ClInclude Include="src\ShaderCore\IR\IRBase.h">
+      <Filter>Source\ShaderCore\IR</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ShaderCore\SymbolTable.h">
+      <Filter>Source\ShaderCore</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\D3D11\D3D11IndexBuffer.cpp">
@@ -207,6 +213,9 @@
     </ClCompile>
     <ClCompile Include="src\ShaderCore\Phases\Lexer.cpp">
       <Filter>Source\ShaderCore\Phases</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ShaderCore\SymbolTable.cpp">
+      <Filter>Source\ShaderCore</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

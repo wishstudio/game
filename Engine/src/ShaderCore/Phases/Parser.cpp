@@ -7,11 +7,11 @@ IRType *Parser::tryParseType()
 {
 	if (lexer->getToken() == Lexer::Identifier)
 	{
-		auto it = ctx->types.find(lexer->getTokenIdentifier());
-		if (it != ctx->types.end())
+		IRNode *node = ctx->symbolTable.lookup(lexer->getTokenIdentifier());
+		if (node != nullptr && node->getIsType())
 		{
 			lexer->nextToken();
-			return it->second;
+			return (IRType *) node;
 		}
 	}
 	return nullptr;
@@ -82,6 +82,7 @@ Context *Parser::parseShader(const std::string &source)
 			{
 				/* Function definition */
 				IRType *returnType = type;
+				ctx->symbolTable.enterScope();
 
 				IRFunction *func = new IRFunction(lexer->getTokenIdentifier());
 				lexer->nextToken();
@@ -95,18 +96,28 @@ Context *Parser::parseShader(const std::string &source)
 					parseSingleVariableDef(IRVariableDef::Parameter, type, [&](IRVariableDef *varDef, IRNode *initialValue) {
 						assert(initialValue == nullptr);
 						func->addParameter(varDef);
+						assert(ctx->symbolTable.add(varDef->getName(), varDef));
 					});
 				}
 				lexer->nextToken();
+				std::string semantic;
 				if (lexer->getToken() == Lexer::Colon)
 				{
 					lexer->nextToken();
 					assert(lexer->getToken() == Lexer::Identifier);
-					std::string semantic = lexer->getTokenIdentifier();
-					func->setReturn(new IRVariableDef(IRVariableDef::Return, returnType, std::string(), semantic));
+					semantic = lexer->getTokenIdentifier();
+					lexer->nextToken();
 				}
+				func->setReturn(new IRVariableDef(IRVariableDef::Return, returnType, std::string(), semantic));
+				assert(lexer->getToken() == Lexer::BOpen);
+				lexer->getToken();
 				func->setBody(parseStatementList());
+				assert(lexer->getToken() == Lexer::BClose);
+				lexer->getToken();
+
+				ctx->symbolTable.leaveScope();
 				ctx->globalFuncs.push_back(std::unique_ptr<IRFunction>(func));
+				assert(ctx->symbolTable.add(func->getName(), func));
 			}
 			else
 			{
@@ -114,6 +125,7 @@ Context *Parser::parseShader(const std::string &source)
 				parseVariableDef(IRVariableDef::Global, type, [&](IRVariableDef *varDef, IRNode *initialValue) {
 					assert(initialValue == nullptr);
 					ctx->globalVars.push_back(std::unique_ptr<IRVariableDef>(varDef));
+					assert(ctx->symbolTable.add(varDef->getName(), varDef));
 				});
 				assert(lexer->getToken() == Lexer::Semicolon);
 				lexer->nextToken();
