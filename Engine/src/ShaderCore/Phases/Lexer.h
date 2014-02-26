@@ -2,7 +2,7 @@
 
 #include <string>
 
-class Lexer
+class Lexer final
 {
 public:
 	Lexer(const std::string &source);
@@ -36,7 +36,7 @@ public:
 	void nextToken();
 	TokenType getToken() const { return ctx.token; }
 	std::string getTokenIdentifier() const { return ctx.tokenIdentifier; }
-
+	
 private:
 	void nextChar();
 
@@ -49,4 +49,8 @@ private:
 	};
 	std::string source;
 	LexerContext ctx;
+
+public:
+	LexerContext *saveContext() const;
+	void restoreContext(LexerContext *savedContext);
 };

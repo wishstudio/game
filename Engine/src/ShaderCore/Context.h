@@ -12,6 +12,8 @@ class Context
 public:
 	Context();
 
-	std::unordered_map<std::string, std::unique_ptr<IRType>> types;
+	std::vector<std::unique_ptr<IRType>> globalTypes;
+	std::unordered_map<std::string, IRType *> types;
 	std::vector<std::unique_ptr<IRVariableDef>> globalVars;
+	std::vector<std::unique_ptr<IRFunction>> globalFuncs;
 };

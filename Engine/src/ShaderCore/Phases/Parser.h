@@ -10,13 +10,16 @@ class Parser final
 public:
 	Parser() {}
 
-	IRType *tryParseType();
-	template <typename T>
-	void parseVariableDef(IRVariableDef::VariableKind kind, IRType *type, T callback);
 	Context *parseShader(const std::string &source);
 
 private:
-	/* Parser */
+	IRType *tryParseType();
+	template <typename T>
+	void parseSingleVariableDef(IRVariableDef::VariableKind kind, IRType *type, T callback);
+	template <typename T>
+	void parseVariableDef(IRVariableDef::VariableKind kind, IRType *type, T callback);
+	IRList *parseStatementList();
+
 	Lexer *lexer;
 	Context *ctx;
 };

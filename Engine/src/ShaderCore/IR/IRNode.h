@@ -36,7 +36,7 @@ private:
 class IRVariableDef: public IRNode
 {
 public:
-	enum VariableKind { Global, Local, Parameter };
+	enum VariableKind { Global, Local, Parameter, Return };
 	IRVariableDef(VariableKind _kind, IRType *_type, const std::string &_name = std::string(), const std::string &_semantic = std::string())
 		: IRNode(VariableDef), kind(_kind), type(_type), name(_name), semantic(_semantic) {}
 
@@ -172,16 +172,16 @@ public:
 	IRList *getBody() const { return body.get(); }
 	void setBody(IRList *_body) { body.reset(_body); }
 
-	void addParameter(IRVariable *param) { parameters.push_back(std::unique_ptr<IRVariable>(param)); }
+	void addParameter(IRVariableDef *param) { parameters.push_back(std::unique_ptr<IRVariableDef>(param)); }
 	int getParameterCount() const { return parameters.size(); }
-	IRVariable *getParameter(int index) const { return parameters[index].get(); }
+	IRVariableDef *getParameter(int index) const { return parameters[index].get(); }
 
-	void setReturn(IRVariable *_ret) { ret.reset(_ret); }
-	IRVariable *getReturn() const { return ret.get(); }
+	void setReturn(IRVariableDef *_ret) { ret.reset(_ret); }
+	IRVariableDef *getReturn() const { return ret.get(); }
 
 private:
 	std::string name;
 	std::unique_ptr<IRList> body;
-	std::vector<std::unique_ptr<IRVariable>> parameters;
-	std::unique_ptr<IRVariable> ret;
+	std::vector<std::unique_ptr<IRVariableDef>> parameters;
+	std::unique_ptr<IRVariableDef> ret;
 };

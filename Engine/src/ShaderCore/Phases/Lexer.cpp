@@ -3,6 +3,22 @@
 Lexer::Lexer(const std::string &_source)
 	: source(_source)
 {
+	ctx.pointer = 0;
+
+	nextChar();
+	nextToken();
+}
+
+Lexer::LexerContext *Lexer::saveContext() const
+{
+	return new LexerContext(ctx);
+}
+
+void Lexer::restoreContext(Lexer::LexerContext *savedContext)
+{
+	/* TODO: Define move operators for LexerContext */
+	ctx = std::move(*savedContext);
+	delete savedContext;
 }
 
 void Lexer::nextChar()
