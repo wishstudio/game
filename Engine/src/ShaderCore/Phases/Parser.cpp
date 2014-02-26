@@ -1,120 +1,75 @@
+#include <cassert>
 #include <cctype>
 
 #include "Parser.h"
 
-void Parser::getCh()
+IRType *Parser::tryParseType()
 {
-	if (pointer == source.size())
-		ch = -1;
-	else
-		ch = source[pointer++];
+	if (lexer->getToken() == Lexer::Identifier)
+	{
+		auto it = ctx->types.find(lexer->getTokenIdentifier());
+		if (it != ctx->types.end())
+			return it->second.get();
+	}
+	return nullptr;
 }
 
-void Parser::getToken()
+template <typename T>
+void Parser::parseVariableDef(IRVariableDef::VariableKind kind, IRType *type, T callback)
 {
-	while (isspace(ch))
-		getCh();
-	if (ch == -1)
+	for (;;)
 	{
-		token = tkEOF;
-		return;
-	}
-	if (isalpha(ch) || ch == '_')
-	{
-		tokenIdent = ch;
-		getCh();
-		while (isalpha(ch) || isdigit(ch) || ch == '_')
+		std::string name, semantic;
+
+		assert(lexer->getToken() == Lexer::Identifier);
+		name = lexer->getTokenIdentifier();
+		lexer->nextToken();
+		if (lexer->getToken() == Lexer::Colon)
 		{
-			tokenIdent.push_back(ch);
-			getCh();
+			lexer->nextToken();
+			assert(lexer->getToken() == Lexer::Identifier);
+			semantic = lexer->getTokenIdentifier();
+			lexer->nextToken();
 		}
-		if (tokenIdent == "return")
-			token = tkReturn;
-		else
-			token = tkIdentifier;
-		return;
-	}
-	switch (ch)
-	{
-	case '+':
-		token = tkAdd;
-		return;
-
-	case '-':
-		token = tkSub;
-		return;
-
-	case '*':
-		token = tkMul;
-		return;
-
-	case '/':
-		token = tkDiv;
-		return;
-
-	case '%':
-		token = tkMod;
-		return;
-
-	case '=':
-		token = tkAssign;
-		return;
-
-	case '.':
-		token = tkDot;
-		return;
-
-	case ',':
-		token = tkComma;
-		return;
-
-	case ':':
-		token = tkColon;
-		return;
-
-	case ';':
-		token = tkSemicolon;
-		return;
-
-	case '(':
-		token = tkPOpen;
-		return;
-
-	case ')':
-		token = tkPClose;
-		return;
-
-	case '[':
-		token = tkSOpen;
-		return;
-
-	case ']':
-		token = tkSClose;
-		return;
-
-	case '{':
-		token = tkBOpen;
-		return;
-
-	case '}':
-		token = tkBClose;
-		return;
-
-	default:
-		token = tkERROR;
-		return;
+		if (lexer->getToken() == Lexer::Assign)
+		{
+			lexer->nextToken();
+			/* TODO */
+		}
+		callback(new IRVariableDef(kind, type, name, semantic), nullptr);
+		if (lexer->getToken() == Lexer::Comma)
+		{
+			lexer->nextToken();
+			continue;
+		}
 	}
 }
 
-Context *Parser::parseShader(const std::string &_source)
+Context *Parser::parseShader(const std::string &source)
 {
 	ctx = new Context();
 
-	source = _source;
-	pointer = 0;
+	/* Prepare initial lexer/tokenizer context */
+	lexer = new Lexer(source);
 
-	getCh();
-	getToken();
+	while (lexer->getToken() != Lexer::Eof)
+	{
+		IRType *type = tryParseType();
+		if (type != nullptr)
+		{
+			parseVariableDef(IRVariableDef::Global, type, [&](IRVariableDef *varDef, IRNode *initialValue) {
+				assert(initialValue == nullptr);
+				ctx->globalVars.push_back(std::unique_ptr<IRVariableDef>(varDef));
+			});
+			assert(lexer->getToken() == Lexer::Semicolon);
+			lexer->nextToken();
+		}
+		else
+		{
+		}
+	}
+
+	delete lexer;
 
 	return ctx;
 }

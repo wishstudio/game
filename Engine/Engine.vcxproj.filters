@@ -128,9 +128,6 @@
     <ClInclude Include="src\Core\Matrix3.h">
       <Filter>Source\Core</Filter>
     </ClInclude>
-    <ClInclude Include="src\ShaderCore\Phases\Parser.h">
-      <Filter>Source\ShaderCore\Phases</Filter>
-    </ClInclude>
     <ClInclude Include="src\ShaderCore\IR\IRType.h">
       <Filter>Source\ShaderCore\IR</Filter>
     </ClInclude>
@@ -139,6 +136,12 @@
     </ClInclude>
     <ClInclude Include="src\ShaderCore\Context.h">
       <Filter>Source\ShaderCore</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ShaderCore\Phases\Parser.h">
+      <Filter>Source\ShaderCore\Phases</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ShaderCore\Phases\Lexer.h">
+      <Filter>Source\ShaderCore\Phases</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -190,9 +193,6 @@
     <ClCompile Include="src\UI\UIElement.cpp">
       <Filter>Source\UI</Filter>
     </ClCompile>
-    <ClCompile Include="src\ShaderCore\Phases\Parser.cpp">
-      <Filter>Source\ShaderCore\Phases</Filter>
-    </ClCompile>
     <ClCompile Include="src\ShaderCore\IR\IRType.cpp">
       <Filter>Source\ShaderCore\IR</Filter>
     </ClCompile>
@@ -201,6 +201,12 @@
     </ClCompile>
     <ClCompile Include="src\ShaderCore\Context.cpp">
       <Filter>Source\ShaderCore</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ShaderCore\Phases\Parser.cpp">
+      <Filter>Source\ShaderCore\Phases</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ShaderCore\Phases\Lexer.cpp">
+      <Filter>Source\ShaderCore\Phases</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

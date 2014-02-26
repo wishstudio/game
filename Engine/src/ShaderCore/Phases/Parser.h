@@ -1,51 +1,22 @@
 #pragma once
 
 #include "../Context.h"
+#include "../IR/IRNode.h"
+#include "../IR/IRType.h"
+#include "Lexer.h"
 
-class IRNode;
-class IRType;
 class Parser final
 {
 public:
 	Parser() {}
 
+	IRType *tryParseType();
+	template <typename T>
+	void parseVariableDef(IRVariableDef::VariableKind kind, IRType *type, T callback);
 	Context *parseShader(const std::string &source);
 
 private:
-	/* Reader */
-	std::string source;
-	char ch;
-	int pointer;
-	void getCh();
-	
-	/* Tokenizer */
-	enum TokenType
-	{
-		tkEOF,
-		tkERROR,
-		tkReturn,
-		tkIdentifier,
-		tkAdd,
-		tkSub,
-		tkMul,
-		tkDiv,
-		tkMod,
-		tkAssign,
-		tkDot,
-		tkComma,
-		tkColon,
-		tkSemicolon,
-		tkPOpen,
-		tkPClose,
-		tkSOpen,
-		tkSClose,
-		tkBOpen,
-		tkBClose,
-	};
-	TokenType token;
-	std::string tokenIdent;
-	void getToken();
-	
 	/* Parser */
+	Lexer *lexer;
 	Context *ctx;
 };

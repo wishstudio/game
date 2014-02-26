@@ -36,7 +36,7 @@ private:
 class IRVariableDef: public IRNode
 {
 public:
-	enum VariableKind { Local, Parameter };
+	enum VariableKind { Global, Local, Parameter };
 	IRVariableDef(VariableKind _kind, IRType *_type, const std::string &_name = std::string(), const std::string &_semantic = std::string())
 		: IRNode(VariableDef), kind(_kind), type(_type), name(_name), semantic(_semantic) {}
 
