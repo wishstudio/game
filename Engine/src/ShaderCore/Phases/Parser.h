@@ -18,7 +18,11 @@ private:
 	void parseSingleVariableDef(IRVariableDef::VariableKind kind, IRType *type, T callback);
 	template <typename T>
 	void parseVariableDef(IRVariableDef::VariableKind kind, IRType *type, T callback);
-	IRList *parseStatementList();
+
+	IRValue *parseElement();
+	IRValue *parseUnaryOperator();
+	IRValue *parseBinaryOperator();
+	IRList *parseStatements();
 
 	Lexer *lexer;
 	Context *ctx;

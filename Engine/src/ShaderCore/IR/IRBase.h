@@ -32,6 +32,9 @@ public:
 	inline bool getIsList() const { return kind == List; }
 	inline bool getIsFunction() const { return kind == Function; }
 
+	virtual bool getIsValue() const { return false; }
+	virtual bool getIsLValue() const { return false; }
+
 private:
 	NodeKind kind;
 };

@@ -7,93 +7,86 @@
 #include "IRBase.h"
 
 class IRType;
-class IRVariableDef: public IRNode
+class IRVariableDef;
+class IRFunction;
+class IRValue: public IRNode
 {
 public:
-	enum VariableKind { Global, Local, Parameter, Return };
-	IRVariableDef(VariableKind _kind, IRType *_type, const std::string &_name = std::string(), const std::string &_semantic = std::string())
-		: IRNode(VariableDef), kind(_kind), type(_type), name(_name), semantic(_semantic) {}
+	IRValue(IRNode::NodeKind kind): IRNode(kind) {}
 
-	VariableKind getKind() const { return kind; }
-	bool getIsLocal() const { return kind == Local; }
-	bool getIParameter() const { return kind == Parameter; }
-
-	bool getHasName() const { return !name.empty(); }
-	std::string getName() const { return name; }
-	bool getHasSemantic() const { return !semantic.empty(); }
-	std::string getSemantic() const { return semantic; }
-	IRType *getType() const { return type; }
-
-private:
-	VariableKind kind;
-	IRType *type;
-	std::string name, semantic;
+	virtual bool getIsValue() const override { return true; }
 };
 
-class IRVariable: public IRNode
+class IRVariable: public IRValue
 {
 public:
-	IRVariable(IRVariableDef *_variable): IRNode(IRNode::Variable), variable(_variable) {}
+	IRVariable(IRVariableDef *_variable): IRValue(IRNode::Variable), variable(_variable) {}
 	virtual ~IRVariable() override {}
+
+	virtual bool getIsLValue() const override { return true; }
 
 private:
 	IRVariableDef *variable;
 };
 
-class IRUnary: public IRNode
+class IRField : public IRValue
 {
 public:
-	enum UnaryKind { Negate, Not };
-	IRUnary(IRNode *_operand): IRNode(IRNode::Unary), operand(_operand) {}
-	virtual ~IRUnary() override {}
-
-	IRNode *getOperand() const { return operand.get(); }
-
-private:
-	std::unique_ptr<IRNode> operand;
-};
-
-class IRBinary: public IRNode
-{
-public:
-	enum BinaryKind { Add, Sub, Mul, Div };
-	IRBinary(IRNode *_lhs, IRNode *_rhs): IRNode(IRNode::Binary), lhs(_lhs), rhs(_rhs) {}
-	virtual ~IRBinary() override {}
-
-	IRNode *getLeft() const { return lhs.get(); }
-	IRNode *getRight() const { return rhs.get(); }
-
-private:
-	std::unique_ptr<IRNode> lhs, rhs;
-};
-
-class IRField: public IRNode
-{
-public:
-	IRField(IRNode *_object, const std::string &_field): IRNode(IRNode::Field), object(_object), field(_field) {}
+	IRField(IRValue *_object, const std::string &_field) : IRValue(IRNode::Field), object(_object), field(_field) {}
 	virtual ~IRField() override {}
 
-	IRNode *getObject() const { return object.get(); }
+	IRValue *getObject() const { return object.get(); }
 	std::string getField() const { return field; }
 
+	virtual bool getIsLValue() const override { return true; }
+
 private:
-	std::unique_ptr<IRNode> object;
+	std::unique_ptr<IRValue> object;
 	std::string field;
 };
 
-class IRInvoke: public IRNode
+class IRUnary: public IRValue
 {
 public:
-	IRInvoke(): IRNode(IRNode::Invoke) {}
-	IRInvoke(IRNode *_object): IRNode(IRNode::Invoke), object(_object) {}
-	virtual ~IRInvoke() override {}
+	enum UnaryKind { Negate, Not };
+	IRUnary(IRValue *_operand): IRValue(IRNode::Unary), operand(_operand) {}
+	virtual ~IRUnary() override {}
 
-	bool getIsStaticInvoke() const { return object == nullptr; }
-	bool getIsFieleInvoke() const { return object != nullptr; }
-	IRNode *getObject() const { return object.get(); }
+	IRValue *getOperand() const { return operand.get(); }
 
 private:
-	std::unique_ptr<IRNode> object;
+	std::unique_ptr<IRValue> operand;
+};
+
+class IRBinary: public IRValue
+{
+public:
+	enum BinaryKind { Add, Sub, Mul, Div };
+	IRBinary(IRValue *_lhs, IRValue *_rhs): IRValue(IRNode::Binary), lhs(_lhs), rhs(_rhs) {}
+	virtual ~IRBinary() override {}
+
+	IRValue *getLeft() const { return lhs.get(); }
+	IRValue *getRight() const { return rhs.get(); }
+
+private:
+	std::unique_ptr<IRValue> lhs, rhs;
+};
+
+class IRInvoke: public IRValue
+{
+public:
+	IRInvoke(IRFunction *_func): IRValue(IRNode::Invoke), func(_func) {}
+	virtual ~IRInvoke() override {}
+
+	IRFunction *getFunction() const { return func.get(); }
+
+	void addParameter(IRValue *value) { parameters.push_back(std::unique_ptr<IRValue>(value)); }
+	int getParameterCount() const { return parameters.size(); }
+	IRValue *getParameter(int index) const { return parameters[index].get(); }
+
+private:
+	std::unique_ptr<IRFunction> func;
+	std::vector<std::unique_ptr<IRValue>> parameters;
 };
 
 class IRAssign: public IRNode
@@ -133,6 +126,29 @@ public:
 
 private:
 	std::vector<std::unique_ptr<IRNode>> nodes;
+};
+
+class IRVariableDef : public IRNode
+{
+public:
+	enum VariableKind { Global, Local, Parameter, Return };
+	IRVariableDef(VariableKind _kind, IRType *_type, const std::string &_name = std::string(), const std::string &_semantic = std::string())
+		: IRNode(VariableDef), kind(_kind), type(_type), name(_name), semantic(_semantic) {}
+
+	VariableKind getKind() const { return kind; }
+	bool getIsLocal() const { return kind == Local; }
+	bool getIParameter() const { return kind == Parameter; }
+
+	bool getHasName() const { return !name.empty(); }
+	std::string getName() const { return name; }
+	bool getHasSemantic() const { return !semantic.empty(); }
+	std::string getSemantic() const { return semantic; }
+	IRType *getType() const { return type; }
+
+private:
+	VariableKind kind;
+	IRType *type;
+	std::string name, semantic;
 };
 
 class IRFunction: public IRNode
