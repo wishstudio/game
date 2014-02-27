@@ -15,6 +15,6 @@ public:
 
 	SymbolTable symbolTable;
 	std::vector<std::unique_ptr<IRType>> globalTypes;
-	std::vector<std::unique_ptr<IRVariableDef>> globalVars;
+	std::vector<std::unique_ptr<IRVariable>> globalVars;
 	std::vector<std::unique_ptr<IRFunction>> globalFuncs;
 };

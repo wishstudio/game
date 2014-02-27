@@ -7,7 +7,7 @@
 #include "IRBase.h"
 
 class IRType;
-class IRVariableDef;
+class IRVariable;
 class IRFunction;
 class IRValue: public IRNode
 {
@@ -17,16 +17,16 @@ public:
 	virtual bool getIsValue() const override { return true; }
 };
 
-class IRVariable: public IRValue
+class IRVariableRef: public IRValue
 {
 public:
-	IRVariable(IRVariableDef *_variable): IRValue(IRNode::Variable), variable(_variable) {}
-	virtual ~IRVariable() override {}
+	IRVariableRef(IRVariable *_variable): IRValue(IRNode::Variable), variable(_variable) {}
+	virtual ~IRVariableRef() override {}
 
 	virtual bool getIsLValue() const override { return true; }
 
 private:
-	IRVariableDef *variable;
+	IRVariable *variable;
 };
 
 class IRField : public IRValue
@@ -132,11 +132,11 @@ private:
 	std::vector<std::unique_ptr<IRNode>> nodes;
 };
 
-class IRVariableDef : public IRNode
+class IRVariable: public IRNode
 {
 public:
 	enum VariableKind { Global, Local, Parameter, Return };
-	IRVariableDef(VariableKind _kind, IRType *_type, const std::string &_name = std::string(), const std::string &_semantic = std::string())
+	IRVariable(VariableKind _kind, IRType *_type, const std::string &_name = std::string(), const std::string &_semantic = std::string())
 		: IRNode(VariableDef), kind(_kind), type(_type), name(_name), semantic(_semantic) {}
 
 	VariableKind getKind() const { return kind; }
@@ -166,16 +166,16 @@ public:
 	IRList *getBody() const { return body.get(); }
 	void setBody(IRList *_body) { body.reset(_body); }
 
-	void addParameter(IRVariableDef *param) { parameters.push_back(std::unique_ptr<IRVariableDef>(param)); }
+	void addParameter(IRVariable *param) { parameters.push_back(std::unique_ptr<IRVariable>(param)); }
 	int getParameterCount() const { return parameters.size(); }
-	IRVariableDef *getParameter(int index) const { return parameters[index].get(); }
+	IRVariable *getParameter(int index) const { return parameters[index].get(); }
 
-	void setReturn(IRVariableDef *_ret) { ret.reset(_ret); }
-	IRVariableDef *getReturn() const { return ret.get(); }
+	void setReturn(IRVariable *_ret) { ret.reset(_ret); }
+	IRVariable *getReturn() const { return ret.get(); }
 
 private:
 	std::string name;
 	std::unique_ptr<IRList> body;
-	std::vector<std::unique_ptr<IRVariableDef>> parameters;
-	std::unique_ptr<IRVariableDef> ret;
+	std::vector<std::unique_ptr<IRVariable>> parameters;
+	std::unique_ptr<IRVariable> ret;
 };

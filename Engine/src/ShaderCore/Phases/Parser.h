@@ -15,9 +15,9 @@ public:
 private:
 	IRType *tryParseType();
 	template <typename T>
-	void parseSingleVariableDef(IRVariableDef::VariableKind kind, IRType *type, T callback);
+	void parseSingleVariableDef(IRVariable::VariableKind kind, IRType *type, T callback);
 	template <typename T>
-	void parseVariableDef(IRVariableDef::VariableKind kind, IRType *type, T callback);
+	void parseVariableDef(IRVariable::VariableKind kind, IRType *type, T callback);
 
 	IRValue *parseElement();
 	IRValue *parseUnaryOperator();

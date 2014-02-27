@@ -18,7 +18,7 @@ IRType *Parser::tryParseType()
 }
 
 template <typename T>
-void Parser::parseSingleVariableDef(IRVariableDef::VariableKind kind, IRType *type, T callback)
+void Parser::parseSingleVariableDef(IRVariable::VariableKind kind, IRType *type, T callback)
 {
 	std::string name, semantic;
 
@@ -38,11 +38,11 @@ void Parser::parseSingleVariableDef(IRVariableDef::VariableKind kind, IRType *ty
 		lexer->nextToken();
 		initialValue = parseExpression();
 	}
-	callback(new IRVariableDef(kind, type, name, semantic), initialValue);
+	callback(new IRVariable(kind, type, name, semantic), initialValue);
 }
 
 template <typename T>
-void Parser::parseVariableDef(IRVariableDef::VariableKind kind, IRType *type, T callback)
+void Parser::parseVariableDef(IRVariable::VariableKind kind, IRType *type, T callback)
 {
 	for (;;)
 	{
@@ -74,7 +74,7 @@ IRValue *Parser::parseElement()
 		IRNode *node = ctx->symbolTable.lookup(lexer->getTokenIdentifier());
 		lexer->nextToken();
 		if (node->getIsVariableDef())
-			return new IRVariable((IRVariableDef *) node);
+			return new IRVariableRef((IRVariable *) node);
 		else if (node->getIsFunction())
 		{
 			/* Function invocation */
@@ -108,6 +108,7 @@ IRValue *Parser::parseElement()
 	default:
 		assert(false);
 	}
+	return nullptr;
 }
 
 IRValue *Parser::parseUnaryOperator()
@@ -161,7 +162,7 @@ IRList *Parser::parseStatements()
 			if (type != nullptr)
 			{
 				/* Variable definition */
-				parseVariableDef(IRVariableDef::Local, type, [&](IRVariableDef *varDef, IRValue *initialValue) {
+				parseVariableDef(IRVariable::Local, type, [&](IRVariable *varDef, IRValue *initialValue) {
 					assert(initialValue == nullptr);
 					stmts->addNode(varDef);
 					assert(ctx->symbolTable.add(varDef->getName(), varDef));
@@ -222,7 +223,7 @@ Context *Parser::parseShader(const std::string &source)
 				{
 					IRType *type = tryParseType();
 					assert(type != nullptr);
-					parseSingleVariableDef(IRVariableDef::Parameter, type, [&](IRVariableDef *varDef, IRValue *initialValue) {
+					parseSingleVariableDef(IRVariable::Parameter, type, [&](IRVariable *varDef, IRValue *initialValue) {
 						assert(initialValue == nullptr);
 						func->addParameter(varDef);
 						assert(ctx->symbolTable.add(varDef->getName(), varDef));
@@ -237,7 +238,7 @@ Context *Parser::parseShader(const std::string &source)
 					semantic = lexer->getTokenIdentifier();
 					lexer->nextToken();
 				}
-				func->setReturn(new IRVariableDef(IRVariableDef::Return, returnType, std::string(), semantic));
+				func->setReturn(new IRVariable(IRVariable::Return, returnType, std::string(), semantic));
 				assert(lexer->getToken() == Lexer::BOpen);
 				lexer->getToken();
 				func->setBody(parseStatements());
@@ -251,9 +252,9 @@ Context *Parser::parseShader(const std::string &source)
 			else
 			{
 				/* Global variable definition */
-				parseVariableDef(IRVariableDef::Global, type, [&](IRVariableDef *varDef, IRValue *initialValue) {
+				parseVariableDef(IRVariable::Global, type, [&](IRVariable *varDef, IRValue *initialValue) {
 					assert(initialValue == nullptr);
-					ctx->globalVars.push_back(std::unique_ptr<IRVariableDef>(varDef));
+					ctx->globalVars.push_back(std::unique_ptr<IRVariable>(varDef));
 					assert(ctx->symbolTable.add(varDef->getName(), varDef));
 				});
 				assert(lexer->getToken() == Lexer::Semicolon);
