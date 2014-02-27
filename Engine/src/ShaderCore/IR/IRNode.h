@@ -29,11 +29,11 @@ private:
 	IRVariable *variable;
 };
 
-class IRField : public IRValue
+class IRFieldRef: public IRValue
 {
 public:
-	IRField(IRValue *_object, const std::string &_field) : IRValue(IRNode::Field), object(_object), field(_field) {}
-	virtual ~IRField() override {}
+	IRFieldRef(IRValue *_object, const std::string &_field) : IRValue(IRNode::FieldRef), object(_object), field(_field) {}
+	virtual ~IRFieldRef() override {}
 
 	IRValue *getObject() const { return object.get(); }
 	std::string getField() const { return field; }
@@ -137,7 +137,7 @@ class IRVariable: public IRNode
 public:
 	enum VariableKind { Global, Local, Parameter, Return };
 	IRVariable(VariableKind _kind, IRType *_type, const std::string &_name = std::string(), const std::string &_semantic = std::string())
-		: IRNode(VariableDef), kind(_kind), type(_type), name(_name), semantic(_semantic) {}
+		: IRNode(Variable), kind(_kind), type(_type), name(_name), semantic(_semantic) {}
 
 	VariableKind getKind() const { return kind; }
 	bool getIsLocal() const { return kind == Local; }

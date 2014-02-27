@@ -73,7 +73,7 @@ IRValue *Parser::parseElement()
 	{
 		IRNode *node = ctx->symbolTable.lookup(lexer->getTokenIdentifier());
 		lexer->nextToken();
-		if (node->getIsVariableDef())
+		if (node->getIsVariable())
 			return new IRVariableRef((IRVariable *) node);
 		else if (node->getIsFunction())
 		{
@@ -113,7 +113,15 @@ IRValue *Parser::parseElement()
 
 IRValue *Parser::parseUnaryOperator()
 {
-	return parseElement();
+	IRValue *value = parseElement();
+	while (lexer->getToken() == Lexer::Dot)
+	{
+		lexer->nextToken();
+		assert(lexer->getToken() == Lexer::Identifier);
+		value = new IRFieldRef(value, lexer->getTokenIdentifier());
+		lexer->nextToken();
+	}
+	return value;
 }
 
 IRValue *Parser::parseBinaryOperator(int precedence)
@@ -261,8 +269,42 @@ Context *Parser::parseShader(const std::string &source)
 				lexer->nextToken();
 			}
 		}
-		else
+		else if (lexer->getToken() == Lexer::Struct)
 		{
+			lexer->nextToken();
+			assert(lexer->getToken() == Lexer::Identifier);
+			IRStructType *structType = new IRStructType(lexer->getTokenIdentifier());
+			assert(lexer->getToken() == Lexer::BOpen);
+			for (;;)
+			{
+				IRType *type = tryParseType();
+				if (type == nullptr)
+					break;
+				for (;;)
+				{
+					std::string name, semantic;
+					assert(lexer->getToken() == Lexer::Identifier);
+					name = lexer->getTokenIdentifier();
+					lexer->nextToken();
+					if (lexer->getToken() == Lexer::Colon)
+					{
+						lexer->nextToken();
+						assert(lexer->getToken() == Lexer::Identifier);
+						semantic = lexer->getTokenIdentifier();
+						lexer->nextToken();
+					}
+					structType->addField(type, name, semantic);
+					if (lexer->getToken() == Lexer::Comma)
+					{
+						lexer->nextToken();
+						continue;
+					}
+					else
+						break;
+				}
+			}
+			assert(lexer->getToken() == Lexer::BClose);
+			lexer->nextToken();
 		}
 	}
 
