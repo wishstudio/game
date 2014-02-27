@@ -2,6 +2,8 @@
 
 #include <string>
 
+#include "../IR/IRNode.h"
+
 class Lexer final
 {
 public:
@@ -15,11 +17,13 @@ public:
 		Struct,
 		Return,
 		Identifier,
+		_BINARY_TOKEN_BEGIN,
 		Add,
 		Sub,
 		Mul,
 		Div,
 		Mod,
+		_BINARY_TOKEN_END,
 		Assign,
 		Dot,
 		Comma,
@@ -32,6 +36,9 @@ public:
 		BOpen,
 		BClose,
 	};
+	
+	static bool isBinaryToken(TokenType token) { return token > _BINARY_TOKEN_BEGIN && token < _BINARY_TOKEN_END; }
+	static IRBinary::BinaryKind translateBinaryToken(TokenType token);
 
 	void nextToken();
 	TokenType getToken() const { return ctx.token; }

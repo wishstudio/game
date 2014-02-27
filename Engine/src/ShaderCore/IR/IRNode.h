@@ -61,14 +61,18 @@ private:
 class IRBinary: public IRValue
 {
 public:
-	enum BinaryKind { Add, Sub, Mul, Div };
-	IRBinary(IRValue *_lhs, IRValue *_rhs): IRValue(IRNode::Binary), lhs(_lhs), rhs(_rhs) {}
+	enum BinaryKind { Add, Sub, Div, Mul, Mod };
+	IRBinary(BinaryKind _op, IRValue *_lhs, IRValue *_rhs): IRValue(IRNode::Binary), op(_op), lhs(_lhs), rhs(_rhs) {}
 	virtual ~IRBinary() override {}
 
+	static int getPrecedence(BinaryKind kind);
+
+	BinaryKind getOperator() const { return op; }
 	IRValue *getLeft() const { return lhs.get(); }
 	IRValue *getRight() const { return rhs.get(); }
 
 private:
+	BinaryKind op;
 	std::unique_ptr<IRValue> lhs, rhs;
 };
 

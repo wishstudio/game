@@ -9,6 +9,18 @@ Lexer::Lexer(const std::string &_source)
 	nextToken();
 }
 
+static IRBinary::BinaryKind binaryTokenMap[] = {
+	IRBinary::Add,
+	IRBinary::Sub,
+	IRBinary::Mul,
+	IRBinary::Div,
+	IRBinary::Mod,
+};
+IRBinary::BinaryKind translateBinaryToken(Lexer::TokenType token)
+{
+	return binaryTokenMap[token - Lexer::_BINARY_TOKEN_BEGIN - 1];
+}
+
 Lexer::LexerContext *Lexer::saveContext() const
 {
 	return new LexerContext(ctx);

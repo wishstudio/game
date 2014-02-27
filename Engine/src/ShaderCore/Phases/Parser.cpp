@@ -36,7 +36,7 @@ void Parser::parseSingleVariableDef(IRVariableDef::VariableKind kind, IRType *ty
 	if (lexer->getToken() == Lexer::Assign)
 	{
 		lexer->nextToken();
-		initialValue = parseBinaryOperator();
+		initialValue = parseExpression();
 	}
 	callback(new IRVariableDef(kind, type, name, semantic), initialValue);
 }
@@ -63,7 +63,7 @@ IRValue *Parser::parseElement()
 	{
 		IRValue *value;
 		lexer->nextToken();
-		value = parseBinaryOperator();
+		value = parseExpression();
 		assert(lexer->getToken() == Lexer::PClose);
 		lexer->nextToken();
 		return value;
@@ -86,7 +86,7 @@ IRValue *Parser::parseElement()
 			{
 				for (;;)
 				{
-					IRValue *parameter = parseBinaryOperator();
+					IRValue *parameter = parseExpression();
 					invokeValue->addParameter(parameter);
 					if (lexer->getToken() == Lexer::Comma)
 					{
@@ -115,9 +115,19 @@ IRValue *Parser::parseUnaryOperator()
 	return parseElement();
 }
 
-IRValue *Parser::parseBinaryOperator()
+IRValue *Parser::parseBinaryOperator(int precedence)
 {
-	return parseUnaryOperator();
+	IRValue *left = parseUnaryOperator();
+	IRBinary::BinaryKind op;
+	while (lexer->isBinaryToken(lexer->getToken()) &&
+		(op = lexer->translateBinaryToken(lexer->getToken()), IRBinary::getPrecedence(op) >= precedence))
+	{
+		/* Parse binary operator with higher precedence */
+		lexer->nextToken();
+		IRValue *right = parseBinaryOperator(precedence + 1);
+		left = new IRBinary(op, left, right);
+	}
+	return left;
 }
 
 IRList *Parser::parseStatements()
@@ -141,7 +151,7 @@ IRList *Parser::parseStatements()
 		{
 			lexer->nextToken();
 			/* TODO: Check void type */
-			IRValue *value = parseBinaryOperator();
+			IRValue *value = parseExpression();
 			stmts->addNode(new IRReturn(value));
 		}
 
@@ -159,12 +169,12 @@ IRList *Parser::parseStatements()
 			}
 			else
 			{
-				IRValue *value = parseBinaryOperator();
+				IRValue *value = parseExpression();
 				if (lexer->getToken() == Lexer::Assign)
 				{
 					assert(value->getIsLValue());
 					lexer->nextToken();
-					IRValue *rhs = parseBinaryOperator();
+					IRValue *rhs = parseExpression();
 					stmts->addNode(new IRAssign(value, rhs));
 				}
 				else

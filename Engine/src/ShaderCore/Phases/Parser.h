@@ -21,7 +21,8 @@ private:
 
 	IRValue *parseElement();
 	IRValue *parseUnaryOperator();
-	IRValue *parseBinaryOperator();
+	IRValue *parseBinaryOperator(int precedence);
+	inline IRValue *parseExpression() { return parseBinaryOperator(0); }
 	IRList *parseStatements();
 
 	Lexer *lexer;
