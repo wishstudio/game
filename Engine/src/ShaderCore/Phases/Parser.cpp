@@ -246,7 +246,7 @@ Context *Parser::parseShader(const std::string &source)
 				lexer->getToken();
 
 				ctx->symbolTable.leaveScope();
-				ctx->globalFuncs.push_back(std::unique_ptr<IRFunction>(func));
+				ctx->globalDefs.push_back(std::unique_ptr<IRNode>(func));
 				assert(ctx->symbolTable.add(func->getName(), func));
 			}
 			else
@@ -254,7 +254,7 @@ Context *Parser::parseShader(const std::string &source)
 				/* Global variable definition */
 				parseVariableDef(IRVariable::Global, type, [&](IRVariable *varDef, IRValue *initialValue) {
 					assert(initialValue == nullptr);
-					ctx->globalVars.push_back(std::unique_ptr<IRVariable>(varDef));
+					ctx->globalDefs.push_back(std::unique_ptr<IRNode>(varDef));
 					assert(ctx->symbolTable.add(varDef->getName(), varDef));
 				});
 				assert(lexer->getToken() == Lexer::Semicolon);
