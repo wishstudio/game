@@ -6,7 +6,6 @@ public:
 	enum NodeKind
 	{
 		Type,
-		Variable,
 		Constant,
 		VariableRef,
 		Unary,
@@ -16,6 +15,7 @@ public:
 		Assign,
 		Return,
 		List,
+		Variable,
 		Function,
 	};
 	IRNode(NodeKind _kind) : kind(_kind) {}
@@ -28,6 +28,7 @@ public:
 	inline bool getIsUnary() const { return kind == Unary; }
 	inline bool getIsBinary() const { return kind == Binary; }
 	inline bool getIsFieldRef() const { return kind == FieldRef; }
+	inline bool getIsInvoke() const { return kind == Invoke; }
 	inline bool getIsAssign() const { return kind == Assign; }
 	inline bool getIsReturn() const { return kind == Return; }
 	inline bool getIsList() const { return kind == List; }

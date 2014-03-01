@@ -56,7 +56,7 @@ public:
 	IRMatrixType(IRPrimitiveType *_base, int _rowdim, int _coldim): IRType(IRType::Matrix), base(_base), rowdim(_rowdim), coldim(_coldim) {}
 	virtual ~IRMatrixType() override {}
 
-	IRPrimitiveType *getBase() const { return base; }
+	IRPrimitiveType *getBaseType() const { return base; }
 	int getRowDimension() const { return rowdim; }
 	int getColumnDimension() const { return coldim; }
 

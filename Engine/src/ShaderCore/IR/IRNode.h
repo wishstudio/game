@@ -23,6 +23,8 @@ public:
 	IRVariableRef(IRVariable *_variable): IRValue(IRNode::Variable), variable(_variable) {}
 	virtual ~IRVariableRef() override {}
 
+	IRVariable *getVariable() const { return variable; }
+
 	virtual bool getIsLValue() const override { return true; }
 
 private:
@@ -96,26 +98,26 @@ private:
 class IRAssign: public IRNode
 {
 public:
-	IRAssign(IRNode *_lhs, IRNode *_rhs): IRNode(IRNode::Assign), lhs(_lhs), rhs(_rhs) {}
+	IRAssign(IRValue *_lhs, IRValue *_rhs): IRNode(IRNode::Assign), lhs(_lhs), rhs(_rhs) {}
 	virtual ~IRAssign() override {}
 
-	IRNode *getLeft() const { return lhs.get(); }
-	IRNode *getRight() const { return rhs.get(); }
+	IRValue *getLeft() const { return lhs.get(); }
+	IRValue *getRight() const { return rhs.get(); }
 
 private:
-	std::unique_ptr<IRNode> lhs, rhs;
+	std::unique_ptr<IRValue> lhs, rhs;
 };
 
 class IRReturn: public IRNode
 {
 public:
-	IRReturn(IRNode *_object): IRNode(IRNode::Return), object(_object) {}
+	IRReturn(IRValue *_object): IRNode(IRNode::Return), object(_object) {}
 	virtual ~IRReturn() override {}
 
-	IRNode *getObject() const { return object.get(); }
+	IRValue *getObject() const { return object.get(); }
 
 private:
-	std::unique_ptr<IRNode> object;
+	std::unique_ptr<IRValue> object;
 };
 
 class IRList: public IRNode

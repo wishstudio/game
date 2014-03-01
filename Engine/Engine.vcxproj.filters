@@ -149,6 +149,9 @@
     <ClInclude Include="src\ShaderCore\SymbolTable.h">
       <Filter>Source\ShaderCore</Filter>
     </ClInclude>
+    <ClInclude Include="src\ShaderCore\D3D11\D3D11Backend.h">
+      <Filter>Source\ShaderCore\D3D11</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\D3D11\D3D11IndexBuffer.cpp">
@@ -217,6 +220,9 @@
     <ClCompile Include="src\ShaderCore\SymbolTable.cpp">
       <Filter>Source\ShaderCore</Filter>
     </ClCompile>
+    <ClCompile Include="src\ShaderCore\D3D11\D3D11Backend.cpp">
+      <Filter>Source\ShaderCore\D3D11</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Source">
@@ -245,6 +251,9 @@
     </Filter>
     <Filter Include="Source\ShaderCore\IR">
       <UniqueIdentifier>{007b3183-4dbe-442c-bb6f-8054c971ffa4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\ShaderCore\D3D11">
+      <UniqueIdentifier>{03050d14-cf35-443e-af81-675bef95a1ac}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

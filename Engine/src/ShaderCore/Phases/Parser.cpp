@@ -303,6 +303,7 @@ Context *Parser::parseShader(const std::string &source)
 						break;
 				}
 			}
+			ctx->globalDefs.push_back(std::unique_ptr<IRNode>(structType));
 			assert(lexer->getToken() == Lexer::BClose);
 			lexer->nextToken();
 		}
