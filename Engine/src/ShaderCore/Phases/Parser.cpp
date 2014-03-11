@@ -274,7 +274,9 @@ Context *Parser::parseShader(const std::string &source)
 			lexer->nextToken();
 			assert(lexer->getToken() == Lexer::Identifier);
 			IRStructType *structType = new IRStructType(lexer->getTokenIdentifier());
+			lexer->nextToken();
 			assert(lexer->getToken() == Lexer::BOpen);
+			lexer->nextToken();
 			for (;;)
 			{
 				IRType *type = tryParseType();
@@ -302,11 +304,19 @@ Context *Parser::parseShader(const std::string &source)
 					else
 						break;
 				}
+				assert(lexer->getToken() == Lexer::Semicolon);
+				lexer->nextToken();
+				if (lexer->getToken() == Lexer::Eof || lexer->getToken() == Lexer::Error || lexer->getToken() == Lexer::BClose)
+					break;
 			}
 			ctx->globalDefs.push_back(std::unique_ptr<IRNode>(structType));
 			assert(lexer->getToken() == Lexer::BClose);
 			lexer->nextToken();
+			assert(lexer->getToken() == Lexer::Semicolon);
+			lexer->nextToken();
 		}
+		else
+			assert(false);
 	}
 
 	delete lexer;

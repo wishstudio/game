@@ -16,7 +16,7 @@ static IRBinary::BinaryKind binaryTokenMap[] = {
 	IRBinary::Div,
 	IRBinary::Mod,
 };
-IRBinary::BinaryKind translateBinaryToken(Lexer::TokenType token)
+IRBinary::BinaryKind Lexer::translateBinaryToken(Lexer::TokenType token)
 {
 	return binaryTokenMap[token - Lexer::_BINARY_TOKEN_BEGIN - 1];
 }
@@ -47,7 +47,7 @@ void Lexer::nextToken()
 		nextChar();
 	if (ctx.ch == -1)
 	{
-		ctx.token = Error;;
+		ctx.token = Eof;
 		return;
 	}
 	if (isalpha(ctx.ch) || ctx.ch == '_')
@@ -71,70 +71,87 @@ void Lexer::nextToken()
 	{
 	case '+':
 		ctx.token = Add;
+		nextChar();
 		return;
 
 	case '-':
 		ctx.token = Sub;
+		nextChar();
 		return;
 
 	case '*':
 		ctx.token = Mul;
+		nextChar();
 		return;
 
 	case '/':
 		ctx.token = Div;
+		nextChar();
 		return;
 
 	case '%':
 		ctx.token = Mod;
+		nextChar();
 		return;
 
 	case '=':
 		ctx.token = Assign;
+		nextChar();
 		return;
 
 	case '.':
 		ctx.token = Dot;
+		nextChar();
 		return;
 
 	case ',':
 		ctx.token = Comma;
+		nextChar();
 		return;
 
 	case ':':
 		ctx.token = Colon;
+		nextChar();
 		return;
 
 	case ';':
 		ctx.token = Semicolon;
+		nextChar();
 		return;
 
 	case '(':
 		ctx.token = POpen;
+		nextChar();
 		return;
 
 	case ')':
 		ctx.token = PClose;
+		nextChar();
 		return;
 
 	case '[':
 		ctx.token = SOpen;
+		nextChar();
 		return;
 
 	case ']':
 		ctx.token = SClose;
+		nextChar();
 		return;
 
 	case '{':
 		ctx.token = BOpen;
+		nextChar();
 		return;
 
 	case '}':
 		ctx.token = BClose;
+		nextChar();
 		return;
 
 	default:
 		ctx.token = Error;
+		nextChar();
 		return;
 	}
 }
