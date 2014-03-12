@@ -52,6 +52,8 @@ void Parser::parseVariableDef(IRVariable::VariableKind kind, IRType *type, T cal
 			lexer->nextToken();
 			continue;
 		}
+		else
+			break;
 	}
 }
 
@@ -156,12 +158,16 @@ IRList *Parser::parseStatements()
 			lexer->nextToken();
 			continue;
 
+		case Lexer::BClose:
+			return stmts;
+
 		case Lexer::Return:
 		{
 			lexer->nextToken();
 			/* TODO: Check void type */
 			IRValue *value = parseExpression();
 			stmts->addNode(new IRReturn(value));
+			break;
 		}
 
 		default:
@@ -194,8 +200,6 @@ IRList *Parser::parseStatements()
 		assert(lexer->getToken() == Lexer::Semicolon);
 		lexer->nextToken();
 	}
-
-	return stmts;
 }
 
 Context *Parser::parseShader(const std::string &source)
@@ -227,7 +231,7 @@ Context *Parser::parseShader(const std::string &source)
 				assert(lexer->getToken() == Lexer::POpen);
 				lexer->nextToken();
 				/* Parse parameter list */
-				while (lexer->getToken() != Lexer::PClose)
+				for (;;)
 				{
 					IRType *type = tryParseType();
 					assert(type != nullptr);
@@ -236,7 +240,12 @@ Context *Parser::parseShader(const std::string &source)
 						func->addParameter(varDef);
 						assert(ctx->symbolTable.add(varDef->getName(), varDef));
 					});
+					if (lexer->getToken() == Lexer::Comma)
+						lexer->nextToken();
+					else
+						break;
 				}
+				assert(lexer->getToken() == Lexer::PClose);
 				lexer->nextToken();
 				std::string semantic;
 				if (lexer->getToken() == Lexer::Colon)
@@ -248,10 +257,10 @@ Context *Parser::parseShader(const std::string &source)
 				}
 				func->setReturn(new IRVariable(IRVariable::Return, returnType, std::string(), semantic));
 				assert(lexer->getToken() == Lexer::BOpen);
-				lexer->getToken();
+				lexer->nextToken();
 				func->setBody(parseStatements());
 				assert(lexer->getToken() == Lexer::BClose);
-				lexer->getToken();
+				lexer->nextToken();
 
 				ctx->symbolTable.leaveScope();
 				ctx->globalDefs.push_back(std::unique_ptr<IRNode>(func));
@@ -309,6 +318,7 @@ Context *Parser::parseShader(const std::string &source)
 				if (lexer->getToken() == Lexer::Eof || lexer->getToken() == Lexer::Error || lexer->getToken() == Lexer::BClose)
 					break;
 			}
+			ctx->symbolTable.add(structType->getName(), structType);
 			ctx->globalDefs.push_back(std::unique_ptr<IRNode>(structType));
 			assert(lexer->getToken() == Lexer::BClose);
 			lexer->nextToken();

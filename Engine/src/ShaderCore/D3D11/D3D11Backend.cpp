@@ -118,7 +118,7 @@ void D3D11Backend::compileNode(IRNode *node)
 	{
 		IRReturn *r = (IRReturn *) node;
 		ret += "return ";
-		compileNode(r);
+		compileValue(r->getValue());
 		ret += ";\n";
 	}
 	else if (node->getIsList())

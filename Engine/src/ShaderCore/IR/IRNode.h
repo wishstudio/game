@@ -20,7 +20,7 @@ public:
 class IRVariableRef: public IRValue
 {
 public:
-	IRVariableRef(IRVariable *_variable): IRValue(IRNode::Variable), variable(_variable) {}
+	IRVariableRef(IRVariable *_variable): IRValue(IRNode::VariableRef), variable(_variable) {}
 	virtual ~IRVariableRef() override {}
 
 	IRVariable *getVariable() const { return variable; }
@@ -111,13 +111,13 @@ private:
 class IRReturn: public IRNode
 {
 public:
-	IRReturn(IRValue *_object): IRNode(IRNode::Return), object(_object) {}
+	IRReturn(IRValue *_value): IRNode(IRNode::Return), value(_value) {}
 	virtual ~IRReturn() override {}
 
-	IRValue *getObject() const { return object.get(); }
+	IRValue *getValue() const { return value.get(); }
 
 private:
-	std::unique_ptr<IRValue> object;
+	std::unique_ptr<IRValue> value;
 };
 
 class IRList: public IRNode
