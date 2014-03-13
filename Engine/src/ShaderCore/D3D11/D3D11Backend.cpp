@@ -151,6 +151,17 @@ void D3D11Backend::compileNode(IRNode *node)
 		ret += "\n";
 		compileNode(func->getBody());
 	}
+	else if (node->getIsCBuffer())
+	{
+		IRCBuffer *cbuffer = (IRCBuffer *) node;
+		ret += "cbuffer " + cbuffer->getName() + " {\n";
+		for (int i = 0; i < cbuffer->getVariableCount(); i++)
+		{
+			compileSingleVariableDef(cbuffer->getVariable(i));
+			ret += ";\n";
+		}
+		ret += "}\n";
+	}
 	else if (node->getIsValue())
 	{
 		compileValue((IRValue *) node);

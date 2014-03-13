@@ -15,6 +15,7 @@ public:
 		Assign,
 		Return,
 		List,
+		CBuffer,
 		Variable,
 		Function,
 	};
@@ -33,6 +34,7 @@ public:
 	inline bool getIsReturn() const { return kind == Return; }
 	inline bool getIsList() const { return kind == List; }
 	inline bool getIsFunction() const { return kind == Function; }
+	inline bool getIsCBuffer() const { return kind == CBuffer; }
 
 	virtual bool getIsValue() const { return false; }
 	virtual bool getIsLValue() const { return false; }

@@ -63,6 +63,8 @@ void Lexer::nextToken()
 			ctx.token = Struct;
 		else if (ctx.tokenIdentifier == "return")
 			ctx.token = Return;
+		else if (ctx.tokenIdentifier == "cbuffer")
+			ctx.token = CBuffer;
 		else
 			ctx.token = Identifier;
 		return;

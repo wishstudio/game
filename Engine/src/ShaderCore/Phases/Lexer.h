@@ -16,6 +16,7 @@ public:
 		Error,
 		Struct,
 		Return,
+		CBuffer,
 		Identifier,
 		_BINARY_TOKEN_BEGIN,
 		Add,

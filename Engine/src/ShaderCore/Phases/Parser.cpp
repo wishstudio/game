@@ -325,6 +325,31 @@ Context *Parser::parseShader(const std::string &source)
 			assert(lexer->getToken() == Lexer::Semicolon);
 			lexer->nextToken();
 		}
+		else if (lexer->getToken() == Lexer::CBuffer)
+		{
+			lexer->nextToken();
+			assert(lexer->getToken() == Lexer::Identifier);
+			IRCBuffer *cbuffer = new IRCBuffer(lexer->getTokenIdentifier());
+			lexer->nextToken();
+			assert(lexer->getToken() == Lexer::BOpen);
+			lexer->nextToken();
+			for (;;)
+			{
+				IRType *type = tryParseType();
+				if (type == nullptr)
+					break;
+				parseVariableDef(IRVariable::CBuffer, type, [&](IRVariable *varDef, IRValue *initialValue) {
+					assert(initialValue == nullptr);
+					cbuffer->addVariable(varDef);
+					ctx->symbolTable.add(varDef->getName(), varDef);
+				});
+				assert(lexer->getToken() == Lexer::Semicolon);
+				lexer->nextToken();
+			}
+			ctx->globalDefs.push_back(std::unique_ptr<IRNode>(cbuffer));
+			assert(lexer->getToken() == Lexer::BClose);
+			lexer->nextToken();
+		}
 		else
 			assert(false);
 	}

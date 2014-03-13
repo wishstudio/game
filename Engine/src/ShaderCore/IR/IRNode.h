@@ -137,9 +137,10 @@ private:
 class IRVariable: public IRNode
 {
 public:
-	enum VariableKind { Global, Local, Parameter, Return };
+	enum VariableKind { CBuffer, Global, Local, Parameter, Return };
 	IRVariable(VariableKind _kind, IRType *_type, const std::string &_name = std::string(), const std::string &_semantic = std::string())
 		: IRNode(Variable), kind(_kind), type(_type), name(_name), semantic(_semantic) {}
+	virtual ~IRVariable() override {}
 
 	VariableKind getKind() const { return kind; }
 	bool getIsLocal() const { return kind == Local; }
@@ -155,6 +156,23 @@ private:
 	VariableKind kind;
 	IRType *type;
 	std::string name, semantic;
+};
+
+class IRCBuffer : public IRNode
+{
+public:
+	IRCBuffer(const std::string &_name): IRNode(IRNode::CBuffer), name(_name) {}
+	virtual ~IRCBuffer() override {}
+
+	std::string getName() const { return name; }
+
+	void addVariable(IRVariable *_var) { variables.push_back(std::unique_ptr<IRVariable>(_var)); }
+	int getVariableCount() const { return variables.size(); }
+	IRVariable *getVariable(int index) const { return variables[index].get(); }
+
+private:
+	std::string name;
+	std::vector<std::unique_ptr<IRVariable>> variables;
 };
 
 class IRFunction: public IRNode
