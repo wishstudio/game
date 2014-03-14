@@ -57,6 +57,31 @@ void Parser::parseVariableDef(IRVariable::VariableKind kind, IRType *type, T cal
 	}
 }
 
+IRValue *Parser::parseFunctionCall(IRValue *object, IRFunction *func)
+{
+	assert(lexer->getToken() == Lexer::POpen);
+	lexer->nextToken();
+	IRInvoke *invokeValue = new IRInvoke(object, func);
+	if (lexer->getToken() != Lexer::PClose)
+	{
+		for (;;)
+		{
+			IRValue *parameter = parseExpression();
+			invokeValue->addParameter(parameter);
+			if (lexer->getToken() == Lexer::Comma)
+			{
+				lexer->nextToken();
+				continue;
+			}
+			else
+				break;
+		}
+	}
+	assert(lexer->getToken() == Lexer::PClose);
+	lexer->nextToken();
+	return invokeValue;
+}
+
 IRValue *Parser::parseElement()
 {
 	switch (lexer->getToken())
@@ -77,32 +102,8 @@ IRValue *Parser::parseElement()
 		lexer->nextToken();
 		if (node->getIsVariable())
 			return new IRVariableRef((IRVariable *) node);
-		else if (node->getIsFunction())
-		{
-			/* Function invocation */
-			assert(lexer->getToken() == Lexer::POpen);
-			lexer->nextToken();
-			IRFunction *func = (IRFunction *) node;
-			IRInvoke *invokeValue = new IRInvoke(func);
-			if (lexer->getToken() != Lexer::PClose)
-			{
-				for (;;)
-				{
-					IRValue *parameter = parseExpression();
-					invokeValue->addParameter(parameter);
-					if (lexer->getToken() == Lexer::Comma)
-					{
-						lexer->nextToken();
-						continue;
-					}
-					else
-						break;
-				}
-			}
-			assert(lexer->getToken() == Lexer::PClose);
-			lexer->nextToken();
-			return invokeValue;
-		}
+		else if (node->getIsFunction()) /* Function invocation */
+			return parseFunctionCall(nullptr, (IRFunction *) node);
 		else
 			assert(false);
 	}
@@ -120,8 +121,21 @@ IRValue *Parser::parseUnaryOperator()
 	{
 		lexer->nextToken();
 		assert(lexer->getToken() == Lexer::Identifier);
-		value = new IRFieldRef(value, lexer->getTokenIdentifier());
+		std::string name = lexer->getTokenIdentifier();
 		lexer->nextToken();
+		if (lexer->getToken() == Lexer::POpen)
+		{
+			/* Object method invocation */
+			/* TODO: Temporary workaround */
+			assert(value->getIsVariableRef());
+			IRType *type = ((IRVariableRef *) value)->getVariable()->getType();
+			assert(type->getIsShaderObject());
+			IRFunction *func = ((IRShaderObject *) type)->getFunction(name);
+			assert(func != nullptr);
+			value = parseFunctionCall(value, func);
+		}
+		else
+			value = new IRFieldRef(value, name);
 	}
 	return value;
 }

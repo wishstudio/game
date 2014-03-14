@@ -10,7 +10,18 @@
 class IRType: public IRNode
 {
 public:
-	enum TypeKind { Primitive, Vector, Matrix, Struct };
+	enum TypeKind
+	{
+		Primitive,
+		Vector,
+		Matrix,
+		Struct,
+
+		_SHADER_OBJECT_BEGIN,
+		SamplerState,
+		Texture2D,
+		_SHADER_OBJECT_END,
+	};
 	enum PrimitiveKind { Float };
 	IRType(TypeKind _kind): IRNode(IRNode::Type), kind(_kind) {}
 	virtual ~IRType() {}
@@ -19,6 +30,9 @@ public:
 	bool getIsVector() const { return kind == Vector; }
 	bool getIsMatrix() const { return kind == Matrix; }
 	bool getIsStruct() const { return kind == Struct; }
+	bool getIsShaderObject() const { return kind > _SHADER_OBJECT_BEGIN && kind < _SHADER_OBJECT_END; }
+	bool getIsSamplerState() const { return kind == SamplerState; }
+	bool getIsTexture2D() const { return kind == Texture2D; }
 
 private:
 	TypeKind kind;
@@ -90,4 +104,30 @@ private:
 	};
 	std::string name;
 	std::vector<Field> fields;
+};
+
+class IRFunction;
+class IRShaderObject: public IRType
+{
+public:
+	IRShaderObject(IRType::TypeKind kind): IRType(kind) {}
+	virtual ~IRShaderObject() {}
+
+	virtual IRFunction *getFunction(const std::string &name) { return nullptr; }
+};
+
+class IRSamplerState: public IRShaderObject
+{
+public:
+	IRSamplerState(): IRShaderObject(IRType::SamplerState) {}
+	virtual ~IRSamplerState() {}
+};
+
+class IRTexture2D: public IRShaderObject
+{
+public:
+	IRTexture2D(): IRShaderObject(IRType::Texture2D) {}
+	virtual ~IRTexture2D() {}
+
+	virtual IRFunction *getFunction(const std::string &name) override;
 };

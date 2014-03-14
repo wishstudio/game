@@ -19,6 +19,7 @@ private:
 	template <typename T>
 	void parseVariableDef(IRVariable::VariableKind kind, IRType *type, T callback);
 
+	IRValue *parseFunctionCall(IRValue *object, IRFunction *func);
 	IRValue *parseElement();
 	IRValue *parseUnaryOperator();
 	IRValue *parseBinaryOperator(int precedence);

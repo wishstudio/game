@@ -82,8 +82,11 @@ class IRInvoke: public IRValue
 {
 public:
 	IRInvoke(IRFunction *_func): IRValue(IRNode::Invoke), func(_func) {}
+	IRInvoke(IRValue *_object, IRFunction *_func) : IRValue(IRNode::Invoke), object(_object), func(_func) {}
 	virtual ~IRInvoke() override {}
 
+	bool getIsObjectInvoke() const { return object.get() != nullptr; }
+	IRValue *getObject() const { return object.get(); }
 	IRFunction *getFunction() const { return func.get(); }
 
 	void addParameter(IRValue *value) { parameters.push_back(std::unique_ptr<IRValue>(value)); }
@@ -91,6 +94,7 @@ public:
 	IRValue *getParameter(int index) const { return parameters[index].get(); }
 
 private:
+	std::unique_ptr<IRValue> object;
 	std::unique_ptr<IRFunction> func;
 	std::vector<std::unique_ptr<IRValue>> parameters;
 };

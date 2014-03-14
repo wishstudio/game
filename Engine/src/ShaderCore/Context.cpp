@@ -11,6 +11,9 @@ Context::Context()
 	symbolTable.add("float4", new IRVectorType(floatType, 4));
 	symbolTable.add("float4x4", new IRMatrixType(floatType, 4, 4));
 
+	symbolTable.add("SamplerState", new IRSamplerState());
+	symbolTable.add("Texture2D", new IRTexture2D());
+
 	IRFunction *func = new IRFunction("mul");
 	func->addParameter(new IRVariable(IRVariable::Parameter, floatType, "var1"));
 	func->addParameter(new IRVariable(IRVariable::Parameter, floatType, "var2"));

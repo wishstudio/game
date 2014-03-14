@@ -25,7 +25,12 @@ std::string D3D11Backend::getTypeName(IRType *type) const
 	}
 	else if (type->getIsStruct())
 		return ((IRStructType *) type)->getName();
-	assert(false);
+	else if (type->getIsSamplerState())
+		return "SamplerState";
+	else if (type->getIsTexture2D())
+		return "Texture2D";
+	else
+		assert(false);
 	return std::string();
 }
 
@@ -66,6 +71,11 @@ void D3D11Backend::compileValue(IRValue *value)
 	else if (value->getIsInvoke())
 	{
 		IRInvoke *invoke = (IRInvoke *) value;
+		if (invoke->getIsObjectInvoke())
+		{
+			compileValue(invoke->getObject());
+			ret += ".";
+		}
 		ret += invoke->getFunction()->getName() + "(";
 		for (int i = 0; i < invoke->getParameterCount(); i++)
 		{
