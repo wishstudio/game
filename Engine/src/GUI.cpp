@@ -8,10 +8,10 @@
 #include "Video.h"
 
 static const char SHADER2D_SRC[] = R"DELIM(
-cbuffer MatrixBuffer /* TODO: This is kept to be compatible with normal shaders */
+cbuffer MatrixBuffer
 {
 	float4x4 mvpMatrix;
-};
+}
 
 struct VS_InputType
 {
@@ -32,12 +32,12 @@ PS_InputType VS_Main(VS_InputType input)
 	return input;
 }
 
-Texture2D shaderTexture: register(t0);
-SamplerState shaderSampler: register(s0);
+SamplerState samplerState;
+Texture2D shaderTexture;
 
 float4 PS_Main(PS_InputType input): SV_TARGET
 {
-	return shaderTexture.Sample(shaderSampler, input.tex) * input.color;
+	return shaderTexture.Sample(samplerState, input.tex) * input.color;
 }
 
 )DELIM";

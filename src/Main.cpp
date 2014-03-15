@@ -16,16 +16,16 @@ static const char SHADER_SRC[] = R"DELIM(
 cbuffer MatrixBuffer
 {
 	float4x4 mvpMatrix;
-};
+}
 
 struct PS_InputType
 {
-	float4 pos : SV_POSITION;
-	float4 color : COLOR;
-	float2 tex : TEXCOORD;
+	float4 pos: SV_POSITION;
+	float4 color: COLOR;
+	float2 tex: TEXCOORD;
 };
 
-PS_InputType VS_Main(float4 pos : SV_POSITION, float4 color : COLOR, float2 tex : TEXCOORD)
+PS_InputType VS_Main(float4 pos: SV_POSITION, float4 color: COLOR, float2 tex: TEXCOORD)
 {
 	PS_InputType output;
 	output.pos = mul(pos, mvpMatrix);
@@ -34,12 +34,12 @@ PS_InputType VS_Main(float4 pos : SV_POSITION, float4 color : COLOR, float2 tex 
 	return output;
 }
 
-Texture2D shaderTexture: register(t0);
-SamplerState shaderSampler: register(s0);
+SamplerState samplerState;
+Texture2D shaderTexture;
 
 float4 PS_Main(PS_InputType input): SV_TARGET
 {
-	return shaderTexture.Sample(shaderSampler, input.tex) * input.color;
+	return shaderTexture.Sample(samplerState, input.tex) * input.color;
 }
 )DELIM";
 

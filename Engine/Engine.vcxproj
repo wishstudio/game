@@ -103,6 +103,7 @@
     <ClInclude Include="src\Shader.h" />
     <ClInclude Include="src\ShaderCore\Context.h" />
     <ClInclude Include="src\ShaderCore\D3D11\D3D11Backend.h" />
+    <ClInclude Include="src\ShaderCore\D3D11\D3D11Reflection.h" />
     <ClInclude Include="src\ShaderCore\IR\IRBase.h" />
     <ClInclude Include="src\ShaderCore\IR\IRNode.h" />
     <ClInclude Include="src\ShaderCore\IR\IRType.h" />
@@ -137,6 +138,7 @@
     <ClCompile Include="src\Pass.cpp" />
     <ClCompile Include="src\ShaderCore\Context.cpp" />
     <ClCompile Include="src\ShaderCore\D3D11\D3D11Backend.cpp" />
+    <ClCompile Include="src\ShaderCore\D3D11\D3D11Reflection.cpp" />
     <ClCompile Include="src\ShaderCore\IR\IRNode.cpp" />
     <ClCompile Include="src\ShaderCore\IR\IRType.cpp" />
     <ClCompile Include="src\ShaderCore\Phases\Lexer.cpp" />

@@ -12,9 +12,12 @@ class IRType: public IRNode
 public:
 	enum TypeKind
 	{
+		_VALUE_TYPE_BEGIN,
 		Primitive,
 		Vector,
 		Matrix,
+		_VALUE_TYPE_END,
+
 		Struct,
 
 		_SHADER_OBJECT_BEGIN,
@@ -26,6 +29,7 @@ public:
 	IRType(TypeKind _kind): IRNode(IRNode::Type), kind(_kind) {}
 	virtual ~IRType() {}
 
+	bool getIsValueType() const { return kind > _VALUE_TYPE_BEGIN && kind < _VALUE_TYPE_END; }
 	bool getIsPrimitive() const { return kind == Primitive; }
 	bool getIsVector() const { return kind == Vector; }
 	bool getIsMatrix() const { return kind == Matrix; }
@@ -38,41 +42,67 @@ private:
 	TypeKind kind;
 };
 
-class IRPrimitiveType: public IRType
+class IRValueType: public IRType
 {
 public:
-	IRPrimitiveType(PrimitiveKind _kind): IRType(IRType::Primitive), kind(_kind) {}
+	IRValueType(TypeKind kind): IRType(kind) {}
+	virtual ~IRValueType() {}
+
+	virtual int getSize() = 0;
+};
+
+class IRPrimitiveType: public IRValueType
+{
+public:
+	IRPrimitiveType(PrimitiveKind _kind): IRValueType(IRType::Primitive), kind(_kind) {}
 	virtual ~IRPrimitiveType() override {}
 
 	PrimitiveKind getPrimitiveKind() const { return kind; }
+
+	virtual int getSize() override
+	{
+		if (kind == IRType::Float)
+			return 4;
+		return 0; /* Make compiler happy */
+	}
 
 private:
 	PrimitiveKind kind;
 };
 
-class IRVectorType: public IRType
+class IRVectorType: public IRValueType
 {
 public:
-	IRVectorType(IRPrimitiveType *_base, int _dim): IRType(IRType::Vector), base(_base), dim(_dim) {}
+	IRVectorType(IRPrimitiveType *_base, int _dim): IRValueType(IRType::Vector), base(_base), dim(_dim) {}
 	virtual ~IRVectorType() override {}
 
 	IRPrimitiveType *getBaseType() const { return base; }
 	int getDimension() const { return dim; }
+
+	virtual int getSize() override
+	{
+		return base->getSize() * dim;
+	}
 
 private:
 	IRPrimitiveType *base;
 	int dim;
 };
 
-class IRMatrixType: public IRType
+class IRMatrixType: public IRValueType
 {
 public:
-	IRMatrixType(IRPrimitiveType *_base, int _rowdim, int _coldim): IRType(IRType::Matrix), base(_base), rowdim(_rowdim), coldim(_coldim) {}
+	IRMatrixType(IRPrimitiveType *_base, int _rowdim, int _coldim): IRValueType(IRType::Matrix), base(_base), rowdim(_rowdim), coldim(_coldim) {}
 	virtual ~IRMatrixType() override {}
 
 	IRPrimitiveType *getBaseType() const { return base; }
 	int getRowDimension() const { return rowdim; }
 	int getColumnDimension() const { return coldim; }
+
+	virtual int getSize() override
+	{
+		return base->getSize() * rowdim * coldim;
+	}
 
 private:
 	IRPrimitiveType *base;

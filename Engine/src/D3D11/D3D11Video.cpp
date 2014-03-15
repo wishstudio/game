@@ -1,6 +1,7 @@
 #include <Core.h>
 
 #include <d3dcompiler.h>
+#include "../ShaderCore/D3D11/D3D11Backend.h"
 #include "../Device/Win32Device.h"
 #include "../Material.h"
 #include "D3D11IndexBuffer.h"
@@ -377,6 +378,10 @@ PIndexBuffer D3D11Video::createIndexBuffer(VertexElementType type, u32 size)
 
 ID3DBlob *D3D11Video::createShader(const char *program, const char *entrypoint, const char *target)
 {
+	D3D11Backend *shaderReflection = new D3D11Backend();
+	if (!shaderReflection->compile(program))
+		return nullptr;
+
 	typedef HRESULT(_stdcall * PD3DCOMPILE)(
 		LPCVOID pSrcData,
 		SIZE_T SrcDataSize,
@@ -396,10 +401,12 @@ ID3DBlob *D3D11Video::createShader(const char *program, const char *entrypoint, 
 	ID3DBlob *shaderBlob, *errMsg;
 
 	UINT compileFlags = D3DCOMPILE_PACK_MATRIX_ROW_MAJOR | D3DCOMPILE_OPTIMIZATION_LEVEL3;
-	D3DCompile(program, strlen(program), nullptr, nullptr, nullptr, entrypoint, target, compileFlags, 0, &shaderBlob, &errMsg);
+	std::string code = shaderReflection->getCompiledCode();
+	D3DCompile(code.c_str(), code.length(), nullptr, nullptr, nullptr, entrypoint, target, compileFlags, 0, &shaderBlob, &errMsg);
 
 	if (errMsg)
 	{
+		printf("%s", code.c_str());
 		printf("Shader compilation error. Message:\n%s\n", errMsg->GetBufferPointer());
 		errMsg->Release();
 		return nullptr;

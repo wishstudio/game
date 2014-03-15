@@ -1,5 +1,6 @@
 #include <cassert>
 
+#include "../Phases/Parser.h"
 #include "D3D11Backend.h"
 
 std::string D3D11Backend::getTypeName(IRType *type) const
@@ -113,7 +114,7 @@ void D3D11Backend::compileNode(IRNode *node)
 					ret += ": " + semantic;
 				ret += ";\n";
 			}
-			ret += "}\n";
+			ret += "};\n";
 		}
 	}
 	else if (node->getIsAssign())
@@ -164,13 +165,18 @@ void D3D11Backend::compileNode(IRNode *node)
 	else if (node->getIsCBuffer())
 	{
 		IRCBuffer *cbuffer = (IRCBuffer *) node;
-		ret += "cbuffer " + cbuffer->getName() + " {\n";
+		int slot = constantBuffers.size();
+		D3D11ConstantBufferReflection *cbufferReflection = new D3D11ConstantBufferReflection(slot);
+		ret += "cbuffer " + cbuffer->getName() + ": register(b" + std::to_string(slot) + ") {\n";
 		for (int i = 0; i < cbuffer->getVariableCount(); i++)
 		{
-			compileSingleVariableDef(cbuffer->getVariable(i));
+			IRVariable *var = cbuffer->getVariable(i);
+			compileSingleVariableDef(var);
+			assert(var->getType()->getIsValueType());
+			cbufferReflection->addConstant(var->getName(), (IRValueType *) var->getType());
 			ret += ";\n";
 		}
-		ret += "}\n";
+		ret += "};\n";
 	}
 	else if (node->getIsValue())
 	{
@@ -181,10 +187,14 @@ void D3D11Backend::compileNode(IRNode *node)
 		assert(false);
 }
 
-std::string D3D11Backend::compile(Context *context)
+bool D3D11Backend::compile(const std::string &source)
 {
+	Context *context = Parser().parseShader(source);
+	if (context == nullptr)
+		return false;
+
 	ret.clear();
 	for (const std::unique_ptr<IRNode> &node: context->globalDefs)
 		compileNode(node.get());
-	return ret;
+	return true;
 }
