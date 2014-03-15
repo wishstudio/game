@@ -13,9 +13,9 @@ private:
 	static Vector3D collideEllipsoidWithWorld(Vector3D currentPosition, Vector3D moveVector, bool canSlide, bool &collided);
 
 	Vector3D currentPosition, nextPosition;
-	f32 nextVerticalVelocity, nextVerticalDistance;
+	float nextVerticalVelocity, nextVerticalDistance;
 	bool nextFalling;
 	Vector3D jumpDistance;
 
-	f32 rotationHorizontal = 0, rotationVertical = 0;
+	float rotationHorizontal = 0, rotationVertical = 0;
 };

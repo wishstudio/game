@@ -173,7 +173,7 @@ bool D3D11Video::init(std::shared_ptr<Win32Device> _device)
 	blendDesc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
 	blendDesc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
 	pDevice->CreateBlendState(&blendDesc, &pBlendState);
-	f32 blendFactor[4];
+	float blendFactor[4];
 	pContext->OMSetBlendState(pBlendState, blendFactor, 0xFFFFFFFF);
 
 	/* Set viewport */

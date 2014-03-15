@@ -15,7 +15,7 @@ public:
 
 	bool isValid() const { return maxPoint.x >= minPoint.x && maxPoint.y >= minPoint.y; }
 	bool isEmpty() const { return maxPoint.x <= minPoint.x || maxPoint.y <= minPoint.y; }
-	f32 getWidth() const { return maxPoint.x - minPoint.x; }
-	f32 getHeight() const { return maxPoint.y - minPoint.y; }
+	float getWidth() const { return maxPoint.x - minPoint.x; }
+	float getHeight() const { return maxPoint.y - minPoint.y; }
 	Size2D getSize() const { return Size2D(getWidth(), getHeight()); }
 };

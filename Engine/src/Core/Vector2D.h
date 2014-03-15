@@ -7,14 +7,14 @@ public:
 	{
 		struct
 		{
-			f32 x, y;
+			float x, y;
 		};
-		f32 m[2];
+		float m[2];
 	};
 
 	Vector2D(): x(0), y(0) {}
 	Vector2D(const Vector2D &) = default;
-	Vector2D(f32 _x, f32 _y): x(_x), y(_y) {}
+	Vector2D(float _x, float _y): x(_x), y(_y) {}
 
 	Vector2D &operator= (const Vector2D &) = default;
 
@@ -42,24 +42,24 @@ public:
 		return *this;
 	}
 
-	Vector2D operator* (f32 scale) const
+	Vector2D operator* (float scale) const
 	{
 		return Vector2D(x * scale, y * scale);
 	}
 
-	Vector2D &operator*= (f32 scale)
+	Vector2D &operator*= (float scale)
 	{
 		x *= scale;
 		y *= scale;
 		return *this;
 	}
 
-	Vector2D operator/ (f32 scale) const
+	Vector2D operator/ (float scale) const
 	{
 		return Vector2D(x / scale, y / scale);
 	}
 
-	Vector2D &operator/= (f32 scale)
+	Vector2D &operator/= (float scale)
 	{
 		x /= scale;
 		y /= scale;

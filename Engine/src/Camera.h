@@ -5,17 +5,17 @@ class Camera
 public:
 	Camera(PVideo video);
 
-	f32 getAspectRatio() const { return aspectRatio; }
-	void setAspectRatio(f32 aspectRatio) { this->aspectRatio = aspectRatio; updateProjectionMatrix(); }
+	float getAspectRatio() const { return aspectRatio; }
+	void setAspectRatio(float aspectRatio) { this->aspectRatio = aspectRatio; updateProjectionMatrix(); }
 
-	f32 getFarValue() const { return farValue; }
-	void setFarValue(f32 farValue) { this->farValue = farValue; updateProjectionMatrix(); }
+	float getFarValue() const { return farValue; }
+	void setFarValue(float farValue) { this->farValue = farValue; updateProjectionMatrix(); }
 
-	f32 getNearValue() const { return nearValue; }
-	void setNearValue(f32 nearValue) { this->nearValue = nearValue; updateProjectionMatrix(); }
+	float getNearValue() const { return nearValue; }
+	void setNearValue(float nearValue) { this->nearValue = nearValue; updateProjectionMatrix(); }
 
-	f32 getFOV() const { return fovy; }
-	void setFOV(f32 fovy) { this->fovy = fovy; updateProjectionMatrix(); }
+	float getFOV() const { return fovy; }
+	void setFOV(float fovy) { this->fovy = fovy; updateProjectionMatrix(); }
 
 	const Vector3D &getPosition() const { return position; }
 	void setPosition(const Vector3D &position)
@@ -40,7 +40,7 @@ private:
 	void updateProjectionMatrix();
 
 	PVideo video;
-	f32 aspectRatio, farValue, nearValue, fovy;
+	float aspectRatio, farValue, nearValue, fovy;
 	Vector3D position, lookAt, upVector;
 	Matrix4 viewMatrix, projectionMatrix;
 };

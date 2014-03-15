@@ -21,12 +21,12 @@ public:
 	void setCullMode(CullMode cullMode) { this->cullMode = cullMode; rasterizerDirty = true; }
 	FrontMode getFrontMode() const { return frontMode; }
 	void setFrontMode(FrontMode frontMode) { this->frontMode = frontMode; rasterizerDirty = true; }
-	f32 getDepthBias() const { return depthBias; }
-	void setDepthBias(f32 depthBias) { this->depthBias = depthBias; rasterizerDirty = true; }
-	f32 getDepthBiasClamp() const { return depthBiasClamp; }
-	void setDepthBiasClamp(f32 depthBiasClamp) { this->depthBiasClamp = depthBiasClamp; rasterizerDirty = true; }
-	f32 getSlopeScaledDepthBias() const { return slopeScaledDepthBias; }
-	void setSlopeScaledDepthBias(f32 slopeScaledDepthBias) { this->slopeScaledDepthBias = slopeScaledDepthBias; rasterizerDirty = true; }
+	float getDepthBias() const { return depthBias; }
+	void setDepthBias(float depthBias) { this->depthBias = depthBias; rasterizerDirty = true; }
+	float getDepthBiasClamp() const { return depthBiasClamp; }
+	void setDepthBiasClamp(float depthBiasClamp) { this->depthBiasClamp = depthBiasClamp; rasterizerDirty = true; }
+	float getSlopeScaledDepthBias() const { return slopeScaledDepthBias; }
+	void setSlopeScaledDepthBias(float slopeScaledDepthBias) { this->slopeScaledDepthBias = slopeScaledDepthBias; rasterizerDirty = true; }
 	bool getDepthClipEnabled() const { return depthClipEnabled; }
 	void setDepthClipEnabled(bool depthClipEnabled) { this->depthClipEnabled = depthClipEnabled; rasterizerDirty = true; }
 	bool getScissorEnabled() const { return scissorEnabled; }
@@ -55,6 +55,6 @@ private:
 	FillMode fillMode = FILLMODE_SOLID;
 	CullMode cullMode = CULLMODE_BACK;
 	FrontMode frontMode = FRONTMODE_COUNTERCLOCKWISE;
-	f32 depthBias = 0.f, depthBiasClamp = 0.f, slopeScaledDepthBias = 0.f;
+	float depthBias = 0.f, depthBiasClamp = 0.f, slopeScaledDepthBias = 0.f;
 	bool depthClipEnabled = true, scissorEnabled = false, multisampleEnabled = false, antialiasedLineEnabled = false;
 };

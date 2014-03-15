@@ -20,15 +20,15 @@ public:
 	Vector3D getNormal() const
 	{
 		/* This should have higher precision than simple (B-A)x(C-A) */
-		f32 nx = pointA.y * (pointB.z - pointC.z) + pointB.y * (pointC.z - pointA.z) + pointC.y * (pointA.z - pointB.z);
-		f32 ny = pointA.z * (pointB.x - pointC.x) + pointB.z * (pointC.x - pointA.x) + pointC.z * (pointA.x - pointB.x);
-		f32 nz = pointA.x * (pointB.y - pointC.y) + pointB.x * (pointC.y - pointA.y) + pointC.x * (pointA.y - pointB.y);
+		float nx = pointA.y * (pointB.z - pointC.z) + pointB.y * (pointC.z - pointA.z) + pointC.y * (pointA.z - pointB.z);
+		float ny = pointA.z * (pointB.x - pointC.x) + pointB.z * (pointC.x - pointA.x) + pointC.z * (pointA.x - pointB.x);
+		float nz = pointA.x * (pointB.y - pointC.y) + pointB.x * (pointC.y - pointA.y) + pointC.x * (pointA.y - pointB.y);
 		return Vector3D(nx, ny, nz);
 	}
 
 	bool isFrontFacing(const Vector3D &lookDirection) const
 	{
-		f32 d = getNormal().dotProduct(lookDirection);
+		float d = getNormal().dotProduct(lookDirection);
 		return d < EPSILON;
 	}
 
@@ -59,9 +59,9 @@ public:
 		Vector3D bc = closestPointOnLine(point, pointB, pointC);
 		Vector3D ca = closestPointOnLine(point, pointC, pointA);
 
-		f32 dab = (ab - point).getLength();
-		f32 dbc = (bc - point).getLength();
-		f32 dca = (ca - point).getLength();
+		float dab = (ab - point).getLength();
+		float dbc = (bc - point).getLength();
+		float dca = (ca - point).getLength();
 		
 		if (dab < dbc)
 			return dab < dca? ab: ca;
@@ -72,7 +72,7 @@ public:
 	Vector3D closestPointOnLine(const Vector3D &P, const Vector3D &A, const Vector3D &B) const
 	{
 		Vector3D V = (B - A).getNormalized();
-		f32 t = (P - A).dotProduct(V);
+		float t = (P - A).dotProduct(V);
 		if (t < 0)
 			return A;
 		if (t > (B - A).getLength())

@@ -22,25 +22,25 @@ public:
 	bool isKeyPressed(KeyValue key) const { return keyPressState[key]; }
 	bool isMouseDown(MouseButton button) const { return mouseDownState[button]; }
 	bool isMousePressed(MouseButton button) const { return mousePressState[button]; }
-	f32 getMouseWheel() const { return mouseWheel; }
+	float getMouseWheel() const { return mouseWheel; }
 
 	virtual void setMouseVisible(bool isVisible) = 0;
 	virtual bool isMouseVisible() const = 0;
 	Vector2D getNormalizedMousePosition() const { return normalizedMousePosition; }
 	virtual void setMousePosition(s32 x, s32 y) = 0;
-	void setNormalizedMousePosition(f32 x, f32 y);
+	void setNormalizedMousePosition(float x, float y);
 	void setNormalizedMousePosition(Vector2D position) { setNormalizedMousePosition(position.x, position.y); }
 
 	/* Time flow */
 	void setTicksPerSecond(u32 _ticksPerSecond) { ticksPerSecond = _ticksPerSecond; }
 	bool tick();
 	u64 getTick() const { return currentTick; }
-	f32 getTickInterval() const { return 1.0f / ticksPerSecond; }
+	float getTickInterval() const { return 1.0f / ticksPerSecond; }
 	u32 getElapsedTickTimeMilliseconds() const { return (u32)((currentTimeMicroseconds - currentTickTimeMicroseconds) / 1000); }
-	f32 getElapsedTickTime() const { return getElapsedTickTimeMilliseconds() / 1000.f; };
+	float getElapsedTickTime() const { return getElapsedTickTimeMilliseconds() / 1000.f; };
 
 	u32 getFPS() const { return averageFrameTimeMicroseconds == 0? 0: (u32)(1000000.f / averageFrameTimeMicroseconds); }
-	f32 getAverageFrameTime() const { return averageFrameTimeMicroseconds / 1000000.f; }
+	float getAverageFrameTime() const { return averageFrameTimeMicroseconds / 1000000.f; }
 
 protected:
 	void onKeyDown(KeyValue key);
@@ -56,7 +56,7 @@ private:
 	Vector2D normalizedMousePosition = Vector2D(0, 0);
 	bool keyDownState[KEY_VALUE_COUNT], keyPressState[KEY_VALUE_COUNT];
 	bool mouseDownState[MOUSE_BUTTON_COUNT], mousePressState[MOUSE_BUTTON_COUNT];
-	f32 mouseWheel;
+	float mouseWheel;
 	u32 ticksPerSecond;
 	u64 currentTick = 0, initialTimeMicroseconds = -1;
 	u64 currentTimeMicroseconds, currentTickTimeMicroseconds;

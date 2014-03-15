@@ -16,10 +16,10 @@ public:
 class Colorf
 {
 public:
-	f32 r, g, b, a;
+	float r, g, b, a;
 
 	Colorf() : r(0), g(0), b(0), a(0) {}
-	Colorf(f32 _r, f32 _g, f32 _b, f32 _a) : r(_r), g(_g), b(_b), a(_a) {}
+	Colorf(float _r, float _g, float _b, float _a) : r(_r), g(_g), b(_b), a(_a) {}
 
 	Colorf(const Colorf &c) = default;
 	Colorf &operator= (const Colorf &c) = default;
@@ -54,12 +54,12 @@ public:
 		return *this;
 	}
 
-	Colorf operator* (f32 scalar)
+	Colorf operator* (float scalar)
 	{
 		return Colorf(r * scalar, g * scalar, b * scalar, a * scalar);
 	}
 
-	Colorf &operator*= (f32 scalar)
+	Colorf &operator*= (float scalar)
 	{
 		r *= scalar;
 		g *= scalar;
@@ -68,12 +68,12 @@ public:
 		return *this;
 	}
 
-	Colorf operator/ (f32 scalar)
+	Colorf operator/ (float scalar)
 	{
 		return Colorf(r / scalar, g / scalar, b / scalar, a / scalar);
 	}
 
-	Colorf &operator/= (f32 scalar)
+	Colorf &operator/= (float scalar)
 	{
 		r /= scalar;
 		g /= scalar;
@@ -102,17 +102,17 @@ inline Color &Color::operator= (const Colorf &c)
 
 inline Colorf::Colorf(const Color &c)
 {
-	r = c.r / (f32)0xFF;
-	g = c.g / (f32)0xFF;
-	b = c.b / (f32)0xFF;
-	a = c.a / (f32)0xFF;
+	r = c.r / (float)0xFF;
+	g = c.g / (float)0xFF;
+	b = c.b / (float)0xFF;
+	a = c.a / (float)0xFF;
 }
 
 inline Colorf &Colorf::operator= (const Color &c)
 {
-	r = c.r / (f32)0xFF;
-	g = c.g / (f32)0xFF;
-	b = c.b / (f32)0xFF;
-	a = c.a / (f32)0xFF;
+	r = c.r / (float)0xFF;
+	g = c.g / (float)0xFF;
+	b = c.b / (float)0xFF;
+	a = c.a / (float)0xFF;
 	return *this;
 }

@@ -12,7 +12,7 @@ public:
 	AABB3D(const AABB3D &) = default;
 	AABB3D(const Vector3D &point): minPoint(point), maxPoint(point) {}
 	AABB3D(const Vector3D &_minPoint, const Vector3D &_maxPoint): minPoint(_minPoint), maxPoint(_maxPoint) {}
-	AABB3D(f32 xMin, f32 yMin, f32 zMin, f32 xMax, f32 yMax, f32 zMax): minPoint(xMin, yMin, zMin), maxPoint(xMax, yMax, zMax) {}
+	AABB3D(float xMin, float yMin, float zMin, float xMax, float yMax, float zMax): minPoint(xMin, yMin, zMin), maxPoint(xMax, yMax, zMax) {}
 
 	AABB3D &operator= (const AABB3D &) = default;
 
@@ -48,8 +48,8 @@ public:
 		{
 			for (int i = 0; i < 3; i++)
 			{
-				const f32 a = matrix.m[i][j] * minPoint.m[j];
-				const f32 b = matrix.m[i][j] * maxPoint.m[j];
+				const float a = matrix.m[i][j] * minPoint.m[j];
+				const float b = matrix.m[i][j] * maxPoint.m[j];
 				if (a < b)
 				{
 					rMin.m[j] += a;
@@ -65,7 +65,7 @@ public:
 		return AABB3D(rMin, rMax);
 	}
 
-	AABB3D translate(f32 offsetX, f32 offsetY, f32 offsetZ) const
+	AABB3D translate(float offsetX, float offsetY, float offsetZ) const
 	{
 		return AABB3D(minPoint + Vector3D(offsetX, offsetY, offsetZ), maxPoint + Vector3D(offsetX, offsetY, offsetZ));
 	}

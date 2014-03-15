@@ -60,9 +60,9 @@ inline bool rayIntersectsWithBox(const Ray3D &ray, const AABB3D &box)
 	/* MinX <= Xt + x0 <= MaxX
 	   MinY <= Yt + y0 <= MaxY
 	   MinZ <= Zt + z0 <= MinZ */
-	f32 x0 = ray.start.x, X = ray.direction.x;
-	f32 y0 = ray.start.y, Y = ray.direction.y;
-	f32 z0 = ray.start.z, Z = ray.direction.z;
+	float x0 = ray.start.x, X = ray.direction.x;
+	float y0 = ray.start.y, Y = ray.direction.y;
+	float z0 = ray.start.z, Z = ray.direction.z;
 
 	/* Note the following formulas (derived from above)
 	   Xt >= MinX - x0
@@ -73,7 +73,7 @@ inline bool rayIntersectsWithBox(const Ray3D &ray, const AABB3D &box)
 	   Zt <= MaxZ - z0
 	   It is obvious the range of t can be determined.
 	 */
-	f32 tMin = 0, tMax = std::numeric_limits<f32>::infinity();
+	float tMin = 0, tMax = std::numeric_limits<float>::infinity();
 	if (isZero(X)) /* 0 >= MinX - x0 */ /* 0 <= MaxX - x0 */
 	{
 		if (box.minPoint.x - x0 > EPSILON || box.maxPoint.x < -EPSILON)
@@ -124,7 +124,7 @@ inline bool rayIntersectsWithBox(const Ray3D &ray, const AABB3D &box)
 	return tMin <= tMax;
 }
 
-inline bool rayIntersectsWithSphere(const Ray3D &ray, const Vector3D &center, f32 radius, f32 &distance)
+inline bool rayIntersectsWithSphere(const Ray3D &ray, const Vector3D &center, float radius, float &distance)
 {
 	/*         |
 	 *         |       % % %
@@ -142,12 +142,12 @@ inline bool rayIntersectsWithSphere(const Ray3D &ray, const Vector3D &center, f3
 	/* Sphere center in point coordinate system */
 	Vector3D Q = center - ray.start;
 	/* Distance from sphere center to origin */
-	f32 c = Q.getLength();
+	float c = Q.getLength();
 	/* v = Q * vn
 	     = |Q| * 1 * cos(alpha)
 	     = c * cos(alpha)
 	 */
-	f32 v = Q.dotProduct(ray.direction.getNormalized());
+	float v = Q.dotProduct(ray.direction.getNormalized());
 	if (v < 0.f)
 		return false;
 	/* d = R^2 - (c^2 - v^2)
@@ -156,7 +156,7 @@ inline bool rayIntersectsWithSphere(const Ray3D &ray, const Vector3D &center, f3
 	 *   = R^2 - c^2 * sin(alpha)^2
 	 *   = R^2 - (c * sin(alpha))^2
 	 */
-	f32 d = radius * radius - (c * c - v * v);
+	float d = radius * radius - (c * c - v * v);
 	if (d < 0.f)
 		return false;
 
@@ -174,10 +174,10 @@ inline bool rayIntersectsPlane(const Ray3D &ray, const Triangle3D &plane, Vector
 	 * =>              t = (d - n * P) / (n * V)
 	 */
 	Vector3D n = plane.getNormal().getNormalized();
-	f32 d = plane.pointA.dotProduct(n);
-	f32 t = (d - n.dotProduct(ray.start)) / n.dotProduct(ray.direction);
+	float d = plane.pointA.dotProduct(n);
+	float t = (d - n.dotProduct(ray.start)) / n.dotProduct(ray.direction);
 	/* If n * V == 0 we will get Inf or NaN, they are correctly handled below */
-	if (t > -EPSILON && t < std::numeric_limits<f32>::infinity())
+	if (t > -EPSILON && t < std::numeric_limits<float>::infinity())
 	{
 		intersectionPoint = ray.start + t * ray.direction;
 		return true;

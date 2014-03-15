@@ -206,15 +206,15 @@ bool World::getCameraIntersection(const Ray3D &ray, CameraIntersectionInfo **inf
 	const int cellBoundaryZ = z + (stepZ > 0 ? 1 : 0);
 
 	/* Determine how far we can travel along the ray before we hit a voxel boundary. */
-	const f32 inf = std::numeric_limits<f32>::infinity();
-	f32 tMaxX = isZero(ray.direction.x) ? inf : (cellBoundaryX - ray.start.x) / ray.direction.x;
-	f32 tMaxY = isZero(ray.direction.y) ? inf : (cellBoundaryY - ray.start.y) / ray.direction.y;
-	f32 tMaxZ = isZero(ray.direction.z) ? inf : (cellBoundaryZ - ray.start.z) / ray.direction.z;
+	const float inf = std::numeric_limits<float>::infinity();
+	float tMaxX = isZero(ray.direction.x) ? inf : (cellBoundaryX - ray.start.x) / ray.direction.x;
+	float tMaxY = isZero(ray.direction.y) ? inf : (cellBoundaryY - ray.start.y) / ray.direction.y;
+	float tMaxZ = isZero(ray.direction.z) ? inf : (cellBoundaryZ - ray.start.z) / ray.direction.z;
  
 	/* Determine how far we must travel along the ray before we have crossed a gridcell. */
-	const f32 tDeltaX = isZero(ray.direction.x) ? inf : (stepX / ray.direction.x);
-	const f32 tDeltaY = isZero(ray.direction.y) ? inf : (stepY / ray.direction.y);
-	const f32 tDeltaZ = isZero(ray.direction.z) ? inf : (stepZ / ray.direction.z);
+	const float tDeltaX = isZero(ray.direction.x) ? inf : (stepX / ray.direction.x);
+	const float tDeltaY = isZero(ray.direction.y) ? inf : (stepY / ray.direction.y);
+	const float tDeltaZ = isZero(ray.direction.z) ? inf : (stepZ / ray.direction.z);
 
 	/* For step == 0, this does not matter. */
 	const Direction directionX = (stepX > 0) ? DIRECTION_X : DIRECTION_MX;

@@ -68,7 +68,7 @@ GUI::GUI(PVideo _video):
 	vertexBuffer = video->createVertexBuffer(vertexFormat, 128);
 }
 
-#define NORMALIZE_POS(_x, _y) Vector2D((_x) * 2 / (f32) bbSize.x - 1.f, 1.f - (_y) * 2 / (f32) bbSize.y)
+#define NORMALIZE_POS(_x, _y) Vector2D((_x) * 2 / (float) bbSize.x - 1.f, 1.f - (_y) * 2 / (float) bbSize.y)
 void GUI::draw2DLine(const Vector2DI &start, const Vector2DI &end, Color color)
 {
 	Vector2DI bbSize = video->getBackBufferSize();

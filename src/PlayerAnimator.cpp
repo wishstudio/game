@@ -5,7 +5,7 @@
 #include "World.h"
 
 static const Vector3D playerRadius = { 0.48f, 1.9f, 0.48f };
-static const f32 veryCloseDistance = 0.0001;
+static const float veryCloseDistance = 0.0001;
 
 PlayerAnimator::PlayerAnimator()
 {
@@ -22,13 +22,13 @@ void PlayerAnimator::tick()
 {
 	/* Update current values */
 	Vector3D currentDistance = { 0, 0, 0 };
-	f32 currentVerticalVelocity = nextVerticalVelocity;
-	f32 currentVerticalDistance = nextVerticalDistance;
+	float currentVerticalVelocity = nextVerticalVelocity;
+	float currentVerticalDistance = nextVerticalDistance;
 	currentPosition = nextPosition;
 	bool currentFalling = nextFalling;
 
 	/* Update next velocity */
-	const f32 MOVE_SPEED = 6 * device->getTickInterval();
+	const float MOVE_SPEED = 6 * device->getTickInterval();
 	if (!currentFalling)
 	{
 		Vector3D forwardVec = (camera->getLookAt() - camera->getPosition());
@@ -65,7 +65,7 @@ void PlayerAnimator::tick()
 	/* Collision detection */
 	bool collided;
 	nextPosition = collideEllipsoidWithWorld(nextPosition, currentDistance, true, collided);
-	f32 originalY = nextPosition.y;
+	float originalY = nextPosition.y;
 	nextPosition = collideEllipsoidWithWorld(nextPosition, currentVerticalDistance * Vector3D(0, 1, 0), false, collided);
 
 	/* Check if we are stadning on the ground */
@@ -97,9 +97,9 @@ Vector3D PlayerAnimator::collideEllipsoidWithWorld(Vector3D position, Vector3D m
 	box.merge(position + moveVector + playerRadius);
 
 	/* Calculating base coordinates */
-	f32 fx = position.x / CHUNK_SIZE;
-	f32 fy = position.y / CHUNK_SIZE;
-	f32 fz = position.z / CHUNK_SIZE;
+	float fx = position.x / CHUNK_SIZE;
+	float fy = position.y / CHUNK_SIZE;
+	float fz = position.z / CHUNK_SIZE;
 
 	int basex = (int)floor(fx);
 	int basey = (int)floor(fy);
@@ -128,11 +128,11 @@ Vector3D PlayerAnimator::collideEllipsoidWithWorld(Vector3D position, Vector3D m
 	/* Note the sphere is unit sphere */
 
 	Vector3D vn = moveVector.getNormalized();
-	f32 remainDistance = moveVector.getLength();
+	float remainDistance = moveVector.getLength();
 	for (int depth = 0; depth < 5; depth++) /* Do sliding at most 5 times */
 	{
 		/* Find colliding triangle */
-		f32 minDistance = remainDistance; /* Don't count if colliding distance is larger than move distance */
+		float minDistance = remainDistance; /* Don't count if colliding distance is larger than move distance */
 		Vector3D minPlaneIntersection;
 
 		Vector3D invertedVelocity(-vn);
@@ -154,7 +154,7 @@ Vector3D PlayerAnimator::collideEllipsoidWithWorld(Vector3D position, Vector3D m
 			Vector3D planeIntersection;
 			if (rayIntersectsPlane(Ray3D(sphereIntersection, vn), triangle, planeIntersection));
 			{
-				f32 distance;
+				float distance;
 				if (triangle.isPointInside(planeIntersection))
 				{
 					/* Simple case: plane intersection in on the triangle */
@@ -212,7 +212,7 @@ Vector3D PlayerAnimator::collideEllipsoidWithWorld(Vector3D position, Vector3D m
 void PlayerAnimator::update()
 {
 	const Vector3D playerCameraOffset(0, 1.7f, 0);
-	const f32 VIEW_DELTA = 0.01;
+	const float VIEW_DELTA = 0.01;
 
 	/* Interpolate camera position for smooth rendering */
 	Vector3D position(currentPosition);
@@ -224,8 +224,8 @@ void PlayerAnimator::update()
 	/* Update rotation */
 	Vector2D mouseDelta = device->getNormalizedMousePosition();
 	/* TODO: Aspect ratio */
-	f32 rotationHorizontalDelta = -mouseDelta.x * PI / 3;
-	f32 rotationVerticalDelta = mouseDelta.y * PI / 4;
+	float rotationHorizontalDelta = -mouseDelta.x * PI / 3;
+	float rotationVerticalDelta = mouseDelta.y * PI / 4;
 
 	rotationHorizontal += rotationHorizontalDelta;
 	rotationVertical = bound(-PI / 2, rotationVertical + rotationVerticalDelta, PI / 2 - VIEW_DELTA);

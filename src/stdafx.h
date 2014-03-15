@@ -41,10 +41,10 @@ struct Vertex
 {
 	Vector3D position;
 	Color color;
-	f32 u, v;
+	float u, v;
 
 	Vertex() = default;
-	Vertex(Vector3D _position, Color _color, f32 _u, f32 _v):
+	Vertex(Vector3D _position, Color _color, float _u, float _v):
 		position(_position), color(_color), u(_u), v(_v)
 	{}
 };

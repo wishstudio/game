@@ -38,8 +38,8 @@ void Device::onMouseMove(int x, int y)
 {
 	u32 width, height;
 	getWindowSize(&width, &height);
-	f32 nx = 2.f * (f32)x / (f32)width - 1.f;
-	f32 ny = 2.f * (f32)(height - y) / (f32)height - 1.f;
+	float nx = 2.f * (float)x / (float)width - 1.f;
+	float ny = 2.f * (float)(height - y) / (float)height - 1.f;
 	normalizedMousePosition = Vector2D(nx, ny);
 }
 
@@ -82,12 +82,12 @@ void Device::onNewFrame(u64 _currentTimeMicroseconds)
 	}
 }
 
-void Device::setNormalizedMousePosition(f32 nx, f32 ny)
+void Device::setNormalizedMousePosition(float nx, float ny)
 {
 	u32 width, height;
 	getWindowSize(&width, &height);
-	s32 x = (s32)((nx + 1.f) / 2.f * (f32)width);
-	s32 y = (s32)(height - (ny + 1.f) / 2.f * (f32)height);
+	s32 x = (s32)((nx + 1.f) / 2.f * (float)width);
+	s32 y = (s32)(height - (ny + 1.f) / 2.f * (float)height);
 	setMousePosition(x, y);
 }
 

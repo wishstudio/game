@@ -20,7 +20,7 @@ public:
 		for (int x = 0; x < CHUNK_SIZE; x++)
 			for (int z = 0; z < CHUNK_SIZE; z++)
 			{
-				f32 m = -1;
+				float m = -1;
 				for (int xx = x - 5; xx <= x + 5; xx++)
 					for (int zz = z - 5; zz <= z + 5; zz++)
 						m = max(m, treeProbability.getNoise(xx + CHUNK_SIZE, zz + CHUNK_SIZE));
