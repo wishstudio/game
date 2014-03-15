@@ -50,7 +50,7 @@ static void draw3DBox(const AABB3D &box, Color color)
 	static PVertexBuffer buffer = video->createVertexBuffer(vertexFormat, 36);
 
 	video->setTexture(whiteTexture);
-	video->setModelMatrix(Matrix4::identity());
+	camera->apply(Matrix4::identity());
 
 	Vector3D p000(box.minPoint.x, box.minPoint.y, box.minPoint.z);
 	Vector3D p001(box.minPoint.x, box.minPoint.y, box.maxPoint.z);
@@ -165,8 +165,6 @@ int main()
 		playerAnimator->update();
 
 		video->beginDraw({ 127, 200, 251, 255 });
-		video->setViewMatrix(camera->getViewMatrix());
-		video->setProjectionMatrix(camera->getProjectionMatrix());
 
 		video->setMaterial(defaultMaterial);
 		chunkSceneNode->render();

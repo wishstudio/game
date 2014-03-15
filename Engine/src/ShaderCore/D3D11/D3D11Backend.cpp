@@ -176,6 +176,7 @@ void D3D11Backend::compileNode(IRNode *node)
 			cbufferReflection->addConstant(var->getName(), (IRValueType *) var->getType());
 			ret += ";\n";
 		}
+		constantBuffers.push_back(std::unique_ptr<D3D11ConstantBufferReflection>(cbufferReflection));
 		ret += "};\n";
 	}
 	else if (node->getIsValue())

@@ -4,7 +4,14 @@
 #include <d3d11_2.h>
 #include <wincodec.h>
 
+class D3D11Backend;
+class D3D11VertexBuffer;
 class D3D11VertexShader;
+class D3D11PixelShader;
+class D3D11GeometryShader;
+class D3D11HullShader;
+class D3D11DomainShader;
+class D3D11ComputeShader;
 class Win32Device;
 class D3D11Video: public Video
 {
@@ -36,16 +43,21 @@ public:
 
 	virtual void setViewport(s32 width, s32 height) override;
 	virtual void setTexture(PTexture texture) override;
-	virtual void setModelMatrix(const Matrix4 &matrix) override;
-	virtual void setViewMatrix(const Matrix4 &matrix) override;
-	virtual void setProjectionMatrix(const Matrix4 &matrix) override;
+	virtual void setMaterial(PMaterial material) override;
+
 	virtual void setVertexShader(PVertexShader vertexShader) override;
 	virtual void setPixelShader(PPixelShader pixelShader) override;
 	virtual void setGeometryShader(PGeometryShader geometryShader) override;
 	virtual void setHullShader(PHullShader hullShader) override;
 	virtual void setDomainShader(PDomainShader domainShader) override;
 	virtual void setComputeShader(PComputeShader computeShader) override;
-	virtual void setMaterial(PMaterial material) override;
+
+	virtual PVertexShader getVertexShader() const override;
+	virtual PPixelShader getPixelShader() const override;
+	virtual PGeometryShader getGeometryShader() const override;
+	virtual PHullShader getHullShader() const override;
+	virtual PDomainShader getDomainShader() const override;
+	virtual PComputeShader getComputeShader() const override;
 
 	virtual Vector2DI getBackBufferSize() const override;
 	virtual u32 getVertexCount() const override { return vertexCount; }
@@ -72,10 +84,11 @@ public:
 	ID3D11DeviceContext *getD3D11DeviceContext() const { return pContext; }
 
 private:
-	ID3DBlob *createShader(const char *program, const char *entrypoint, const char *target);
+	ID3DBlob *createShader(const char *program, const char *entrypoint, const char *target, D3D11Backend **shaderReflection);
 	char *decodeImage(const char *raw, u32 size, u32 *width, u32 *height);
 	char *getResourceData(const char *resourceName, u32 *fileSize);
 	PTexture createTexture(u32 width, u32 height, const void *initialData, D3D11_USAGE usage, UINT bindFlag);
+	void prepareDraw(D3D11VertexBuffer *vertexBuffer);
 
 	u32 vertexCount;
 	u32 width, height;
@@ -95,9 +108,11 @@ private:
 	ID3D11RenderTargetView *pBackBufferRenderTargetView = nullptr;
 	ID3D11RasterizerState *pRasterizerState = nullptr;
 	ID3D11BlendState *pBlendState = nullptr;
-	
-	ID3D11Buffer *pMatrixBuffer = nullptr;
-	Matrix4 modelMatrix, viewMatrix, projectionMatrix;
 
-	std::weak_ptr<D3D11VertexShader> currentVertexShader;
+	std::weak_ptr<D3D11VertexShader> vertexShader;
+	std::weak_ptr<D3D11PixelShader> pixelShader;
+	std::weak_ptr<D3D11GeometryShader> geometryShader;
+	std::weak_ptr<D3D11HullShader> hullShader;
+	std::weak_ptr<D3D11DomainShader> domainShader;
+	std::weak_ptr<D3D11ComputeShader> computeShader;
 };

@@ -1,6 +1,7 @@
 #include <Core.h>
 
 #include "Camera.h"
+#include "Shader.h"
 #include "Video.h"
 
 Camera::Camera(PVideo _video):
@@ -26,4 +27,12 @@ void Camera::updateViewMatrix()
 void Camera::updateProjectionMatrix()
 {
 	projectionMatrix = Matrix4::perspectiveFovRH(fovy, aspectRatio, nearValue, farValue);
+}
+
+void Camera::apply(const Matrix4 &modelMatrix)
+{
+	PVertexShader vertexShader = video->getVertexShader();
+	if (!vertexShader)
+		return;
+	vertexShader->setShaderConstant("mvpMatrix", modelMatrix * viewMatrix * projectionMatrix);
 }

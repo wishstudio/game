@@ -25,7 +25,8 @@ public:
 	D3D11ConstantBufferReflection(int _slot) : slot(_slot), size(0) {}
 
 	int getSize() const { return size; }
-	D3D11ConstantBufferReflection *getConstantSpec(const std::string &name) const;
+	int getConstantCount() const { return constants.size(); }
+	D3D11ConstantReflection *getConstantReflection(int index) const { return constants[index].get(); }
 
 private:
 	friend class D3D11Backend;

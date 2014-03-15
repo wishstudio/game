@@ -30,16 +30,21 @@ public:
 	/* Render state manipulation */
 	virtual void setViewport(s32 width, s32 height) = 0;
 	virtual void setTexture(PTexture texture) = 0;
-	virtual void setModelMatrix(const Matrix4 &matrix) = 0;
-	virtual void setViewMatrix(const Matrix4 &matrix) = 0;
-	virtual void setProjectionMatrix(const Matrix4 &matrix) = 0;
+	virtual void setMaterial(PMaterial material) = 0;
+
 	virtual void setVertexShader(PVertexShader vertexShader) = 0;
 	virtual void setPixelShader(PPixelShader pixelShader) = 0;
 	virtual void setGeometryShader(PGeometryShader geometryShader) = 0;
 	virtual void setHullShader(PHullShader hullShader) = 0;
 	virtual void setDomainShader(PDomainShader domainShader) = 0;
 	virtual void setComputeShader(PComputeShader computeShader) = 0;
-	virtual void setMaterial(PMaterial material) = 0;
+
+	virtual PVertexShader getVertexShader() const = 0;
+	virtual PPixelShader getPixelShader() const = 0;
+	virtual PGeometryShader getGeometryShader() const = 0;
+	virtual PHullShader getHullShader() const = 0;
+	virtual PDomainShader getDomainShader() const = 0;
+	virtual PComputeShader getComputeShader() const = 0;
 
 	/* Query states */
 	virtual Vector2DI getBackBufferSize() const = 0;

@@ -33,6 +33,8 @@ public:
 	const Matrix4 &getViewMatrix() const { return viewMatrix; }
 	const Matrix4 &getProjectionMatrix() const { return projectionMatrix; }
 
+	void apply(const Matrix4 &modelMatrix);
+
 private:
 	void updateViewMatrix();
 	void updateProjectionMatrix();

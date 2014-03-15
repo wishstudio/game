@@ -13,9 +13,8 @@ public:
 	bool compile(const std::string &source);
 
 	std::string getCompiledCode() const { return ret; }
-	int getConstantBufferCount() const;
-	int getConstantBufferSize(int index) const;
-	D3D11ConstantReflection *getConstantReflection(const std::string &name) const;
+	int getConstantBufferCount() const { return constantBuffers.size(); }
+	D3D11ConstantBufferReflection *getConstantBufferReflection(int slot) const { return constantBuffers[slot].get(); }
 
 private:
 	std::string getTypeName(IRType *type) const;

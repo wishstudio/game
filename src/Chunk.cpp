@@ -169,7 +169,7 @@ void Chunk::render()
 			world->asyncLoadChunk(this);
 		return;
 	}
-	video->setModelMatrix(modelTransform);
+	camera->apply(modelTransform);
 	collector->render();
 }
 
