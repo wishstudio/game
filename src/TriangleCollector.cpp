@@ -8,9 +8,9 @@ struct MeshBuffer
 {
 	PVertexBuffer vertexBuffer;
 	PIndexBuffer indexBuffer;
-	u32 indexCount = 0;
+	int indexCount = 0;
 	std::vector<Vertex> vertices;
-	std::vector<u16> indices;
+	std::vector<uint16_t> indices;
 };
 
 TriangleCollector::TriangleCollector()
@@ -23,7 +23,7 @@ TriangleCollector::~TriangleCollector()
 	clear();
 }
 
-MeshBuffer *TriangleCollector::getBuffer(PTexture texture)
+MeshBuffer *TriangleCollector::_getBuffer(PTexture texture)
 {
 	auto it = textureMap.find(texture);
 	if (it != textureMap.end())
@@ -40,7 +40,7 @@ MeshBuffer *TriangleCollector::getBuffer(PTexture texture)
 
 void TriangleCollector::render()
 {
-	for (u32 i = 0; i < buffers.size(); i++)
+	for (int i = 0; i < buffers.size(); i++)
 	{
 		MeshBuffer *buffer = buffers[i];
 		PTexture texture = textures[i];
@@ -91,45 +91,45 @@ void TriangleCollector::setCurrentBlock(const Block &block)
 
 void TriangleCollector::addQuad(
 	const Tile &tile,
-	const Vector3D &topLeft,
+	const float3 &topLeft,
 	const Color &topLeftColor,
-	const Vector3D &topRight,
+	const float3 &topRight,
 	const Color &topRightColor,
-	const Vector3D &bottomLeft,
+	const float3 &bottomLeft,
 	const Color &bottomLeftColor,
-	const Vector3D &bottomRight,
+	const float3 &bottomRight,
 	const Color &bottomRightColor,
-	const Vector3D &normal)
+	const float3 &normal)
 {
-	MeshBuffer *buffer = getBuffer(tile.texture);
+	MeshBuffer *buffer = _getBuffer(tile.texture);
 
-	u32 s = buffer->vertices.size();
+	int s = buffer->vertices.size();
 	buffer->vertices.push_back({
-		Vector3D(topLeft.x + x, topLeft.y + y, topLeft.z + z),
+		float3(topLeft.x + x, topLeft.y + y, topLeft.z + z),
 		topLeftColor,
 		tile.u1, tile.v1
 	});
 	buffer->vertices.push_back({
-		Vector3D(topRight.x + x, topRight.y + y, topRight.z + z),
+		float3(topRight.x + x, topRight.y + y, topRight.z + z),
 		topRightColor,
 		tile.u2, tile.v1
 	});
 	buffer->vertices.push_back({
-		Vector3D(bottomLeft.x + x, bottomLeft.y + y, bottomLeft.z + z),
+		float3(bottomLeft.x + x, bottomLeft.y + y, bottomLeft.z + z),
 		bottomLeftColor,
 		tile.u1, tile.v2
 	});
 	buffer->vertices.push_back({
-		Vector3D(bottomRight.x + x, bottomRight.y + y, bottomRight.z + z),
+		float3(bottomRight.x + x, bottomRight.y + y, bottomRight.z + z),
 		bottomRightColor,
 		tile.u2, tile.v2
 	});
 
-	addTriangleIndex(buffer, s, s + 2, s + 1);
-	addTriangleIndex(buffer, s + 1, s + 2, s + 3);
+	_addTriangleIndex(buffer, s, s + 2, s + 1);
+	_addTriangleIndex(buffer, s + 1, s + 2, s + 3);
 }
 
-void TriangleCollector::addTriangleIndex(MeshBuffer *buffer, u16 i1, u16 i2, u16 i3)
+void TriangleCollector::_addTriangleIndex(MeshBuffer *buffer, int i1, int i2, int i3)
 {
 	buffer->indices.push_back(i1);
 	buffer->indices.push_back(i2);

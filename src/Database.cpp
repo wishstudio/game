@@ -35,7 +35,7 @@ bool Database::loadChunk(Chunk *chunk)
 	{
 		/* Found, read blob data */
 		const void *data = sqlite3_column_blob(stmt, 0); /* sqlite will free this automatically */
-		u32 len = sqlite3_column_bytes(stmt, 0);
+		int len = sqlite3_column_bytes(stmt, 0);
 		Deserializer deserializer(data, len, true);
 		deserializer >> *chunk;
 		sqlite3_finalize(stmt);
@@ -55,7 +55,7 @@ void Database::saveChunk(const Chunk *chunk)
 	sqlite3_bind_int(stmt, 3, chunk->z());
 	/* Sqlite will call free() when done */
 	void *data;
-	u32 len = serializer.getCompressedData(&data);
+	int len = serializer.getCompressedData(&data);
 	sqlite3_bind_blob(stmt, 4, data, len, free);
 	sqlite3_step(stmt);
 	sqlite3_finalize(stmt);

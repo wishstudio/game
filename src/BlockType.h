@@ -12,14 +12,14 @@ public:
 	BlockType();
 	virtual ~BlockType();
 
-	void registerCube(u16 id, const std::string &tilePath);
-	void registerCube(u16 id, Color color);
-	bool isLightTransparent(u16 type) const;
+	void registerCube(int id, const std::string &tilePath);
+	void registerCube(int id, Color color);
+	bool isLightTransparent(int type) const;
 	AABB3D getBoundingBox(const Block &block) const;
 	bool isSolid(const Block &block) const;
 	void drawBlock(TriangleCollector *collector, const Block &block) const;
 
-	PTexture getTexture(u16 id) const;
+	PTexture getTexture(int id) const;
 
 private:
 	struct BlockTypeSpec

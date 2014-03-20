@@ -9,8 +9,8 @@
 World::World()
 {
 	shouldStop = false;
-	u32 cnt = std::thread::hardware_concurrency();
-	for (u32 i = 0; i < cnt; i++)
+	int cnt = std::thread::hardware_concurrency();
+	for (int i = 0; i < cnt; i++)
 		workerThreads.push_back(std::thread(&World::run, this));
 }
 

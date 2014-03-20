@@ -42,14 +42,14 @@ public:
 	AABB3D getBoundingBox() const;
 	bool isSolid() const;
 
-	u16 getType() const;
-	void setType(u16 type);
-	u8 getParam1() const;
-	u8 getParam2() const;
-	void setParam1(u8 param1);
-	void setParam2(u8 param2);
-	void setParam(u8 param1, u8 param2);
-	u8 getLight() const;
+	int getType() const;
+	void setType(int type);
+	int getParam1() const;
+	int getParam2() const;
+	void setParam1(int param1);
+	void setParam2(int param2);
+	void setParam(int param1, int param2);
+	int getLight() const;
 
 private:
 	Chunk *chunk;

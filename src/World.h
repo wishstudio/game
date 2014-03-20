@@ -22,7 +22,7 @@ public:
 
 	void asyncDeleteTriangleCollector(TriangleCollector *collector);
 
-	u32 getLoadedChunkCount() const { return chunks.size(); }
+	int getLoadedChunkCount() const { return chunks.size(); }
 	void save();
 	void asyncLoadChunk(Chunk *chunk);
 	void asyncSaveChunk(Chunk *chunk);

@@ -59,8 +59,8 @@
     <ClCompile Include="src\WorldGenerator\WorldGenerator.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="Engine\Engine.vcxproj">
-      <Project>{6dbcd565-0982-4c42-aa4e-2900250770dd}</Project>
+    <ProjectReference Include="..\sare\sare.vcxproj">
+      <Project>{90920d0f-74a8-44c0-8c66-6cfe99ab7efb}</Project>
     </ProjectReference>
   </ItemGroup>
   <PropertyGroup Label="Globals">
@@ -92,11 +92,11 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>$(ProjectDir)\Engine\src;$(ProjectDir)\src;$(ProjectDir)\tools\sqlite;$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)\..\sare\src;$(ProjectDir)\src;$(ProjectDir)\tools\sqlite;$(IncludePath)</IncludePath>
     <LibraryPath>$(ProjectDir)\tools\sqlite;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <IncludePath>$(ProjectDir)\Engine\src;$(ProjectDir)\src;$(ProjectDir)\tools\sqlite;$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)\..\sare\src;$(ProjectDir)\src;$(ProjectDir)\tools\sqlite;$(IncludePath)</IncludePath>
     <LibraryPath>$(ProjectDir)\tools\sqlite;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">

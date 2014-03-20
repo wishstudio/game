@@ -31,7 +31,7 @@ Serializer::~Serializer()
 	}
 }
 
-u32 Serializer::getData(void **data)
+int Serializer::getData(void **data)
 {
 	*data = malloc(len);
 	SerializerBlock *block = first;
@@ -46,14 +46,14 @@ u32 Serializer::getData(void **data)
 	return len;
 }
 
-u32 Serializer::getCompressedData(void **data)
+int Serializer::getCompressedData(void **data)
 {
 	void *raw;
 	getData(&raw);
 	*data = malloc(LZ4_compressBound(len) + 4);
-	u32 compressedLen = LZ4_compress((const char *) raw, (char *) *data + 4, len);
+	int32_t compressedLen = LZ4_compress((const char *) raw, (char *) *data + 4, len);
 	free(raw);
-	*(u32 *) (*data) = len;
+	*(int32_t *) (*data) = len;
 	return compressedLen + 4;
 }
 
@@ -74,13 +74,13 @@ void Serializer::writeChar(const char ch)
 	len++;
 }
 
-void Serializer::writeBlock(const char *data, u32 len)
+void Serializer::writeBlock(const char *data, uint32_t len)
 {
-	u32 s = 0;
+	uint32_t s = 0;
 	this->len += len;
 	while (len > 0)
 	{
-		u32 cl = min(BLOCK_SIZE - p, len);
+		uint32_t cl = min(BLOCK_SIZE - p, len);
 		memcpy(&current->data[p], &data[s], cl);
 		p += cl;
 		len -= cl;
@@ -89,49 +89,49 @@ void Serializer::writeBlock(const char *data, u32 len)
 	}
 }
 
-Serializer &Serializer::operator << (const u8 data)
+Serializer &Serializer::operator << (const uint8_t data)
 {
 	writeChar(data);
 	return *this;
 }
 
-Serializer &Serializer::operator << (const u16 data)
+Serializer &Serializer::operator << (const uint16_t data)
 {
 	writeBlock((char *) &data, 2);
 	return *this;
 }
 
-Serializer &Serializer::operator << (const u32 data)
+Serializer &Serializer::operator << (const uint32_t data)
 {
 	writeBlock((char *) &data, 4);
 	return *this;
 }
 
-Serializer &Serializer::operator << (const u64 data)
+Serializer &Serializer::operator << (const uint64_t data)
 {
 	writeBlock((char *) &data, 8);
 	return *this;
 }
 
-Serializer &Serializer::operator << (const s8 data)
+Serializer &Serializer::operator << (const int8_t data)
 {
 	writeChar(data);
 	return *this;
 }
 
-Serializer &Serializer::operator << (const s16 data)
+Serializer &Serializer::operator << (const int16_t data)
 {
 	writeBlock((char *) &data, 2);
 	return *this;
 }
 
-Serializer &Serializer::operator << (const s32 data)
+Serializer &Serializer::operator << (const int32_t data)
 {
 	writeBlock((char *) &data, 4);
 	return *this;
 }
 
-Serializer &Serializer::operator << (const s64 data)
+Serializer &Serializer::operator << (const int64_t data)
 {
 	writeBlock((char *) &data, 8);
 	return *this;

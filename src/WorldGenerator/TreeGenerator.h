@@ -6,8 +6,8 @@ public:
 	TreeGenerator() {}
 	virtual ~TreeGenerator() {}
 
-	virtual Vector3DI getSpanMin() const override { return { -1, 0, -1 }; };
-	virtual Vector3DI getSpanMax() const override { return {  1, 1,  1 }; };
+	virtual int3 getSpanMin() const override { return { -1, 0, -1 }; };
+	virtual int3 getSpanMax() const override { return {  1, 1,  1 }; };
 
 	virtual void generate(int seed, int chunk_x, int chunk_y, int chunk_z, const WorldManipulator &w) const override
 	{

@@ -33,8 +33,8 @@ Chunk::Chunk(int _chunk_x, int _chunk_y, int _chunk_z)
 
 	dirty = false;
 
-	boundingBox.merge(Vector3D(CHUNK_SIZE, CHUNK_SIZE, CHUNK_SIZE));
-	modelTransform = Matrix4::translation(chunk_x * CHUNK_SIZE, chunk_y * CHUNK_SIZE, chunk_z * CHUNK_SIZE);
+	boundingBox.merge(float3(CHUNK_SIZE, CHUNK_SIZE, CHUNK_SIZE));
+	modelTransform = float4x4::translation(chunk_x * CHUNK_SIZE, chunk_y * CHUNK_SIZE, chunk_z * CHUNK_SIZE);
 }
 
 Serializer &operator << (Serializer &serializer, const Chunk &data)
@@ -79,8 +79,8 @@ void Chunk::generate(int phase)
 	{
 		/* Ensure surrounding chunks are all done [phase - 1] at least */
 		WorldGenerator *generator = WorldGenerator::getGenerator(phase - 1);
-		Vector3DI spanMin = generator->getSpanMin();
-		Vector3DI spanMax = generator->getSpanMax();
+		int3 spanMin = generator->getSpanMin();
+		int3 spanMax = generator->getSpanMax();
 		for (int x = spanMin.x; x <= spanMax.x; x++)
 			for (int y = spanMin.y; y <= spanMax.y; y++)
 				for (int z = spanMin.z; z <= spanMax.z; z++)
@@ -107,8 +107,8 @@ void Chunk::generate(int phase)
 	/* Lock related chunks for current phase */
 	std::vector<std::unique_lock<std::mutex>> locks;
 	WorldGenerator *generator = WorldGenerator::getGenerator(phase);
-	Vector3DI spanMin = generator->getSpanMin();
-	Vector3DI spanMax = generator->getSpanMax();
+	int3 spanMin = generator->getSpanMin();
+	int3 spanMax = generator->getSpanMax();
 	WorldManipulator worldManipulator(spanMin.x, spanMin.y, spanMin.z, spanMax.x, spanMax.y, spanMax.z);
 	for (int x = spanMin.x; x <= spanMax.x; x++)
 		for (int y = spanMin.y; y <= spanMax.y; y++)
@@ -148,7 +148,7 @@ bool Chunk::shouldPreloadBuffer()
 
 bool Chunk::isInViewRange()
 {
-	Vector3D position = camera->getPosition();
+	float3 position = camera->getPosition();
 	int x = (int)floor(position.x / CHUNK_SIZE);
 	int y = (int)floor(position.y / CHUNK_SIZE);
 	int z = (int)floor(position.z / CHUNK_SIZE);
@@ -304,7 +304,7 @@ void Chunk::loadLight()
 	while (!queue.empty())
 	{
 		Block block = queue.pop();
-		u8 light = block.data->sunlight - 2;
+		int light = block.data->sunlight - 2;
 		for (int i = 0; i < DIRECTION_COUNT; i++)
 		{
 			Block dest = block.tryGetNeighbour((Direction) i);
@@ -359,7 +359,7 @@ void Chunk::loadBuffer()
 }
 
 /* Gets all triangles which have or may have contact within a specific bounding box */
-void Chunk::getTriangles(std::vector<Triangle3D> &triangles, const AABB3D &box, const Matrix4 &transform)
+void Chunk::getTriangles(std::vector<Triangle3D> &triangles, const AABB3D &box, const float4x4 &transform)
 {
 	loadData();
 	loadLight();
@@ -367,7 +367,7 @@ void Chunk::getTriangles(std::vector<Triangle3D> &triangles, const AABB3D &box, 
 
 	TriangleCollector *collector = triangleCollector.load();
 
-	Matrix4 mat = modelTransform.getInverse();
+	float4x4 mat = modelTransform.getInverse();
 	AABB3D tBox = box.transform(mat);
 
 	mat = modelTransform * transform;

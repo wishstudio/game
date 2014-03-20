@@ -50,16 +50,16 @@ static void draw3DBox(const AABB3D &box, Color color)
 	static PVertexBuffer buffer = video->createVertexBuffer(vertexFormat, 36);
 
 	video->setTexture(whiteTexture);
-	camera->apply(Matrix4::identity());
+	camera->apply(float4x4::identity());
 
-	Vector3D p000(box.minPoint.x, box.minPoint.y, box.minPoint.z);
-	Vector3D p001(box.minPoint.x, box.minPoint.y, box.maxPoint.z);
-	Vector3D p010(box.minPoint.x, box.maxPoint.y, box.minPoint.z);
-	Vector3D p011(box.minPoint.x, box.maxPoint.y, box.maxPoint.z);
-	Vector3D p100(box.maxPoint.x, box.minPoint.y, box.minPoint.z);
-	Vector3D p101(box.maxPoint.x, box.minPoint.y, box.maxPoint.z);
-	Vector3D p110(box.maxPoint.x, box.maxPoint.y, box.minPoint.z);
-	Vector3D p111(box.maxPoint.x, box.maxPoint.y, box.maxPoint.z);
+	float3 p000(box.minPoint.x, box.minPoint.y, box.minPoint.z);
+	float3 p001(box.minPoint.x, box.minPoint.y, box.maxPoint.z);
+	float3 p010(box.minPoint.x, box.maxPoint.y, box.minPoint.z);
+	float3 p011(box.minPoint.x, box.maxPoint.y, box.maxPoint.z);
+	float3 p100(box.maxPoint.x, box.minPoint.y, box.minPoint.z);
+	float3 p101(box.maxPoint.x, box.minPoint.y, box.maxPoint.z);
+	float3 p110(box.maxPoint.x, box.maxPoint.y, box.minPoint.z);
+	float3 p111(box.maxPoint.x, box.maxPoint.y, box.maxPoint.z);
 	Vertex vertices[36] =
 	{
 		{ p000, color, 0.f, 0.f }, { p001, color, 0.f, 0.f }, { p001, color, 0.f, 0.f },
@@ -86,7 +86,7 @@ int main()
 	/* Create video device */
 	video = Video::createVideo(1366, 768);
 	device = video->getDevice();
-	gui.reset(new GUI(video));
+	painter.reset(new Painter(video));
 
 	device->setMouseVisible(false);
 	device->setTicksPerSecond(20);
@@ -110,7 +110,7 @@ int main()
 		pass->setDepthBias(-0.0003);
 	}
 
-	Color whiteData(255, 255, 255, 255);
+	Color whiteData = 0xFFFFFFFF;
 	whiteTexture = video->createTexture(1, 1, &whiteData);
 
 	/* Create vertex format */
@@ -137,13 +137,16 @@ int main()
 	PlayerAnimator *playerAnimator = new PlayerAnimator();
 	chunkSceneNode = new ChunkSceneNode();
 	
-	while (device->processMessage())
+	while (device->beginFrame())
 	{
-		if (!device->isActive())
+		if (!device->getIsActive())
 		{
 			std::this_thread::yield();
 			continue;
 		}
+		Event event;
+		while (device->pollEvent(&event))
+			/* Do nothing */;
 
 		shortcutItemUI.update();
 		World::CameraIntersectionInfo *info = nullptr;
@@ -164,7 +167,7 @@ int main()
 
 		playerAnimator->update();
 
-		video->beginDraw({ 127, 200, 251, 255 });
+		video->beginDraw(Color(127, 200, 251, 255));
 
 		video->setMaterial(defaultMaterial);
 		chunkSceneNode->render();
@@ -175,12 +178,15 @@ int main()
 			draw3DBox(box, Color(255, 0, 0, 255));
 		}
 
+		painter->beginDraw();
 		shortcutItemUI.render();
-		Vector2DI bbSize = video->getBackBufferSize();
-		gui->draw2DLine({ bbSize.x / 2 - 10, bbSize.y / 2 }, { bbSize.x / 2 + 10, bbSize.y / 2 }, Color(255, 255, 255, 255));
-		gui->draw2DLine({ bbSize.x / 2, bbSize.y / 2 - 10 }, { bbSize.x / 2, bbSize.y / 2 + 10 }, Color(255, 255, 255, 255));
+		int2 bbSize = video->getBackBufferSize();
+		//painter->drawLine({ bbSize.x / 2 - 10, bbSize.y / 2 }, { bbSize.x / 2 + 10, bbSize.y / 2 }, rgba(255, 255, 255, 255));
+		//painter->drawLine({ bbSize.x / 2, bbSize.y / 2 - 10 }, { bbSize.x / 2, bbSize.y / 2 + 10 }, rgba(255, 255, 255, 255));
+		painter->endDraw();
+		video->endDraw();
 
-		Vector3D position = camera->getPosition();
+		float3 position = camera->getPosition();
 		std::wstringstream s;
 		s.setf(std::ios::fixed, std::ios::floatfield);
 		s << "POS(" << position.x << "," << position.y << "," << position.z << ") ";
@@ -192,8 +198,6 @@ int main()
 		s << "Blocks: " << world->getLoadedChunkCount() * CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE << " ";
 		s << "Vertices: " << video->getVertexCount() / 1000 << "k";
 		device->setWindowTitle(s.str().c_str());
-		
-		video->endDraw();
 	}
 
 	delete playerAnimator;

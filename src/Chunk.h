@@ -6,9 +6,9 @@ class TriangleCollector;
 
 struct BlockData final
 {
-	u16 type;
-	u8 param1, param2;
-	u8 sunlight;
+	uint16_t type;
+	uint8_t param1, param2;
+	uint8_t sunlight;
 
 	friend Serializer &operator << (Serializer &serializer, const BlockData &data);
 	friend Deserializer &operator >> (Deserializer &deserializer, BlockData &data);
@@ -40,7 +40,7 @@ public:
 	void save();
 	void render();
 
-	void getTriangles(std::vector<Triangle3D> &triangles, const AABB3D &box, const Matrix4 &transform);
+	void getTriangles(std::vector<Triangle3D> &triangles, const AABB3D &box, const float4x4 &transform);
 
 	friend Serializer &operator << (Serializer &serializer, const Chunk &data);
 	friend Deserializer &operator >> (Deserializer &deserializer, Chunk &data);
@@ -59,7 +59,7 @@ private:
 	std::atomic<TriangleCollector *> triangleCollector;
 	BlockData blocks[CHUNK_SIZE][CHUNK_SIZE][CHUNK_SIZE];
 	AABB3D boundingBox;
-	Matrix4 modelTransform;
+	float4x4 modelTransform;
 
 	friend class Block;
 };

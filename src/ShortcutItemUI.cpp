@@ -27,32 +27,31 @@ void ShortcutItemUI::update()
 		currentItem = 8;
 	else if (device->isKeyPressed(KEY_9))
 		currentItem = 9;
-	currentItem = (currentItem - static_cast<u32>(device->getMouseWheel()) + 9) % 10 + 1;
+	currentItem = (currentItem - int(device->getMouseWheel()) + 9) % 10 + 1;
 }
 
 void ShortcutItemUI::render()
 {
-	Vector2DI bbSize = video->getBackBufferSize();
+	int2 bbSize = video->getBackBufferSize();
 
 	/* Draw frame */
-	gui->fill2DRect({ bbSize.x / 2 - 209, bbSize.y - 140 }, { bbSize.x / 2 + 209, bbSize.y - 100 }, Color(0, 0, 0, 100));
-	gui->fill2DRect({ bbSize.x / 2 - 211, bbSize.y - 142 }, { bbSize.x / 2 + 211, bbSize.y - 140 }, Color(200, 200, 200, 255));
-	gui->fill2DRect({ bbSize.x / 2 - 211, bbSize.y - 100 }, { bbSize.x / 2 + 211, bbSize.y - 98 }, Color(200, 200, 200, 255));
-	for (s32 i = 0; i < 11; i++)
-		gui->fill2DRect({ bbSize.x / 2 - 211 + i * 42, bbSize.y - 140 },
-			{ bbSize.x / 2 - 209 + i * 42, bbSize.y - 100 },
+	painter->fillRect(bbSize.x / 2 - 209, bbSize.y - 140, 418, 40, Color(0, 0, 0, 100));
+	painter->fillRect(bbSize.x / 2 - 211, bbSize.y - 142, 422, 2, Color(200, 200, 200, 255));
+	painter->fillRect(bbSize.x / 2 - 211, bbSize.y - 100, 422, 2, Color(200, 200, 200, 255));
+	for (int i = 0; i < 11; i++)
+		painter->fillRect(bbSize.x / 2 - 211 + i * 42, bbSize.y - 140, 2, 40,
 			Color(200, 200, 200, 255));
 
 	/* Draw items */
-	for (s32 i = 0; i < 10; i++)
+	for (int i = 0; i < 10; i++)
 	{
 		PTexture texture = blockType->getTexture(i);
 		if (texture)
-			gui->draw2DTexture({ bbSize.x / 2 - 206 + i * 42 - 42, bbSize.y - 137 }, { 33, 33 }, texture);
+			painter->drawTexture(bbSize.x / 2 - 206 + i * 42 - 42, bbSize.y - 137, 33, 33, texture, Color(255, 255, 255, 255));
 	}
 
 	/* Highlight curren item */
-	s32 x = bbSize.x / 2 - 207 + currentItem * 42 - 42;
-	s32 y = bbSize.y - 138;
-	gui->draw2DRect({ x, y }, { x + 35, y + 35 }, Color(255, 255, 255, 255));
+	int x = bbSize.x / 2 - 207 + currentItem * 42 - 42;
+	int y = bbSize.y - 138;
+	//painter->drawRect(x, y, x + 35, y + 35, rgba(255, 255, 255, 255));
 }

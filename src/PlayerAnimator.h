@@ -10,12 +10,12 @@ public:
 	void update();
 
 private:
-	static Vector3D collideEllipsoidWithWorld(Vector3D currentPosition, Vector3D moveVector, bool canSlide, bool &collided);
+	static float3 collideEllipsoidWithWorld(float3 currentPosition, float3 moveVector, bool canSlide, bool &collided);
 
-	Vector3D currentPosition, nextPosition;
+	float3 currentPosition, nextPosition;
 	float nextVerticalVelocity, nextVerticalDistance;
 	bool nextFalling;
-	Vector3D jumpDistance;
+	float3 jumpDistance;
 
 	float rotationHorizontal = 0, rotationVertical = 0;
 };

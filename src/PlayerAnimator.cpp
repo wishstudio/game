@@ -4,7 +4,7 @@
 #include "PlayerAnimator.h"
 #include "World.h"
 
-static const Vector3D playerRadius = { 0.48f, 1.9f, 0.48f };
+static const float3 playerRadius = { 0.48f, 1.9f, 0.48f };
 static const float veryCloseDistance = 0.0001;
 
 PlayerAnimator::PlayerAnimator()
@@ -21,7 +21,7 @@ PlayerAnimator::~PlayerAnimator()
 void PlayerAnimator::tick()
 {
 	/* Update current values */
-	Vector3D currentDistance = { 0, 0, 0 };
+	float3 currentDistance = { 0, 0, 0 };
 	float currentVerticalVelocity = nextVerticalVelocity;
 	float currentVerticalDistance = nextVerticalDistance;
 	currentPosition = nextPosition;
@@ -31,10 +31,10 @@ void PlayerAnimator::tick()
 	const float MOVE_SPEED = 6 * device->getTickInterval();
 	if (!currentFalling)
 	{
-		Vector3D forwardVec = (camera->getLookAt() - camera->getPosition());
+		float3 forwardVec = (camera->getLookAt() - camera->getPosition());
 		forwardVec.y = 0;
 		forwardVec = forwardVec.getNormalized();
-		Vector3D leftVec = forwardVec.crossProduct({ 0, -1, 0 });
+		float3 leftVec = forwardVec.crossProduct({ 0, -1, 0 });
 
 		if (device->isKeyDown(KEY_W))
 			currentDistance += forwardVec * MOVE_SPEED;
@@ -66,13 +66,13 @@ void PlayerAnimator::tick()
 	bool collided;
 	nextPosition = collideEllipsoidWithWorld(nextPosition, currentDistance, true, collided);
 	float originalY = nextPosition.y;
-	nextPosition = collideEllipsoidWithWorld(nextPosition, currentVerticalDistance * Vector3D(0, 1, 0), false, collided);
+	nextPosition = collideEllipsoidWithWorld(nextPosition, currentVerticalDistance * float3(0, 1, 0), false, collided);
 
 	/* Check if we are stadning on the ground */
 	nextFalling = !(currentVerticalDistance < EPSILON && collided);
 }
 
-Vector3D PlayerAnimator::collideEllipsoidWithWorld(Vector3D position, Vector3D moveVector, bool canSlide, bool &collided)
+float3 PlayerAnimator::collideEllipsoidWithWorld(float3 position, float3 moveVector, bool canSlide, bool &collided)
 {
 	if (moveVector.getLength() < EPSILON)
 		return position;
@@ -80,11 +80,11 @@ Vector3D PlayerAnimator::collideEllipsoidWithWorld(Vector3D position, Vector3D m
 	collided = false;
 
 	/* Transform matrix */
-	Matrix4 translation = Matrix4::inverseTranslation(position);
-	Matrix4 scale = Matrix4::scale(1.f / playerRadius.x, 1.f / playerRadius.y, 1.f / playerRadius.z);
+	float4x4 translation = float4x4::inverseTranslation(position);
+	float4x4 scale = float4x4::scale(1.f / playerRadius.x, 1.f / playerRadius.y, 1.f / playerRadius.z);
 
-	Matrix4 transform = translation * scale;
-	Matrix4 invTransform = transform.getInverse();
+	float4x4 transform = translation * scale;
+	float4x4 invTransform = transform.getInverse();
 
 	/* Update next position */
 	/* Gather relevant triangles for collision detection
@@ -127,31 +127,31 @@ Vector3D PlayerAnimator::collideEllipsoidWithWorld(Vector3D position, Vector3D m
 	/* From now on, nextPosition is transformed position, currentPosition is not transformed */
 	/* Note the sphere is unit sphere */
 
-	Vector3D vn = moveVector.getNormalized();
+	float3 vn = moveVector.getNormalized();
 	float remainDistance = moveVector.getLength();
 	for (int depth = 0; depth < 5; depth++) /* Do sliding at most 5 times */
 	{
 		/* Find colliding triangle */
 		float minDistance = remainDistance; /* Don't count if colliding distance is larger than move distance */
-		Vector3D minPlaneIntersection;
+		float3 minPlaneIntersection;
 
-		Vector3D invertedVelocity(-vn);
+		float3 invertedVelocity(-vn);
 		for (const Triangle3D triangle : triangles)
 		{
 			if (!triangle.isFrontFacing(vn))
 				continue;
 
-			Vector3D normal = triangle.getNormal().getInverted().getNormalized();
+			float3 normal = triangle.getNormal().getInverted().getNormalized();
 
 			/* Sphere intersection point
 			 * The potential intersection point on the sphere
 			 */
-			Vector3D sphereIntersection = position + normal; /* We have unit sphere */
+			float3 sphereIntersection = position + normal; /* We have unit sphere */
 
 			/* Plane intersection point
 			 * The potential intersection point on the plane the triangle reside on
 			 */
-			Vector3D planeIntersection;
+			float3 planeIntersection;
 			if (rayIntersectsPlane(Ray3D(sphereIntersection, vn), triangle, planeIntersection));
 			{
 				float distance;
@@ -195,9 +195,9 @@ Vector3D PlayerAnimator::collideEllipsoidWithWorld(Vector3D position, Vector3D m
 		 * Origin is the point of plane intersection
 		 * Normal is from the intersection point to the center of the sphere
 		 */
-		Vector3D snormal = (position - minPlaneIntersection).getNormalized();
-		Vector3D remainVector = vn * remainDistance;
-		Vector3D slideVector = remainVector + snormal * snormal.dotProduct(-remainVector);
+		float3 snormal = (position - minPlaneIntersection).getNormalized();
+		float3 remainVector = vn * remainDistance;
+		float3 slideVector = remainVector + snormal * snormal.dotProduct(-remainVector);
 		remainDistance = slideVector.getLength();
 		vn = slideVector.getNormalized();
 		if (remainDistance < veryCloseDistance)
@@ -211,18 +211,18 @@ Vector3D PlayerAnimator::collideEllipsoidWithWorld(Vector3D position, Vector3D m
 
 void PlayerAnimator::update()
 {
-	const Vector3D playerCameraOffset(0, 1.7f, 0);
+	const float3 playerCameraOffset(0, 1.7f, 0);
 	const float VIEW_DELTA = 0.01;
 
 	/* Interpolate camera position for smooth rendering */
-	Vector3D position(currentPosition);
-	Vector3D diffVec(nextPosition - currentPosition);
+	float3 position(currentPosition);
+	float3 diffVec(nextPosition - currentPosition);
 	position += diffVec * (device->getElapsedTickTime() / device->getTickInterval());
 	position += playerCameraOffset;
 	camera->setPosition(position);
 
 	/* Update rotation */
-	Vector2D mouseDelta = device->getNormalizedMousePosition();
+	float2 mouseDelta = device->getNormalizedMousePosition();
 	/* TODO: Aspect ratio */
 	float rotationHorizontalDelta = -mouseDelta.x * PI / 3;
 	float rotationVerticalDelta = mouseDelta.y * PI / 4;
@@ -230,7 +230,7 @@ void PlayerAnimator::update()
 	rotationHorizontal += rotationHorizontalDelta;
 	rotationVertical = bound(-PI / 2, rotationVertical + rotationVerticalDelta, PI / 2 - VIEW_DELTA);
 
-	Vector3D lookDirection = Vector3D(std::sin(rotationHorizontal), std::sin(rotationVertical), std::cos(rotationHorizontal));
+	float3 lookDirection = float3(std::sin(rotationHorizontal), std::sin(rotationVertical), std::cos(rotationHorizontal));
 	camera->setLookAt(position + lookDirection);
 
 	device->setNormalizedMousePosition(0, 0);

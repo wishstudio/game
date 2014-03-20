@@ -10,5 +10,5 @@ Camera *camera;
 
 PDevice device;
 PVideo video;
-PGUI gui;
+PPainter painter;
 PVertexFormat vertexFormat;

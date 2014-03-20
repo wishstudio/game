@@ -4,8 +4,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 12.0.21005.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Game", "Game.vcxproj", "{04D9FA1D-92EE-4E91-8000-DCA7E9405E41}"
+	ProjectSection(ProjectDependencies) = postProject
+		{90920D0F-74A8-44C0-8C66-6CFE99AB7EFB} = {90920D0F-74A8-44C0-8C66-6CFE99AB7EFB}
+	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Engine", "Engine\Engine.vcxproj", "{6DBCD565-0982-4C42-AA4E-2900250770DD}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "sare", "..\sare\sare.vcxproj", "{90920D0F-74A8-44C0-8C66-6CFE99AB7EFB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -19,10 +22,10 @@ Global
 		{04D9FA1D-92EE-4E91-8000-DCA7E9405E41}.Release|Win32.ActiveCfg = Release|Win32
 		{04D9FA1D-92EE-4E91-8000-DCA7E9405E41}.Release|Win32.Build.0 = Release|Win32
 		{04D9FA1D-92EE-4E91-8000-DCA7E9405E41}.Release|Win32.Deploy.0 = Release|Win32
-		{6DBCD565-0982-4C42-AA4E-2900250770DD}.Debug|Win32.ActiveCfg = Debug|Win32
-		{6DBCD565-0982-4C42-AA4E-2900250770DD}.Debug|Win32.Build.0 = Debug|Win32
-		{6DBCD565-0982-4C42-AA4E-2900250770DD}.Release|Win32.ActiveCfg = Release|Win32
-		{6DBCD565-0982-4C42-AA4E-2900250770DD}.Release|Win32.Build.0 = Release|Win32
+		{90920D0F-74A8-44C0-8C66-6CFE99AB7EFB}.Debug|Win32.ActiveCfg = Debug|Win32
+		{90920D0F-74A8-44C0-8C66-6CFE99AB7EFB}.Debug|Win32.Build.0 = Debug|Win32
+		{90920D0F-74A8-44C0-8C66-6CFE99AB7EFB}.Release|Win32.ActiveCfg = Release|Win32
+		{90920D0F-74A8-44C0-8C66-6CFE99AB7EFB}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

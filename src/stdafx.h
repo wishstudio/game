@@ -4,7 +4,9 @@
 #include <Windows.h>
 #undef NOMINMAX
 
-#include <Engine.h>
+#include <Sare.h>
+
+using namespace sare;
 
 #include <atomic>
 #include <concurrent_queue.h>
@@ -39,17 +41,17 @@ extern Camera *camera;
 
 struct Vertex
 {
-	Vector3D position;
+	float3 position;
 	Color color;
 	float u, v;
 
 	Vertex() = default;
-	Vertex(Vector3D _position, Color _color, float _u, float _v):
+	Vertex(float3 _position, Color _color, float _u, float _v):
 		position(_position), color(_color), u(_u), v(_v)
 	{}
 };
 
 extern PDevice device;
 extern PVideo video;
-extern PGUI gui;
+extern PPainter painter;
 extern PVertexFormat vertexFormat;

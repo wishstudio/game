@@ -7,10 +7,10 @@ class ShortcutItemUI
 public:
 	ShortcutItemUI();
 
-	u16 getCurrentItem() const { return currentItem; }
+	int getCurrentItem() const { return currentItem; }
 	void update();
 	void render();
 
 private:
-	u16 currentItem;
+	int currentItem;
 };

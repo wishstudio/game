@@ -124,7 +124,7 @@ inline bool rayIntersectsWithBox(const Ray3D &ray, const AABB3D &box)
 	return tMin <= tMax;
 }
 
-inline bool rayIntersectsWithSphere(const Ray3D &ray, const Vector3D &center, float radius, float &distance)
+inline bool rayIntersectsWithSphere(const Ray3D &ray, const float3 &center, float radius, float &distance)
 {
 	/*         |
 	 *         |       % % %
@@ -140,7 +140,7 @@ inline bool rayIntersectsWithSphere(const Ray3D &ray, const Vector3D &center, fl
 	 *         |
 	 */
 	/* Sphere center in point coordinate system */
-	Vector3D Q = center - ray.start;
+	float3 Q = center - ray.start;
 	/* Distance from sphere center to origin */
 	float c = Q.getLength();
 	/* v = Q * vn
@@ -164,7 +164,7 @@ inline bool rayIntersectsWithSphere(const Ray3D &ray, const Vector3D &center, fl
 	return true;
 }
 
-inline bool rayIntersectsPlane(const Ray3D &ray, const Triangle3D &plane, Vector3D &intersectionPoint)
+inline bool rayIntersectsPlane(const Ray3D &ray, const Triangle3D &plane, float3 &intersectionPoint)
 {
 	/* Plane: n * X = d
 	 * Line : X = P + tV
@@ -173,7 +173,7 @@ inline bool rayIntersectsPlane(const Ray3D &ray, const Triangle3D &plane, Vector
 	 * =>         tn * V = d - n * P
 	 * =>              t = (d - n * P) / (n * V)
 	 */
-	Vector3D n = plane.getNormal().getNormalized();
+	float3 n = plane.getNormal().getNormalized();
 	float d = plane.pointA.dotProduct(n);
 	float t = (d - n.dotProduct(ray.start)) / n.dotProduct(ray.direction);
 	/* If n * V == 0 we will get Inf or NaN, they are correctly handled below */

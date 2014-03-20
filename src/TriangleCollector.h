@@ -18,19 +18,19 @@ public:
 	void setCurrentBlock(const Block &block);
 	void addQuad(
 		const Tile &tile,
-		const Vector3D &topLeft,
+		const float3 &topLeft,
 		const Color &topLeftColor,
-		const Vector3D &topRight,
+		const float3 &topRight,
 		const Color &topRightColor,
-		const Vector3D &bottomLeft,
+		const float3 &bottomLeft,
 		const Color &bottomLeftColor,
-		const Vector3D &bottomRight,
+		const float3 &bottomRight,
 		const Color &bottomRightColor,
-		const Vector3D &normal
+		const float3 &normal
 	);
 
 	/* Collision detection utilities */
-	inline u32 getTriangleCount() const { return triangles.size(); }
+	inline int getTriangleCount() const { return triangles.size(); }
 	inline std::vector<Triangle3D>::const_iterator begin() const { return triangles.cbegin(); }
 	inline std::vector<Triangle3D>::const_iterator end() const { return triangles.cend(); }
 	inline std::vector<Triangle3D>::const_iterator blockBegin(int x, int y, int z) const
@@ -43,8 +43,8 @@ public:
 	}
 
 private:
-	MeshBuffer *getBuffer(PTexture texture);
-	void addTriangleIndex(MeshBuffer *buffer, u16 i1, u16 i2, u16 i3);
+	MeshBuffer *_getBuffer(PTexture texture);
+	void _addTriangleIndex(MeshBuffer *buffer, int i1, int i2, int i3);
 
 	bool valid;
 	std::vector<MeshBuffer *> buffers;

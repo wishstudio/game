@@ -71,43 +71,43 @@ bool Block::isSolid() const
 	return blockType->isSolid(*this);
 }
 
-u16 Block::getType() const
+int Block::getType() const
 {
 	return data->type;
 }
 
-void Block::setType(u16 type)
+void Block::setType(int type)
 {
 	std::lock_guard<std::mutex> lock(chunk->accessMutex);
 	data->type = type;
 	chunk->setDirty(in_x, in_y, in_z);
 }
 
-u8 Block::getParam1() const
+int Block::getParam1() const
 {
 	return data->param1;
 }
 
-u8 Block::getParam2() const
+int Block::getParam2() const
 {
 	return data->param2;
 }
 
-void Block::setParam1(u8 param1)
+void Block::setParam1(int param1)
 {
 	std::lock_guard<std::mutex> lock(chunk->accessMutex);
 	data->param1 = param1;
 	chunk->setDirty(in_x, in_y, in_z);
 }
 
-void Block::setParam2(u8 param2)
+void Block::setParam2(int param2)
 {
 	std::lock_guard<std::mutex> lock(chunk->accessMutex);
 	data->param2 = param2;
 	chunk->setDirty(in_x, in_y, in_z);
 }
 
-void Block::setParam(u8 param1, u8 param2)
+void Block::setParam(int param1, int param2)
 {
 	std::lock_guard<std::mutex> lock(chunk->accessMutex);
 	data->param1 = param1;
@@ -115,7 +115,7 @@ void Block::setParam(u8 param1, u8 param2)
 	chunk->setDirty(in_x, in_y, in_z);
 }
 
-u8 Block::getLight() const
+int Block::getLight() const
 {
 	return data->sunlight;
 }
