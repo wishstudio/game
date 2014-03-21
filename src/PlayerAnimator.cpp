@@ -84,7 +84,7 @@ float3 PlayerAnimator::collideEllipsoidWithWorld(float3 position, float3 moveVec
 	float4x4 scale = float4x4::scale(1.f / playerRadius.x, 1.f / playerRadius.y, 1.f / playerRadius.z);
 
 	float4x4 transform = translation * scale;
-	float4x4 invTransform = transform.getInverse();
+	float4x4 invTransform = transform.getInversed();
 
 	/* Update next position */
 	/* Gather relevant triangles for collision detection

@@ -367,7 +367,7 @@ void Chunk::getTriangles(std::vector<Triangle3D> &triangles, const AABB3D &box, 
 
 	TriangleCollector *collector = triangleCollector.load();
 
-	float4x4 mat = modelTransform.getInverse();
+	float4x4 mat = modelTransform.getInversed();
 	AABB3D tBox = box.transform(mat);
 
 	mat = modelTransform * transform;
