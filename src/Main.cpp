@@ -140,14 +140,14 @@ int main()
 	bool vsync = false;
 	while (device->beginFrame())
 	{
+		Event event;
+		while (device->pollEvent(&event))
+			/* Do nothing */;
 		if (!device->getIsActive())
 		{
 			std::this_thread::yield();
 			continue;
 		}
-		Event event;
-		while (device->pollEvent(&event))
-			/* Do nothing */;
 
 		shortcutItemUI.update();
 		World::CameraIntersectionInfo *info = nullptr;
