@@ -349,7 +349,6 @@ void Chunk::loadBuffer()
 				blockType->drawBlock(collector, Block(this, x, y, z));
 	collector->finalize();
 	
-	std::lock_guard<std::mutex> lock(accessMutex);
 	TriangleCollector *oldCollector = triangleCollector.exchange(collector);
 	if (oldCollector)
 		world->asyncDeleteTriangleCollector(oldCollector);
