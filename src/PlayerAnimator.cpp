@@ -9,7 +9,7 @@ static const float veryCloseDistance = 0.0001;
 
 PlayerAnimator::PlayerAnimator()
 {
-	nextPosition = { 0, 100, 0 };
+	nextPosition = { 0, 10, 0 };
 	nextVerticalVelocity = 0;
 	nextFalling = true;
 }

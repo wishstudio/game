@@ -1,6 +1,6 @@
 #pragma once
 
-static const int PRELOAD_DISTANCE = 5;
+static const int PRELOAD_DISTANCE = 10;
 
 class ChunkSceneNode
 {

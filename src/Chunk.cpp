@@ -105,7 +105,6 @@ void Chunk::generate(int phase)
 	}
 
 	/* Lock related chunks for current phase */
-	std::vector<std::unique_lock<std::mutex>> locks;
 	WorldGenerator *generator = WorldGenerator::getGenerator(phase);
 	int3 spanMin = generator->getSpanMin();
 	int3 spanMax = generator->getSpanMax();
@@ -115,9 +114,9 @@ void Chunk::generate(int phase)
 			for (int z = spanMin.z; z <= spanMax.z; z++)
 			{
 				Chunk *chunk = world->rawGetChunk(chunk_x + x, chunk_y + y, chunk_z + z);
-				locks.push_back(std::unique_lock<std::mutex>(chunk->accessMutex));
 				worldManipulator.addChunk(x, y, z, &chunk->blocks);
 			}
+	std::lock_guard<std::mutex> lock(accessMutex);
 	if (generationPhase > phase) /* Double check */
 		return;
 
@@ -154,7 +153,7 @@ bool Chunk::isInViewRange()
 	int z = (int)floor(position.z / CHUNK_SIZE);
 	int dist = abs(chunk_x - x) + abs(chunk_y - y) + abs(chunk_z - z);
 
-	return dist <= 5;
+	return dist <= 10;
 }
 
 void Chunk::render()
