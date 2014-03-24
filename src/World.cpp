@@ -16,8 +16,6 @@ World::World()
 
 World::~World()
 {
-	for (auto it : chunks)
-		delete it.second;
 	shouldStop = true;
 	{
 		std::lock_guard<std::mutex> lock(workerMutex);
@@ -25,6 +23,8 @@ World::~World()
 	}
 	for (std::thread &thread : workerThreads)
 		thread.join();
+	for (auto it : chunks)
+		delete it.second;
 }
 
 void World::update()
