@@ -9,8 +9,8 @@
 World::World()
 {
 	shouldStop = false;
-	int cnt = std::thread::hardware_concurrency();
-	for (int i = 0; i < cnt; i++)
+	int threadCount = std::max<int>(1, std::thread::hardware_concurrency());
+	for (int i = 0; i < threadCount; i++)
 		workerThreads.push_back(std::thread(&World::run, this));
 }
 
