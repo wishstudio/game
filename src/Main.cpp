@@ -137,6 +137,7 @@ int main()
 	PlayerAnimator *playerAnimator = new PlayerAnimator();
 	chunkSceneNode = new ChunkSceneNode();
 	
+	bool vsync = false;
 	while (device->beginFrame())
 	{
 		if (!device->getIsActive())
@@ -196,8 +197,20 @@ int main()
 		s << "Frame Time: " << device->getAverageFrameTime() * 1000 << "ms ";
 		s << "Chunks: " << world->getLoadedChunkCount() << " ";
 		s << "Blocks: " << world->getLoadedChunkCount() * CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE << " ";
-		s << "Vertices: " << video->getVertexCount() / 1000 << "k";
+		s << "Vertices: " << video->getVertexCount() / 1000 << "k ";
+		if (vsync)
+			s << "VSYNC ON [F1]";
+		else
+			s << "VSYNC OFF [F1]";
 		device->setWindowTitle(s.str().c_str());
+
+		if (device->isKeyPressed(KEY_F1))
+			vsync = !vsync;
+		if (vsync)
+		{
+			int frameTime = device->getElapsedFrameTimeMilliseconds();
+			device->delay(16 - frameTime);
+		}
 	}
 
 	delete playerAnimator;
