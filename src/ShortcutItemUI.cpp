@@ -53,5 +53,5 @@ void ShortcutItemUI::render()
 	/* Highlight curren item */
 	int x = bbSize.x / 2 - 207 + currentItem * 42 - 42;
 	int y = bbSize.y - 138;
-	//painter->drawRect(x, y, x + 35, y + 35, rgba(255, 255, 255, 255));
+	painter->drawRect(x, y, 36, 36, 1, Color(255, 255, 255, 255));
 }

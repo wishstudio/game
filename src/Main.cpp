@@ -182,8 +182,8 @@ int main()
 		painter->beginDraw();
 		shortcutItemUI.render();
 		int2 bbSize = video->getBackBufferSize();
-		//painter->drawLine({ bbSize.x / 2 - 10, bbSize.y / 2 }, { bbSize.x / 2 + 10, bbSize.y / 2 }, rgba(255, 255, 255, 255));
-		//painter->drawLine({ bbSize.x / 2, bbSize.y / 2 - 10 }, { bbSize.x / 2, bbSize.y / 2 + 10 }, rgba(255, 255, 255, 255));
+		painter->drawLine(bbSize.x / 2 - 10, bbSize.y / 2, bbSize.x / 2 + 10, bbSize.y / 2, 1, Color(255, 255, 255, 255));
+		painter->drawLine(bbSize.x / 2, bbSize.y / 2 - 10, bbSize.x / 2, bbSize.y / 2 + 10, 1, Color(255, 255, 255, 255));
 		painter->endDraw();
 		video->endDraw();
 
