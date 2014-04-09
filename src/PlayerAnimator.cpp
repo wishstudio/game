@@ -18,7 +18,7 @@ PlayerAnimator::~PlayerAnimator()
 {
 }
 
-void PlayerAnimator::tick()
+void PlayerAnimator::tick(bool uiOpened)
 {
 	/* Update current values */
 	float3 currentDistance = { 0, 0, 0 };
@@ -36,14 +36,17 @@ void PlayerAnimator::tick()
 		forwardVec = forwardVec.getNormalized();
 		float3 leftVec = forwardVec.crossProduct({ 0, -1, 0 });
 
-		if (device->isKeyDown(KEY_W))
-			currentDistance += forwardVec * MOVE_SPEED;
-		if (device->isKeyDown(KEY_S))
-			currentDistance -= forwardVec * MOVE_SPEED;
-		if (device->isKeyDown(KEY_A))
-			currentDistance += leftVec * MOVE_SPEED;
-		if (device->isKeyDown(KEY_D))
-			currentDistance -= leftVec * MOVE_SPEED;
+		if (!uiOpened)
+		{
+			if (device->isKeyDown(KEY_W))
+				currentDistance += forwardVec * MOVE_SPEED;
+			if (device->isKeyDown(KEY_S))
+				currentDistance -= forwardVec * MOVE_SPEED;
+			if (device->isKeyDown(KEY_A))
+				currentDistance += leftVec * MOVE_SPEED;
+			if (device->isKeyDown(KEY_D))
+				currentDistance -= leftVec * MOVE_SPEED;
+		}
 
 		jumpDistance = currentDistance;
 	}
@@ -55,7 +58,7 @@ void PlayerAnimator::tick()
 		nextVerticalVelocity -= 9.8 * 2 * device->getTickInterval();
 	else
 	{
-		if (device->isKeyDown(KEY_SPACE))
+		if (!uiOpened && device->isKeyDown(KEY_SPACE))
 			nextVerticalVelocity = 9.8;
 		else
 			nextVerticalVelocity = 0;
@@ -209,7 +212,7 @@ float3 PlayerAnimator::collideEllipsoidWithWorld(float3 position, float3 moveVec
 	return position;
 }
 
-void PlayerAnimator::update()
+void PlayerAnimator::update(bool uiOpened)
 {
 	const float3 playerCameraOffset(0, 1.7f, 0);
 	const float VIEW_DELTA = 0.01;
@@ -221,17 +224,18 @@ void PlayerAnimator::update()
 	position += playerCameraOffset;
 	camera->setPosition(position);
 
-	/* Update rotation */
-	float2 mouseDelta = device->getNormalizedMousePosition();
-	/* TODO: Aspect ratio */
-	float rotationHorizontalDelta = -mouseDelta.x * PI / 3;
-	float rotationVerticalDelta = mouseDelta.y * PI / 4;
+	if (!uiOpened)
+	{
+		/* Update rotation */
+		float2 mouseDelta = device->getNormalizedMousePosition();
+		/* TODO: Aspect ratio */
+		float rotationHorizontalDelta = -mouseDelta.x * PI / 3;
+		float rotationVerticalDelta = mouseDelta.y * PI / 4;
 
-	rotationHorizontal += rotationHorizontalDelta;
-	rotationVertical = bound(-PI / 2, rotationVertical + rotationVerticalDelta, PI / 2 - VIEW_DELTA);
+		rotationHorizontal += rotationHorizontalDelta;
+		rotationVertical = bound(-PI / 2, rotationVertical + rotationVerticalDelta, PI / 2 - VIEW_DELTA);
+	}
 
 	float3 lookDirection = float3(std::sin(rotationHorizontal), std::sin(rotationVertical), std::cos(rotationHorizontal));
 	camera->setLookAt(position + lookDirection);
-
-	device->setNormalizedMousePosition(0, 0);
 }

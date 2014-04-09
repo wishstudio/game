@@ -138,40 +138,53 @@ int main()
 	chunkSceneNode = new ChunkSceneNode();
 	
 	bool vsync = false;
+	bool uiOpened = false;
 	while (device->beginFrame())
 	{
 		Event event;
 		while (device->pollEvent(&event))
 			/* Do nothing */;
-		if (!device->getIsActive())
+		/*if (!device->getIsActive())
 		{
 			std::this_thread::yield();
 			continue;
-		}
+		}*/
 
-		shortcutItemUI.update();
-		World::CameraIntersectionInfo *info = nullptr;
-		if (world->getCameraIntersection(Ray3D(camera->getPosition(), camera->getLookAt() - camera->getPosition()), &info))
+		if (device->isKeyPressed(KEY_ESC))
 		{
-			if (device->isMousePressed(MOUSE_BUTTON_LEFT))
-				info->block.setType(0);
-			if (device->isMousePressed(MOUSE_BUTTON_RIGHT))
-				info->block.getNeighbour(oppositeDirection(info->direction)).setType(shortcutItemUI.getCurrentItem());
+			uiOpened = !uiOpened;
+			device->setMouseVisible(uiOpened);
+			device->setNormalizedMousePosition(0, 0);
 		}
+		if (!uiOpened)
+		{
+			shortcutItemUI.update();
+			World::CameraIntersectionInfo *info = nullptr;
+			if (world->getCameraIntersection(Ray3D(camera->getPosition(), camera->getLookAt() - camera->getPosition()), &info))
+			{
+				if (device->isMousePressed(MOUSE_BUTTON_LEFT))
+					info->block.setType(0);
+				if (device->isMousePressed(MOUSE_BUTTON_RIGHT))
+					info->block.getNeighbour(oppositeDirection(info->direction)).setType(shortcutItemUI.getCurrentItem());
+			}
+			playerAnimator->update(false);
+			device->setNormalizedMousePosition(0, 0);
+		}
+		else
+			playerAnimator->update(true);
 		while (device->tick())
 		{
 			world->tick();
-			playerAnimator->tick();
+			playerAnimator->tick(uiOpened);
 		}
 		world->update();
 		world->save();
-
-		playerAnimator->update();
 
 		video->beginDraw(Color(127, 200, 251, 255));
 
 		video->setMaterial(defaultMaterial);
 		chunkSceneNode->render();
+		World::CameraIntersectionInfo *info = nullptr;
 		if (world->getCameraIntersection(Ray3D(camera->getPosition(), camera->getLookAt() - camera->getPosition()), &info))
 		{
 			AABB3D box = info->block.getBoundingBox().translate(info->block.x(), info->block.y(), info->block.z());

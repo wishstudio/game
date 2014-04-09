@@ -6,8 +6,8 @@ public:
 	PlayerAnimator();
 	virtual ~PlayerAnimator();
 
-	void tick();
-	void update();
+	void tick(bool uiOpened);
+	void update(bool uiOpened);
 
 private:
 	static float3 collideEllipsoidWithWorld(float3 currentPosition, float3 moveVector, bool canSlide, bool &collided);
