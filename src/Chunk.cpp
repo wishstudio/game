@@ -71,7 +71,7 @@ Deserializer &operator >> (Deserializer &deserializer, Chunk &data)
 	return deserializer;
 }
 
-void Chunk::generate(int phase)
+void Chunk::_generate(int phase)
 {
 	if (generationPhase > phase)
 		return;
@@ -86,9 +86,9 @@ void Chunk::generate(int phase)
 				for (int z = spanMin.z; z <= spanMax.z; z++)
 				{
 					Chunk *chunk = world->rawGetChunk(chunk_x + x, chunk_y + y, chunk_z + z);
-					chunk->loadRawData();
+					chunk->_loadRawData();
 					if (chunk->generationPhase < phase)
-						chunk->generate(phase - 1);
+						chunk->_generate(phase - 1);
 				}
 	}
 
@@ -131,13 +131,39 @@ void Chunk::setDirty(int x, int y, int z)
 	if (!dirty)
 		world->asyncSaveChunk(this);
 	dirty = true;
-	invalidateLight();
+	_invalidateLight();
+	if (blocks[x][y][z].sunlight != 0 && !blockType->isLightTransparent(blocks[x][y][z].type))
+		unpropagateQueue.push(Block(this, x, y, z));
+	else /* TODO: Do not invalidate if light values does not change */
+		_invalidateMooreBuffer(Block(this, x, y, z));
 }
 
-void Chunk::invalidateLight()
+void Chunk::_invalidateLight()
 {
 	status = Status::Data;
 	world->asyncLoadChunk(this);
+}
+
+void Chunk::_invalidateBuffer()
+{
+	if (status == Status::Buffer)
+	{
+		status = Status::Light;
+		world->asyncLoadChunk(this);
+	}
+}
+
+void Chunk::_invalidateMooreBuffer(const Block &block)
+{
+	/* TODO: Optimization */
+	for (int x = -1; x <= 1; x++)
+		for (int y = -1; y <= 1; y++)
+			for (int z = -1; z <= 1; z++)
+			{
+				Block dest = block.tryGetNeighbour(x, y, z);
+				if (dest.isValid())
+					dest.getChunk()->_invalidateBuffer();
+			}
 }
 
 bool Chunk::shouldPreloadBuffer()
@@ -181,7 +207,7 @@ void Chunk::save()
 }
 
 /* Load chunk data from database, don't do anything else */
-void Chunk::loadRawData()
+void Chunk::_loadRawData()
 {
 	if (status >= Status::Generating)
 		return;
@@ -202,12 +228,63 @@ void Chunk::loadData()
 {
 	if (status == Status::Generating)
 	{
-		generate(WorldGenerator::getPhaseCount());
+		_generate(WorldGenerator::getPhaseCount());
 		return;
 	}
-	loadRawData();
+	_loadRawData();
 	if (status == Status::Generating)
-		generate(WorldGenerator::getPhaseCount());
+		_generate(WorldGenerator::getPhaseCount());
+}
+
+int Chunk::_diminishLight(int light)
+{
+	return light - 2;
+}
+
+void Chunk::_unpropagateLight()
+{
+	Chunk *belowChunk = world->tryGetChunk(chunk_x, chunk_y - 1, chunk_z);
+	while (!unpropagateQueue.empty())
+	{
+		Block block = unpropagateQueue.pop();
+		int light = _diminishLight(block.data->sunlight);
+		block.data->sunlight = 0;
+
+		/* Invalidate neighbour buffers due to ambient occlusion in use */
+		_invalidateMooreBuffer(block);
+		if (light <= 0)
+			continue;
+		if (light == _diminishLight(15))
+		{
+			/* This is straight sunlight, unpropagate the block below */
+			Block dest = block.tryGetNeighbour(DIRECTION_MY);
+			if (dest.isValid() &&
+				(dest.getChunk() == this || dest.getChunk()->getStatus() >= Status::Light) &&
+				dest.data->sunlight == 15)
+			{
+				if (dest.getChunk() != this && dest.getChunk() != belowChunk)
+				{
+					/* Too far, just add it to its own unpropagate queue */
+					dest.getChunk()->unpropagateQueue.push(dest);
+					dest.getChunk()->_invalidateLight();
+				}
+				else
+					unpropagateQueue.push(dest);
+			}
+		}
+		for (int i = 0; i < DIRECTION_COUNT; i++)
+		{
+			Block dest = block.tryGetNeighbour((Direction)i);
+			/* Ensure destination chunk has been lighted */
+			if (dest.isValid() &&
+				(dest.getChunk() == this || dest.getChunk()->getStatus() >= Status::Light) &&
+				dest.data->sunlight <= light) /* So we can be sure that light is propagated from this block */
+			{
+				dest.getChunk()->_invalidateLight();
+				unpropagateQueue.push(dest);
+			}
+		}
+	}
 }
 
 void Chunk::loadLight()
@@ -236,11 +313,9 @@ void Chunk::loadLight()
 	if (status >= Status::Light) /* Double check */
 		return;
 
-	/* Clear sunlight */
-	for (int x = 0; x < CHUNK_SIZE; x++)
-		for (int y = 0; y < CHUNK_SIZE; y++)
-			for (int z = 0; z < CHUNK_SIZE; z++)
-				blocks[x][y][z].sunlight = 0;
+	/* Unpropagate removed lights if any exists */
+	_unpropagateLight();
+
 	/* Propagate sunlight */
 	if (atTop)
 	{
@@ -272,12 +347,12 @@ void Chunk::loadLight()
 					blocks[x][y][z].sunlight = 0;
 
 	/* Indirect illumination */
-	Queue<Block> queue;
+	Queue<Block> lightingQueue;
 	for (int x = 0; x < CHUNK_SIZE; x++)
 		for (int y = 0; y < CHUNK_SIZE; y++)
 			for (int z = 0; z < CHUNK_SIZE; z++)
-				if (blocks[x][y][z].sunlight > 1)
-					queue.push(Block(this, x, y, z));
+				if (_diminishLight(blocks[x][y][z].sunlight) > 0)
+					lightingQueue.push(Block(this, x, y, z));
 	/* Neighbour chunks */
 	/* Order is consistent with Direction enum */
 	int startX[DIRECTION_COUNT] = {              0,              0,              0, CHUNK_SIZE - 1,              0,              0};
@@ -294,16 +369,16 @@ void Chunk::loadLight()
 			for (int x = startX[i]; x <= endX[i]; x++)
 				for (int y = startY[i]; y <= endY[i]; y++)
 					for (int z = startZ[i]; z <= endZ[i]; z++)
-						if (chunk->blocks[x][y][z].sunlight > 1)
-							queue.push(Block(chunk, x, y, z));
+						if (_diminishLight(chunk->blocks[x][y][z].sunlight) > 0)
+							lightingQueue.push(Block(chunk, x, y, z));
 		}
 	}
 
 	/* Calculate illumination */
-	while (!queue.empty())
+	while (!lightingQueue.empty())
 	{
-		Block block = queue.pop();
-		int light = block.data->sunlight - 2;
+		Block block = lightingQueue.pop();
+		int light = _diminishLight(block.data->sunlight);
 		for (int i = 0; i < DIRECTION_COUNT; i++)
 		{
 			Block dest = block.tryGetNeighbour((Direction) i);
@@ -314,8 +389,8 @@ void Chunk::loadLight()
 				light > dest.data->sunlight)
 			{
 				dest.data->sunlight = light;
-				if (light > 2)
-					queue.push(dest);
+				if (_diminishLight(light) > 0)
+					lightingQueue.push(dest);
 			}
 		}
 	}

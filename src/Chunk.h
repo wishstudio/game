@@ -4,6 +4,8 @@ class Serializer;
 class Deserializer;
 class TriangleCollector;
 
+#include "Block.h"
+
 struct BlockData final
 {
 	uint16_t type;
@@ -46,9 +48,13 @@ public:
 	friend Deserializer &operator >> (Deserializer &deserializer, Chunk &data);
 
 private:
-	void generate(int phase);
-	void loadRawData();
-	void invalidateLight();
+	void _generate(int phase);
+	void _loadRawData();
+	void _invalidateLight();
+	void _invalidateBuffer();
+	void _invalidateMooreBuffer(const Block &block);
+	int _diminishLight(int light);
+	void _unpropagateLight();
 
 	const int chunk_x, chunk_y, chunk_z;
 	std::mutex accessMutex;
@@ -60,6 +66,7 @@ private:
 	BlockData blocks[CHUNK_SIZE][CHUNK_SIZE][CHUNK_SIZE];
 	AABB3D boundingBox;
 	float4x4 modelTransform;
+	Queue<Block> unpropagateQueue;
 
 	friend class Block;
 };
