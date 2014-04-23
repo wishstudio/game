@@ -90,6 +90,26 @@ void Chunk::_generate(int phase)
 					if (chunk->generationPhase < phase)
 						chunk->_generate(phase - 1);
 				}
+		if (phase > 1)
+		{
+			/* Ensure surrounding chunks requiring this chunk to be at most [phase - 1] are all done */
+			/*
+			 * x' + spanMin <= x <= x' + spanMax
+			 * x - spanMax <= x' <= x - spanMin
+			 */
+			WorldGenerator *generator = WorldGenerator::getGenerator(phase - 1);
+			int3 spanMin = generator->getSpanMin();
+			int3 spanMax = generator->getSpanMax();
+			for (int x = -spanMax.x; x <= -spanMin.x; x++)
+				for (int y = -spanMax.y; y <= -spanMin.y; y++)
+					for (int z = -spanMax.z; z <= -spanMin.z; z++)
+					{
+						Chunk *chunk = world->rawGetChunk(chunk_x + x, chunk_y + y, chunk_z + z);
+						chunk->_loadRawData();
+						if (chunk->generationPhase < phase)
+							chunk->_generate(phase - 1);
+					}
+		}
 	}
 
 	if (phase == WorldGenerator::getPhaseCount())
