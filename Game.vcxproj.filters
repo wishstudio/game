@@ -11,6 +11,9 @@
     <Filter Include="Source\WorldGenerator">
       <UniqueIdentifier>{bd7af3ce-456b-41a7-94dd-3c9e5db3f1f6}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source\DataStructure">
+      <UniqueIdentifier>{8688c7bd-c763-4c5e-8956-87edb068d90e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Block.h">
@@ -75,6 +78,9 @@
     </ClInclude>
     <ClInclude Include="src\WorldGenerator\TreeGenerator.h">
       <Filter>Source\WorldGenerator</Filter>
+    </ClInclude>
+    <ClInclude Include="src\DataStructure\MemoryPool.h">
+      <Filter>Source\DataStructure</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

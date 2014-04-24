@@ -481,3 +481,13 @@ void Chunk::getTriangles(std::vector<Triangle3D> &triangles, const AABB3D &box, 
 				}
 			}
 }
+
+void *Chunk::operator new(size_t size)
+{
+	return world->getChunkMemoryPool()->allocateObject();
+}
+
+void Chunk::operator delete(void *chunk)
+{
+	world->getChunkMemoryPool()->deleteObject((Chunk *) chunk);
+}

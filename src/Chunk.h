@@ -22,6 +22,7 @@ public:
 	enum class Status : int { Nothing, Generating, Data, Light, Buffer };
 	/* Represents what has been loaded so far */
 	Chunk(int chunk_x, int chunk_y, int chunk_z);
+	Chunk(const Chunk &) = delete;
 
 	Status getStatus() const volatile { return status; }
 	void setStatus(Status _status) { status = _status; }
@@ -46,6 +47,9 @@ public:
 
 	friend Serializer &operator << (Serializer &serializer, const Chunk &data);
 	friend Deserializer &operator >> (Deserializer &deserializer, Chunk &data);
+
+	static void *operator new(size_t size);
+	static void operator delete(void *chunk);
 
 private:
 	void _generate(int phase);

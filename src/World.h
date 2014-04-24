@@ -39,6 +39,8 @@ public:
 
 	bool getCameraIntersection(const Ray3D &ray, CameraIntersectionInfo **info);
 
+	MemoryPool<Chunk> *getChunkMemoryPool() { return &chunkMemoryPool; }
+
 private:
 	void run();
 
@@ -53,4 +55,6 @@ private:
 	std::condition_variable workerCondition;
 	std::mutex workerMutex;
 	std::atomic<bool> shouldStop;
+
+	MemoryPool<Chunk> chunkMemoryPool;
 };

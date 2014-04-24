@@ -20,6 +20,7 @@ using namespace sare;
 #include <unordered_map>
 #include <vector>
 
+#include "DataStructure/MemoryPool.h"
 #include "Hash.h"
 #include "MathHelper.h"
 #include "Queue.h"
@@ -28,9 +29,7 @@ class ChunkSceneNode;
 class Database;
 class BlockType;
 class TileManager;
-class TimeManager;
 class World;
-class EventReceiver;
 extern ChunkSceneNode *chunkSceneNode;
 extern Database *database;
 extern BlockType *blockType;
