@@ -20,7 +20,7 @@ using namespace sare;
 #include <unordered_map>
 #include <vector>
 
-#include "DataStructure/MemoryPool.h"
+#include "Concurrent/ConcurrentMemoryPool.h"
 #include "Hash.h"
 #include "MathHelper.h"
 #include "Queue.h"

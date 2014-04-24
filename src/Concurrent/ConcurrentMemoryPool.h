@@ -1,7 +1,7 @@
 #pragma once
 
 template <typename T, int ChunkSize = 4096>
-class MemoryPool final
+class ConcurrentMemoryPool final
 {
 private:
 	/* TODO: Use unions when VC supports it */
@@ -59,13 +59,13 @@ private:
 	ChunkNode *freeHead;
 
 public:
-	MemoryPool(): chunkHead(nullptr), chunkTail(nullptr), freeHead(new ChunkNode())
+	ConcurrentMemoryPool(): chunkHead(nullptr), chunkTail(nullptr), freeHead(new ChunkNode())
 	{
 		freeHead->asPointerAtomic() = freeHead;
 		_newChunk();
 	}
 
-	~MemoryPool()
+	~ConcurrentMemoryPool()
 	{
 		while (chunkHead)
 		{
