@@ -29,9 +29,9 @@ private:
 	{
 		for (;;)
 		{
-			ChunkNode *first = freeHead->asPointerAtomic();
-			node->asPointerAtomic() = first;
-			if (freeHead->asPointerAtomic().compare_exchange_weak(first, node))
+			ChunkNode *head = freeHead.load();
+			node->asPointerAtomic() = head;
+			if (freeHead.compare_exchange_weak(head, node))
 				return;
 		}
 	}
@@ -56,12 +56,11 @@ private:
 	Chunk *chunkHead, *chunkTail;
 	std::mutex chunkMutex;
 
-	ChunkNode *freeHead;
+	std::atomic<ChunkNode *> freeHead;
 
 public:
-	ConcurrentMemoryPool(): chunkHead(nullptr), chunkTail(nullptr), freeHead(new ChunkNode())
+	ConcurrentMemoryPool(): chunkHead(nullptr), chunkTail(nullptr), freeHead(nullptr)
 	{
-		freeHead->asPointerAtomic() = freeHead;
 		_newChunk();
 	}
 
@@ -79,20 +78,20 @@ public:
 	{
 		for (;;)
 		{
-			ChunkNode *node = freeHead->asPointerAtomic();
-			if (node != freeHead)
-			{
-				ChunkNode *next = node->asPointerAtomic();
-				/* Note 'next' may contains corrupted value since the atomic part is interleaved with real data
-				 * But anyway the compare and exchange operation will definitely fail so 'next' wouldn't be used
-				 */
-				if (freeHead->asPointerAtomic().compare_exchange_weak(node, next))
-					return node->asObject();
-			}
-			else
+			ChunkNode *head = freeHead.load();
+			if (head == nullptr)
 			{
 				/* No free nodes */
 				_newChunk();
+			}
+			else
+			{
+				ChunkNode *next = head->asPointerAtomic().load();
+				/* Note 'next' may contains corrupted value since the atomic part is interleaved with real data
+				 * But anyway the compare and exchange operation will definitely fail so 'next' wouldn't be used
+				 */
+				if (freeHead.compare_exchange_weak(head, next))
+					return head->asObject();
 			}
 		}
 	}
