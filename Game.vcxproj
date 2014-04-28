@@ -16,6 +16,7 @@
     <ClInclude Include="src\Chunk.h" />
     <ClInclude Include="src\ChunkSceneNode.h" />
     <ClInclude Include="src\Concurrent\ConcurrentMemoryPool.h" />
+    <ClInclude Include="src\Concurrent\ConcurrentStack.h" />
     <ClInclude Include="src\Database.h" />
     <ClInclude Include="src\Hash.h" />
     <ClInclude Include="src\lz4\lz4.h" />

@@ -82,6 +82,9 @@
     <ClInclude Include="src\Concurrent\ConcurrentMemoryPool.h">
       <Filter>Source\Concurrent</Filter>
     </ClInclude>
+    <ClInclude Include="src\Concurrent\ConcurrentStack.h">
+      <Filter>Source\Concurrent</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\lz4\lz4.c">

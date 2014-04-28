@@ -2,14 +2,14 @@
 
 #include "Block.h"
 #include "Chunk.h"
-#include "ChunkSceneNode.h"
 #include "Database.h"
 #include "World.h"
 
 World::World()
 {
 	shouldStop = false;
-	int threadCount = std::max<int>(1, std::thread::hardware_concurrency());
+	int threadCount = std::max<int>(1, std::thread::hardware_concurrency() - 1);
+	//int threadCount = 1;
 	for (int i = 0; i < threadCount; i++)
 		workerThreads.push_back(std::thread(&World::run, this));
 }
@@ -55,11 +55,9 @@ void World::asyncDeleteTriangleCollector(TriangleCollector *collector)
 	triangleCollectorDeleteQueue.push(collector);
 }
 
-void World::asyncLoadChunk(Chunk *chunk)
+void World::addTask(const AsyncTask &task)
 {
-	if (chunk->isInQueue())
-		return;
-	loadQueue.push(chunk);
+	asyncTaskQueue.push(task);
 	std::lock_guard<std::mutex> lock(workerMutex);
 	workerCondition.notify_all();
 }
@@ -86,8 +84,9 @@ Block World::tryGetBlock(int x, int y, int z)
 Chunk *World::getChunk(int chunk_x, int chunk_y, int chunk_z)
 {
 	Chunk *chunk = rawGetChunk(chunk_x, chunk_y, chunk_z);
-	if (chunk->getStatus() < Chunk::Status::Data)
-		chunk->loadData();
+	chunk->loadDataAsync();
+	while (chunk->getStatus() < Chunk::Status::Data)
+		/* TODO: Spinlock for now */;
 	return chunk;
 }
 
@@ -124,7 +123,7 @@ Chunk *World::preloadChunk(int chunk_x, int chunk_y, int chunk_z)
 
 	chunk = new Chunk(chunk_x, chunk_y, chunk_z);
 	chunks.insert(std::make_pair(std::make_tuple(chunk_x, chunk_y, chunk_z), chunk));
-	asyncLoadChunk(chunk);
+	chunk->loadDataAsync();
 	return chunk;
 }
 
@@ -150,30 +149,15 @@ void World::run()
 {
 	while (!shouldStop)
 	{
-		Chunk *chunk;
-		if (loadQueue.try_pop(chunk))
+		AsyncTask callback;
+		if (asyncTaskQueue.try_pop(callback))
+			callback();
+		else
 		{
-			chunk->setInQueue(false);
-			Chunk::Status status = chunk->getStatus();
-			if (status < Chunk::Status::Data)
-				chunk->loadData();
-			if (status < Chunk::Status::Light)
-				chunk->loadLight();
-			if (!chunk->shouldPreloadBuffer())
-				chunk->setStatus(Chunk::Status::Light);
-			else
-			{
-				chunk->loadBuffer();
-				chunk->setStatus(Chunk::Status::Buffer);
-			}
-			continue;
-		}
-		
-		/* No remaining chunks to process, suspend */
-		{
+			/* No remaining chunks to process, suspend */
 			std::unique_lock<std::mutex> lock(workerMutex);
 			/* Double check */
-			if (loadQueue.empty())
+			if (asyncTaskQueue.empty())
 				workerCondition.wait(lock);
 			/* We do not need to worry about spurious wakeups */
 		}

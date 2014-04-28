@@ -12,6 +12,7 @@ using namespace sare;
 #include <concurrent_queue.h>
 #include <concurrent_unordered_map.h>
 #include <condition_variable>
+#include <functional>
 #include <limits>
 #include <memory>
 #include <mutex>
@@ -21,6 +22,7 @@ using namespace sare;
 #include <vector>
 
 #include "Concurrent/ConcurrentMemoryPool.h"
+#include "Concurrent/ConcurrentStack.h"
 #include "Hash.h"
 #include "MathHelper.h"
 #include "Queue.h"
@@ -35,6 +37,9 @@ extern Database *database;
 extern BlockType *blockType;
 extern TileManager *tileManager;
 extern World *world;
+
+/* TODO */
+typedef std::function<void()> AsyncTask;
 
 extern Camera *camera;
 

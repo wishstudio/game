@@ -78,7 +78,8 @@ int Block::getType() const
 
 void Block::setType(int type)
 {
-	std::lock_guard<std::mutex> lock(chunk->accessMutex);
+	// TODO
+	//std::lock_guard<std::mutex> lock(chunk->accessMutex);
 	data->type = type;
 	chunk->setDirty(in_x, in_y, in_z);
 }
@@ -95,21 +96,24 @@ int Block::getParam2() const
 
 void Block::setParam1(int param1)
 {
-	std::lock_guard<std::mutex> lock(chunk->accessMutex);
+	// TODO
+	//std::lock_guard<std::mutex> lock(chunk->accessMutex);
 	data->param1 = param1;
 	chunk->setDirty(in_x, in_y, in_z);
 }
 
 void Block::setParam2(int param2)
 {
-	std::lock_guard<std::mutex> lock(chunk->accessMutex);
+	// TODO
+	//std::lock_guard<std::mutex> lock(chunk->accessMutex);
 	data->param2 = param2;
 	chunk->setDirty(in_x, in_y, in_z);
 }
 
 void Block::setParam(int param1, int param2)
 {
-	std::lock_guard<std::mutex> lock(chunk->accessMutex);
+	// TODO
+	//std::lock_guard<std::mutex> lock(chunk->accessMutex);
 	data->param1 = param1;
 	data->param2 = param2;
 	chunk->setDirty(in_x, in_y, in_z);

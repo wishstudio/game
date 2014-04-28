@@ -24,7 +24,6 @@ public:
 
 	int getLoadedChunkCount() const { return chunks.size(); }
 	void save();
-	void asyncLoadChunk(Chunk *chunk);
 	void asyncSaveChunk(Chunk *chunk);
 
 	Block getBlock(int x, int y, int z);
@@ -40,6 +39,7 @@ public:
 	bool getCameraIntersection(const Ray3D &ray, CameraIntersectionInfo **info);
 
 	ConcurrentMemoryPool<Chunk> *getChunkMemoryPool() { return &chunkMemoryPool; }
+	void addTask(const AsyncTask &task);
 
 private:
 	void run();
@@ -49,7 +49,9 @@ private:
 	Concurrency::concurrent_unordered_map<std::tuple<int, int, int>, Chunk *> chunks;
 	std::mutex chunksHashMutex;
 
-	Concurrency::concurrent_queue<Chunk *> loadQueue;
+	Concurrency::concurrent_queue<AsyncTask> asyncTaskQueue;
+	//ConcurrentStack<AsyncTask> asyncTaskQueue;
+
 	Concurrency::concurrent_queue<Chunk *> saveQueue;
 	std::vector<std::thread> workerThreads;
 	std::condition_variable workerCondition;
