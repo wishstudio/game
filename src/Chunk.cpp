@@ -121,7 +121,7 @@ void Chunk::_raiseExpect(Status _expectedStatus, int _expectedGenerationPhase)
 	{
 		Status currentExpectedStatus = expectedStatus.load();
 		int currentExpectedGenerationPhase = expectedGenerationPhase.load();
-		if (currentExpectedStatus > _expectedStatus || (currentExpectedStatus == _expectedStatus && currentExpectedGenerationPhase >= _expectedGenerationPhase))
+		if (currentExpectedStatus >= _expectedStatus && currentExpectedGenerationPhase >= _expectedGenerationPhase)
 			break;
 		if (currentExpectedGenerationPhase < _expectedGenerationPhase)
 		{
@@ -144,16 +144,14 @@ void Chunk::_commonCallback()
 			/* tryClaimWorking() failed means another thread took over the task */
 			return;
 		/* Determine next thing to do */
-		if (expectedStatus == Status::Buffer)
-			world->addTask([=]() { _loadBufferAsync([=]() { _commonCallback(); }); });
-		else if (expectedStatus == Status::Light)
-			world->addTask([=]() { _loadLightAsync([=]() { _commonCallback(); }); });
-		else if (expectedStatus == Status::Data)
-			world->addTask([=]() { _loadDataAsync([=]() { _commonCallback(); }); });
-		else if (expectedStatus == Status::Generating && expectedGenerationPhase == 0)
-			world->addTask([=]() { _loadRawDataAsync([=]() { _commonCallback(); }); });
-		else if (expectedStatus == Status::Generating)
-			world->addTask([=]() { _generateAsync(expectedGenerationPhase - 1, [=]() { _commonCallback(); }); });
+		if (status == Status::Nothing)
+			world->addTask([=]() { _loadRawDataAsync_work(); });
+		else if (status == Status::Generating)
+			world->addTask([=]() { _generateAsync_work(generationPhase); });
+		else if (status == Status::Data)
+			world->addTask([=]() { _loadLightAsync_work(); });
+		else if (status == Status::Light)
+			world->addTask([=]() { _loadBufferAsync_work(); });
 		else
 			/* Some bad thing happened */;
 	}
@@ -161,13 +159,7 @@ void Chunk::_commonCallback()
 
 void Chunk::loadRawDataAsync()
 {
-	if (status > Status::Nothing)
-		return;
-
-	_raiseExpect(Status::Generating, 0);
-
-	if (_tryClaimWorking())
-		world->addTask([=]() { _loadRawDataAsync([=]() { _commonCallback(); }); });
+	_loadRawDataAsync([](){});
 }
 
 void Chunk::_loadRawDataAsync(const AsyncTask &callback)
@@ -178,8 +170,19 @@ void Chunk::_loadRawDataAsync(const AsyncTask &callback)
 		return;
 	}
 
+	/* These orderings are critical, don't change unless you're absolutely sure */
+
 	_raiseExpect(Status::Generating, 0);
 
+	if (_tryClaimWorking())
+		_commonCallback();
+
+	if (rawDataCondition.tryAddWaitOn(callback))
+		callback();
+}
+
+void Chunk::_loadRawDataAsync_work()
+{
 	accessMutex.lock([=]() {
 		if (status == Status::Nothing)
 		{
@@ -190,19 +193,14 @@ void Chunk::_loadRawDataAsync(const AsyncTask &callback)
 			}
 		}
 		accessMutex.unlock();
-		callback();
+		rawDataCondition.notifyAll();
+		_commonCallback();
 	});
 }
 
 void Chunk::loadDataAsync()
 {
-	if (status >= Status::Data)
-		return;
-
-	_raiseExpect(Status::Data);
-
-	if (_tryClaimWorking())
-		world->addTask([=]() { _loadDataAsync([=]() { _commonCallback(); }); });
+	_loadDataAsync([](){});
 }
 
 void Chunk::_loadDataAsync(const AsyncTask &callback)
@@ -212,16 +210,14 @@ void Chunk::_loadDataAsync(const AsyncTask &callback)
 		callback();
 		return;
 	}
-	//printf("LOAD DATA: %d %d %d\n", chunk_x, chunk_y, chunk_z);
 
 	_raiseExpect(Status::Data);
 
-	if (status == Status::Nothing)
-	{
-		_loadRawDataAsync([=]() { _generateAsync(WorldGenerator::getPhaseCount() - 1, callback); });
-		return;
-	}
-	_generateAsync(WorldGenerator::getPhaseCount() - 1, callback);
+	if (_tryClaimWorking())
+		_commonCallback();
+
+	if (dataCondition.tryAddWaitOn(callback))
+		callback();
 }
 
 void Chunk::_generateAsync(int phase, const AsyncTask &callback)
@@ -235,6 +231,24 @@ void Chunk::_generateAsync(int phase, const AsyncTask &callback)
 		_raiseExpect(Status::Data);
 	else
 		_raiseExpect(Status::Generating, phase + 1);
+
+	if (_tryClaimWorking())
+		_commonCallback();
+
+	if (phase + 1 == WorldGenerator::getPhaseCount())
+	{
+		if (dataCondition.tryAddWaitOn(callback))
+			callback();
+	}
+	else
+	{
+		if (generateCondition[phase].tryAddWaitOn(callback))
+			callback();
+	}
+}
+
+void Chunk::_generateAsync_work(int phase)
+{
 	if (phase > 0)
 	{
 		/* Ensure surrounding chunks are all done [phase - 1] at least */
@@ -269,15 +283,15 @@ void Chunk::_generateAsync(int phase, const AsyncTask &callback)
 				else
 					callback();
 			}, [=]() {
-				_generateAsync_lock(phase, callback);
+				_generateAsync_lock(phase);
 			}
 		);
 	}
 	else
-		_generateAsync_lock(phase, callback);
+		_generateAsync_lock(phase);
 }
 
-void Chunk::_generateAsync_lock(int phase, const AsyncTask &callback)
+void Chunk::_generateAsync_lock(int phase)
 {
 	/* Lock related chunks for current phase */
 	WorldGenerator *generator = WorldGenerator::getGenerator(phase);
@@ -298,15 +312,12 @@ void Chunk::_generateAsync_lock(int phase, const AsyncTask &callback)
 					Chunk *chunk = world->rawGetChunk(chunk_x + x, chunk_y + y, chunk_z + z);
 					chunk->accessMutex.unlock();
 				}
-		callback();
+		_commonCallback();
 	});
 }
 
 void Chunk::_generate(int phase)
 {
-	if (generationPhase > phase)
-		return;
-
 	/* Lock related chunks for current phase */
 	WorldGenerator *generator = WorldGenerator::getGenerator(phase);
 	int3 spanMin = generator->getSpanMin();
@@ -328,21 +339,16 @@ void Chunk::_generate(int phase)
 	if (phase + 1 == WorldGenerator::getPhaseCount())
 	{
 		/* We've done */
-		//printf("DATA: %d %d %d\n", chunk_x, chunk_y, chunk_z);
-		if (status == Status::Generating)
-			status = Status::Data;
+		status = Status::Data;
+		dataCondition.notifyAll();
 	}
+	else
+		generateCondition[phase].notifyAll();
 }
 
 void Chunk::loadLightAsync()
 {
-	if (status >= Status::Light)
-		return;
-
-	_raiseExpect(Status::Light);
-
-	if (_tryClaimWorking())
-		world->addTask([=]() { _loadLightAsync([=]() { _commonCallback(); }); });
+	_loadLightAsync([](){});
 }
 
 void Chunk::_loadLightAsync(const AsyncTask &callback)
@@ -352,45 +358,40 @@ void Chunk::_loadLightAsync(const AsyncTask &callback)
 		callback();
 		return;
 	}
-	//printf("LOAD LIGHT: %d %d %d\n", chunk_x, chunk_y, chunk_z);
 
 	_raiseExpect(Status::Light);
 
+	if (_tryClaimWorking())
+		_commonCallback();
+
+	if (lightCondition.tryAddWaitOn(callback))
+		callback();
+}
+
+void Chunk::_loadLightAsync_work()
+{
 	bool atTop = chunk_y > 5;
 	if (!atTop)
 	{
 		Chunk *chunk = world->rawGetChunk(chunk_x, chunk_y + 1, chunk_z);
 		if (chunk->status < Status::Light)
 		{
-			chunk->_loadLightAsync([=]() { _loadLightAsync_self(callback); });
+			chunk->_loadLightAsync([=]() { _loadLightAsync_lock(); });
 			return;
 		}
 	}
-	_loadLightAsync_self(callback);
+	_loadLightAsync_lock();
 }
 
-void Chunk::_loadLightAsync_self(const AsyncTask &callback)
-{
-	if (status >= Status::Light)
-	{
-		callback();
-		return;
-	}
-
-	if (status < Status::Data)
-	{
-		_loadDataAsync([=]() { _loadLightAsync_lock(callback); });
-		return;
-	}
-	_loadLightAsync_lock(callback);
-}
-
-void Chunk::_loadLightAsync_lock(const AsyncTask &callback)
+void Chunk::_loadLightAsync_lock()
 {
 	/* Lock surrounding chunks */
 	Async::forEach3(-1, 1, -1, 1, -1, 1, [=](int x, int y, int z, const AsyncTask &callback) {
 		Chunk *chunk = world->rawGetChunk(chunk_x + x, chunk_y + y, chunk_z + z);
-		chunk->accessMutex.lock(callback);
+		if (chunk->getStatus() < Status::Data)
+			chunk->_loadDataAsync(callback);
+		else
+			callback();
 	}, [=]() {
 		_loadLight();
 
@@ -402,7 +403,7 @@ void Chunk::_loadLightAsync_lock(const AsyncTask &callback)
 					Chunk *chunk = world->rawGetChunk(chunk_x + x, chunk_y + y, chunk_z + z);
 					chunk->accessMutex.unlock();
 				}
-		callback();
+		_commonCallback();
 	});
 }
 
@@ -459,9 +460,6 @@ void Chunk::_unpropagateLight()
 
 void Chunk::_loadLight()
 {
-	if (status >= Status::Light)
-		return;
-
 	/* Unpropagate removed lights if any exists */
 	_unpropagateLight();
 
@@ -547,11 +545,16 @@ void Chunk::_loadLight()
 		}
 	}
 
-	//printf("LIGHT: %d %d %d\n", chunk_x, chunk_y, chunk_z);
 	status = Status::Light;
+	lightCondition.notifyAll();
 }
 
 void Chunk::loadBufferAsync()
+{
+	_loadBufferAsync();
+}
+
+void Chunk::_loadBufferAsync()
 {
 	if (status >= Status::Buffer)
 		return;
@@ -559,18 +562,11 @@ void Chunk::loadBufferAsync()
 	_raiseExpect(Status::Buffer);
 
 	if (_tryClaimWorking())
-		world->addTask([=]() { _loadBufferAsync([=]() { _commonCallback(); }); });
+		_commonCallback();
 }
 
-void Chunk::_loadBufferAsync(const AsyncTask &callback)
+void Chunk::_loadBufferAsync_work()
 {
-	if (status >= Status::Buffer)
-	{
-		callback();
-		return;
-	}
-	//printf("LOAD BUFFER: %d %d %d\n", chunk_x, chunk_y, chunk_z);
-
 	/* Ensuring all surrounding chunks are lighted (including self) */
 	Async::forEach3(-1, 1, -1, 1, -1, 1, [=](int x, int y, int z, const AsyncTask &callback) {
 		Chunk *chunk = world->rawGetChunk(chunk_x + x, chunk_y + y, chunk_z + z);
@@ -579,18 +575,12 @@ void Chunk::_loadBufferAsync(const AsyncTask &callback)
 		else
 			callback();
 	}, [=]() {
-		_loadBufferAsync_lock(callback);
+		_loadBufferAsync_lock();
 	});
 }
 
-void Chunk::_loadBufferAsync_lock(const AsyncTask &callback)
+void Chunk::_loadBufferAsync_lock()
 {
-	if (status >= Status::Buffer)
-	{
-		callback();
-		return;
-	}
-
 	/* Lock surrounding chunks */
 	Async::forEach3(-1, 1, -1, 1, -1, 1, [=](int x, int y, int z, const AsyncTask &callback) {
 		Chunk *chunk = world->rawGetChunk(chunk_x + x, chunk_y + y, chunk_z + z);
@@ -606,15 +596,12 @@ void Chunk::_loadBufferAsync_lock(const AsyncTask &callback)
 					Chunk *chunk = world->rawGetChunk(chunk_x + x, chunk_y + y, chunk_z + z);
 					chunk->accessMutex.unlock();
 				}
-		callback();
+		_commonCallback();
 	});
 }
 
 void Chunk::_loadBuffer()
 {
-	if (status >= Status::Buffer)
-		return;
-
 	TriangleCollector *collector = new TriangleCollector();
 	for (int x = 0; x < CHUNK_SIZE; x++)
 		for (int y = 0; y < CHUNK_SIZE; y++)
@@ -622,7 +609,6 @@ void Chunk::_loadBuffer()
 				blockType->drawBlock(collector, Block(this, x, y, z));
 	collector->finalize();
 	
-	//printf("BUFFER: %d %d %d\n", chunk_x, chunk_y, chunk_z);
 	TriangleCollector *oldCollector = triangleCollector.exchange(collector);
 	if (oldCollector)
 		world->asyncDeleteTriangleCollector(oldCollector);
@@ -664,7 +650,7 @@ void Chunk::getTriangles(std::vector<Triangle3D> &triangles, const AABB3D &box, 
 			}
 }
 
-void *Chunk::operator new(size_t size)
+/*void *Chunk::operator new(size_t size)
 {
 	return world->getChunkMemoryPool()->allocateObject();
 }
@@ -672,7 +658,7 @@ void *Chunk::operator new(size_t size)
 void Chunk::operator delete(void *chunk)
 {
 	world->getChunkMemoryPool()->deleteObject((Chunk *) chunk);
-}
+}*/
 
 void Chunk::setDirty(int x, int y, int z)
 {

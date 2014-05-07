@@ -7,22 +7,52 @@ class TriangleCollector;
 #include "Block.h"
 #include "World.h"
 
+class SpinLock final
+{
+public:
+	void lock()
+	{
+		while (flag.test_and_set())
+			/* Wait */;
+	}
+
+	void unlock()
+	{
+		flag.clear();
+	}
+
+private:
+	std::atomic_flag flag;
+};
+
 class AsyncCondition final
 {
 public:
-	void waitOn(const AsyncTask &callback)
+	AsyncCondition() { signalFlag = false; }
+
+	bool tryAddWaitOn(const AsyncTask &callback)
 	{
+		if (signalFlag)
+			return true;
+		std::lock_guard<SpinLock> lock(accessLock);
+		if (signalFlag)
+			return true;
 		waitingTasks.push(callback);
+		return false;
 	}
 
 	void notifyAll()
 	{
+		std::lock_guard<SpinLock> lock(accessLock);
+		signalFlag = true;
 		AsyncTask task;
 		while (waitingTasks.try_pop(task))
 			world->addTask(task);
 	}
 
 private:
+	SpinLock accessLock;
+	std::atomic<bool> signalFlag; /* false -> Not signaled, true -> Signaled */
 	Concurrency::concurrent_queue<AsyncTask> waitingTasks;
 };
 
@@ -39,11 +69,10 @@ public:
 
 	void unlock()
 	{
+		flag.clear();
 		AsyncTask task;
 		if (waitingTasks.try_pop(task))
-			world->addTask(task); /* Seamlessly hand over mutex */
-		else
-			flag.clear();
+			lock(task);
 	}
 
 private:
@@ -93,8 +122,8 @@ public:
 	friend Serializer &operator << (Serializer &serializer, const Chunk &data);
 	friend Deserializer &operator >> (Deserializer &deserializer, Chunk &data);
 
-	static void *operator new(size_t size);
-	static void operator delete(void *chunk);
+	//static void *operator new(size_t size);
+	//static void operator delete(void *chunk);
 
 private:
 	bool _tryClaimWorking();
@@ -103,19 +132,22 @@ private:
 	void _commonCallback();
 
 	void _loadRawDataAsync(const AsyncTask &callback);
+	void _loadRawDataAsync_work();
 
 	void _loadDataAsync(const AsyncTask &callback);
 	void _generateAsync(int phase, const AsyncTask &callback);
-	void _generateAsync_lock(int phase, const AsyncTask &callback);
+	void _generateAsync_work(int phase);
+	void _generateAsync_lock(int phase);
 	void _generate(int phase);
 	
 	void _loadLightAsync(const AsyncTask &callback);
-	void _loadLightAsync_self(const AsyncTask &callback);
-	void _loadLightAsync_lock(const AsyncTask &callback);
+	void _loadLightAsync_work();
+	void _loadLightAsync_lock();
 	void _loadLight();
 
-	void _loadBufferAsync(const AsyncTask &callback);
-	void _loadBufferAsync_lock(const AsyncTask &callback);
+	void _loadBufferAsync();
+	void _loadBufferAsync_work();
+	void _loadBufferAsync_lock();
 	void _loadBuffer();
 
 	void _invalidateLight();
@@ -128,6 +160,8 @@ private:
 	std::atomic<Status> status, expectedStatus;
 	std::atomic<int> generationPhase, expectedGenerationPhase; /* Current phase to be done */
 
+	/* TODO: Size of generationCondition[] */
+	AsyncCondition rawDataCondition, generateCondition[5], dataCondition, lightCondition;
 	AsyncMutex accessMutex;
 	std::atomic<bool> dirty;
 	std::atomic_flag working; /* Working at now or in queue */
