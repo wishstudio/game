@@ -30,7 +30,7 @@ class AsyncCondition final
 public:
 	AsyncCondition() { signalFlag = false; }
 
-	bool tryAddWaitOn(const AsyncTask &callback)
+	bool tryAddWaitOn(IAsyncTask *callback)
 	{
 		if (signalFlag)
 			return true;
@@ -45,7 +45,7 @@ public:
 	{
 		std::lock_guard<SpinLock> lock(accessLock);
 		signalFlag = true;
-		AsyncTask task;
+		IAsyncTask *task;
 		while (waitingTasks.try_pop(task))
 			world->addTask(task);
 	}
@@ -53,30 +53,44 @@ public:
 private:
 	SpinLock accessLock;
 	std::atomic<bool> signalFlag; /* false -> Not signaled, true -> Signaled */
-	Concurrency::concurrent_queue<AsyncTask> waitingTasks;
+	Concurrency::concurrent_queue<IAsyncTask *> waitingTasks;
 };
 
 class AsyncMutex final
 {
 public:
-	void lock(const AsyncTask &callback)
+	bool lock(IAsyncTask *callback)
 	{
 		if (flag.test_and_set() == true)
+		{
 			waitingTasks.push(callback);
+			if (flag.test_and_set() == false)
+			{
+				IAsyncTask *task;
+				if (waitingTasks.try_pop(task))
+					world->addTask(task);
+				else
+					unlock();
+			}
+			return false;
+		}
 		else
-			callback();
+			return true;
 	}
 
 	void unlock()
 	{
 		flag.clear();
-		AsyncTask task;
+		IAsyncTask *task;
 		if (waitingTasks.try_pop(task))
-			lock(task);
+		{
+			if (lock(task))
+				world->addTask(task);
+		}
 	}
 
 private:
-	Concurrency::concurrent_queue<AsyncTask> waitingTasks;
+	Concurrency::concurrent_queue<IAsyncTask *> waitingTasks;
 	std::atomic_flag flag;
 };
 
@@ -131,23 +145,17 @@ private:
 	void _raiseExpect(Status expectedStatus, int expectedGenerationPhase);
 	void _commonCallback();
 
-	void _loadRawDataAsync(const AsyncTask &callback);
-	void _loadRawDataAsync_work();
+	bool _loadRawDataAsync(IAsyncTask *callback);
+	void _loadRawData();
 
-	void _loadDataAsync(const AsyncTask &callback);
-	void _generateAsync(int phase, const AsyncTask &callback);
-	void _generateAsync_work(int phase);
-	void _generateAsync_lock(int phase);
+	bool _loadDataAsync(IAsyncTask *callback);
+	bool _generateAsync(int phase, IAsyncTask *callback);
 	void _generate(int phase);
 	
-	void _loadLightAsync(const AsyncTask &callback);
-	void _loadLightAsync_work();
-	void _loadLightAsync_lock();
+	bool _loadLightAsync(IAsyncTask *callback);
 	void _loadLight();
 
 	void _loadBufferAsync();
-	void _loadBufferAsync_work();
-	void _loadBufferAsync_lock();
 	void _loadBuffer();
 
 	void _invalidateLight();
@@ -171,5 +179,9 @@ private:
 	float4x4 modelTransform;
 	Queue<Block> unpropagateQueue;
 
-	friend class Block;
+	friend class Block; /* TODO */
+	friend class ChunkRawDataTask;
+	friend class ChunkGenerateTask;
+	friend class ChunkLightTask;
+	friend class ChunkBufferTask;
 };

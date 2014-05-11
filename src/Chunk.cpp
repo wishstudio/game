@@ -9,39 +9,246 @@
 #include "WorldGenerator/WorldGenerator.h"
 #include "WorldGenerator/WorldManipulator.h"
 
-/* TODO: Move it to an appropriate file */
-class Async
+#define reenter(c) \
+	switch (state) \
+	if (false) \
+	{ \
+		_terminate_coroutine: \
+		break; \
+	} \
+	else case 0:
+
+#define yield_impl(cond, n) \
+	if (state = (n), !(cond)) \
+		goto _terminate_coroutine; \
+	else case (n):
+
+#ifdef _MSC_VER
+#define yield(cond) yield_impl(cond, __COUNTER__ + 1)
+#else
+#define yield(cond) yield_impl(cond, __LINE__)
+#endif
+
+class ChunkRawDataTask: public IAsyncTask
 {
 public:
-	/* Three variable for each loop */
-	static void forEach3(int lo1, int hi1, int lo2, int hi2, int lo3, int hi3,
-		const std::function<void(int, int, int, const AsyncTask&)> &func, const AsyncTask &callback)
+	ChunkRawDataTask(Chunk *_chunk): chunk(_chunk) {}
+	virtual ~ChunkRawDataTask() override {}
+
+	virtual void runAsync() override
 	{
-		_forEach3(lo1, hi1, lo2, hi2, lo3, hi3, lo1, lo2, lo3, func, callback);
+		reenter(state)
+		{
+			yield(chunk->accessMutex.lock(this));
+			chunk->_loadRawData();
+			chunk->accessMutex.unlock();
+			chunk->rawDataCondition.notifyAll();
+			chunk->_commonCallback();
+			delete this;
+		}
 	}
 
 private:
-	static void _forEach3(int lo1, int hi1, int lo2, int hi2, int lo3, int hi3, int i1, int i2, int i3,
-		const std::function<void(int, int, int, const AsyncTask&)> &func, const AsyncTask &callback)
+	Chunk *chunk;
+	std::atomic<int> state;
+};
+
+class ChunkGenerateTask: public IAsyncTask
+{
+public:
+	ChunkGenerateTask(Chunk *_chunk, int _phase): chunk(_chunk), phase(_phase) {}
+	virtual ~ChunkGenerateTask() override {}
+
+	virtual void runAsync() override
 	{
-		int n1 = i1, n2 = i2, n3 = i3;
-		if (n3++ == hi3)
+		WorldGenerator *generator;
+		Chunk *c;
+		reenter(state)
 		{
-			n3 = lo3;
-			if (n2++ == hi2)
+			if (phase > 0)
 			{
-				n2 = lo2;
-				if (n1++ == hi1)
+				/* Ensure surrounding chunks are all done [phase - 1] at least */
+				generator = WorldGenerator::getGenerator(phase);
+				spanMin = generator->getSpanMin();
+				spanMax = generator->getSpanMax();
+				if (phase > 1)
 				{
-					/* Last one */
-					func(i1, i2, i3, callback);
-					return;
+					/* Ensure surrounding older chunks requiring this chunk to be at most [phase - 1] are all done */
+					/*
+					 * x' + spanMin <= x <= x' + spanMax
+					 *
+					 * x - spanMax <= x' <= x - spanMin
+					 */
+					WorldGenerator *generator = WorldGenerator::getGenerator(phase - 1);
+					int3 oldSpanMin = -generator->getSpanMax();
+					int3 oldSpanMax = -generator->getSpanMin();
+
+					spanMin.x = std::min(spanMin.x, oldSpanMin.x);
+					spanMin.y = std::min(spanMin.y, oldSpanMin.y);
+					spanMin.z = std::min(spanMin.z, oldSpanMin.z);
+
+					spanMax.x = std::max(spanMax.x, oldSpanMax.x);
+					spanMax.y = std::max(spanMax.y, oldSpanMax.y);
+					spanMax.z = std::max(spanMax.z, oldSpanMax.z);
 				}
+				for (x = spanMin.x; x <= spanMax.x; x++)
+					for (y = spanMin.y; y <= spanMax.y; y++)
+						for (z = spanMin.z; z <= spanMax.z; z++)
+						{
+							c = world->rawGetChunk(chunk->chunk_x + x, chunk->chunk_y + y, chunk->chunk_z + z);
+							yield(c->_generateAsync(phase - 1, this));
+						}
 			}
+
+			/* Lock related chunks for current phase */
+			generator = WorldGenerator::getGenerator(phase);
+			spanMin = generator->getSpanMin();
+			spanMax = generator->getSpanMax();
+
+			/* Lock chunks */
+			for (x = spanMin.x; x <= spanMax.x; x++)
+				for (y = spanMin.y; y <= spanMax.y; y++)
+					for (z = spanMin.z; z <= spanMax.z; z++)
+					{
+						c = world->rawGetChunk(chunk->chunk_x + x, chunk->chunk_y + y, chunk->chunk_z + z);
+						yield(c->accessMutex.lock(this));
+					}
+
+			chunk->_generate(phase);
+
+			/* Unlock chunks */
+			for (x = spanMin.x; x <= spanMax.x; x++)
+				for (y = spanMin.y; y <= spanMax.y; y++)
+					for (z = spanMin.z; z <= spanMax.z; z++)
+					{
+						c = world->rawGetChunk(chunk->chunk_x + x, chunk->chunk_y + y, chunk->chunk_z + z);
+						c->accessMutex.unlock();
+					}
+
+			if (phase + 1 == WorldGenerator::getPhaseCount())
+				chunk->dataCondition.notifyAll();
+			else
+				chunk->generateCondition[phase].notifyAll();
+			chunk->_commonCallback();
+			delete this;
 		}
-		/* Not last one */
-		func(i1, i2, i3, [=]() { _forEach3(lo1, hi1, lo2, hi2, lo3, hi3, n1, n2, n3, func, callback); });
 	}
+
+private:
+	Chunk *chunk;
+	int phase;
+	std::atomic<int> state;
+	int3 spanMin, spanMax;
+	int x, y, z;
+};
+
+class ChunkLightTask: public IAsyncTask
+{
+public:
+	ChunkLightTask(Chunk *_chunk): chunk(_chunk) {}
+	virtual ~ChunkLightTask() override {}
+
+	virtual void runAsync() override
+	{
+		Chunk *c;
+		bool atTop;
+		reenter(state)
+		{
+			atTop = chunk->chunk_y > 5;
+			if (!atTop)
+			{
+				c = world->rawGetChunk(chunk->chunk_x, chunk->chunk_y + 1, chunk->chunk_z);
+				yield(c->_loadLightAsync(this));
+			}
+
+			/* Ensure surrounding chunks have data */
+			for (x = -1; x <= 1; x++)
+				for (y = -1; y <= 1; y++)
+					for (z = -1; z <= 1; z++)
+					{
+						c = world->rawGetChunk(chunk->chunk_x + x, chunk->chunk_y + y, chunk->chunk_z + z);
+						yield(c->_loadDataAsync(this));
+					}
+
+			/* Lock surrounding chunks */
+			for (x = -1; x <= 1; x++)
+				for (y = -1; y <= 1; y++)
+					for (z = -1; z <= 1; z++)
+					{
+						c = world->rawGetChunk(chunk->chunk_x + x, chunk->chunk_y + y, chunk->chunk_z + z);
+						yield(c->accessMutex.lock(this));
+					}
+			
+			chunk->_loadLight();
+
+			/* Unlock chunks */
+			for (x = -1; x <= 1; x++)
+				for (y = -1; y <= 1; y++)
+					for (z = -1; z <= 1; z++)
+					{
+						c = world->rawGetChunk(chunk->chunk_x + x, chunk->chunk_y + y, chunk->chunk_z + z);
+						c->accessMutex.unlock();
+					}
+			chunk->lightCondition.notifyAll();
+			chunk->_commonCallback();
+			delete this;
+		}
+	}
+
+private:
+	Chunk *chunk;
+	std::atomic<int> state;
+	int x, y, z;
+};
+
+class ChunkBufferTask: public IAsyncTask
+{
+public:
+	ChunkBufferTask(Chunk *_chunk): chunk(_chunk) {}
+	virtual ~ChunkBufferTask() override {}
+
+	virtual void runAsync() override
+	{
+		Chunk *c;
+		reenter(state)
+		{
+			/* Ensuring all surrounding chunks are lighted (including self) */
+			for (x = -1; x <= 1; x++)
+				for (y = -1; y <= 1; y++)
+					for (z = -1; z <= 1; z++)
+					{
+						c = world->rawGetChunk(chunk->chunk_x + x, chunk->chunk_y + y, chunk->chunk_z + z);
+						yield(c->_loadLightAsync(this));
+					}
+
+			/* Lock surrounding chunks */
+			for (x = -1; x <= 1; x++)
+				for (y = -1; y <= 1; y++)
+					for (z = -1; z <= 1; z++)
+					{
+						c = world->rawGetChunk(chunk->chunk_x + x, chunk->chunk_y + y, chunk->chunk_z + z);
+						yield(c->accessMutex.lock(this));
+					}
+
+			chunk->_loadBuffer();
+
+			/* Unlock chunks */
+			for (int x = -1; x <= 1; x++)
+				for (int y = -1; y <= 1; y++)
+					for (int z = -1; z <= 1; z++)
+					{
+						c = world->rawGetChunk(chunk->chunk_x + x, chunk->chunk_y + y, chunk->chunk_z + z);
+						c->accessMutex.unlock();
+					}
+
+			delete this;
+		}
+	}
+
+private:
+	Chunk *chunk;
+	std::atomic<int> state;
+	int x, y, z;
 };
 
 Serializer &operator << (Serializer &serializer, const BlockData &data)
@@ -145,13 +352,13 @@ void Chunk::_commonCallback()
 			return;
 		/* Determine next thing to do */
 		if (status == Status::Nothing)
-			world->addTask([=]() { _loadRawDataAsync_work(); });
+			world->addTask(new ChunkRawDataTask(this));
 		else if (status == Status::Generating)
-			world->addTask([=]() { _generateAsync_work(generationPhase); });
+			world->addTask(new ChunkGenerateTask(this, generationPhase));
 		else if (status == Status::Data)
-			world->addTask([=]() { _loadLightAsync_work(); });
+			world->addTask(new ChunkLightTask(this));
 		else if (status == Status::Light)
-			world->addTask([=]() { _loadBufferAsync_work(); });
+			world->addTask(new ChunkBufferTask(this));
 		else
 			/* Some bad thing happened */;
 	}
@@ -159,16 +366,13 @@ void Chunk::_commonCallback()
 
 void Chunk::loadRawDataAsync()
 {
-	_loadRawDataAsync([](){});
+	_loadRawDataAsync(nullptr);
 }
 
-void Chunk::_loadRawDataAsync(const AsyncTask &callback)
+bool Chunk::_loadRawDataAsync(IAsyncTask *callback)
 {
 	if (status > Status::Nothing)
-	{
-		callback();
-		return;
-	}
+		return true;
 
 	/* These orderings are critical, don't change unless you're absolutely sure */
 
@@ -177,56 +381,50 @@ void Chunk::_loadRawDataAsync(const AsyncTask &callback)
 	if (_tryClaimWorking())
 		_commonCallback();
 
+	if (callback == nullptr)
+		return true;
+
 	if (rawDataCondition.tryAddWaitOn(callback))
-		callback();
+		return true;
+	return false;
 }
 
-void Chunk::_loadRawDataAsync_work()
+void Chunk::_loadRawData()
 {
-	accessMutex.lock([=]() {
-		if (status == Status::Nothing)
-		{
-			if (!database->loadChunk(this))
-			{
-				status = Status::Generating;
-				generationPhase = 0;
-			}
-		}
-		accessMutex.unlock();
-		rawDataCondition.notifyAll();
-		_commonCallback();
-	});
+	if (!database->loadChunk(this))
+	{
+		status = Status::Generating;
+		generationPhase = 0;
+	}
 }
 
 void Chunk::loadDataAsync()
 {
-	_loadDataAsync([](){});
+	_loadDataAsync(nullptr);
 }
 
-void Chunk::_loadDataAsync(const AsyncTask &callback)
+bool Chunk::_loadDataAsync(IAsyncTask *callback)
 {
 	if (status >= Status::Data)
-	{
-		callback();
-		return;
-	}
+		return true;
 
 	_raiseExpect(Status::Data);
 
 	if (_tryClaimWorking())
 		_commonCallback();
 
+	if (callback == nullptr)
+		return true;
+
 	if (dataCondition.tryAddWaitOn(callback))
-		callback();
+		return true;
+	return false;
 }
 
-void Chunk::_generateAsync(int phase, const AsyncTask &callback)
+bool Chunk::_generateAsync(int phase, IAsyncTask *callback)
 {
 	if (generationPhase > phase)
-	{
-		callback();
-		return;
-	}
+		return true;
 	if (phase + 1 == WorldGenerator::getPhaseCount())
 		_raiseExpect(Status::Data);
 	else
@@ -238,87 +436,19 @@ void Chunk::_generateAsync(int phase, const AsyncTask &callback)
 	if (phase + 1 == WorldGenerator::getPhaseCount())
 	{
 		if (dataCondition.tryAddWaitOn(callback))
-			callback();
+			return true;
 	}
 	else
 	{
 		if (generateCondition[phase].tryAddWaitOn(callback))
-			callback();
+			return true;
 	}
-}
-
-void Chunk::_generateAsync_work(int phase)
-{
-	if (phase > 0)
-	{
-		/* Ensure surrounding chunks are all done [phase - 1] at least */
-		WorldGenerator *generator = WorldGenerator::getGenerator(phase);
-		int3 spanMin = generator->getSpanMin();
-		int3 spanMax = generator->getSpanMax();
-		if (phase > 1)
-		{
-			/* Ensure surrounding older chunks requiring this chunk to be at most [phase - 1] are all done */
-			/*
-			 * x' + spanMin <= x <= x' + spanMax
-			 *
-			 * x - spanMax <= x' <= x - spanMin
-			 */
-			WorldGenerator *generator = WorldGenerator::getGenerator(phase - 1);
-			int3 oldSpanMin = -generator->getSpanMax();
-			int3 oldSpanMax = -generator->getSpanMin();
-
-			spanMin.x = std::min(spanMin.x, oldSpanMin.x);
-			spanMin.y = std::min(spanMin.y, oldSpanMin.y);
-			spanMin.z = std::min(spanMin.z, oldSpanMin.z);
-
-			spanMax.x = std::max(spanMax.x, oldSpanMax.x);
-			spanMax.y = std::max(spanMax.y, oldSpanMax.y);
-			spanMax.z = std::max(spanMax.z, oldSpanMax.z);
-		}
-		Async::forEach3(spanMin.x, spanMax.x, spanMin.y, spanMax.y, spanMin.z, spanMax.z,
-			[=](int x, int y, int z, const AsyncTask& callback) {
-				Chunk *chunk = world->rawGetChunk(chunk_x + x, chunk_y + y, chunk_z + z);
-				if (chunk->generationPhase <= phase - 1)
-					chunk->_generateAsync(phase - 1, [=]() { world->addTask(callback); });
-				else
-					callback();
-			}, [=]() {
-				_generateAsync_lock(phase);
-			}
-		);
-	}
-	else
-		_generateAsync_lock(phase);
-}
-
-void Chunk::_generateAsync_lock(int phase)
-{
-	/* Lock related chunks for current phase */
-	WorldGenerator *generator = WorldGenerator::getGenerator(phase);
-	int3 spanMin = generator->getSpanMin();
-	int3 spanMax = generator->getSpanMax();
-	/* Lock chunks */
-	Async::forEach3(spanMin.x, spanMax.x, spanMin.y, spanMax.y, spanMin.z, spanMax.z, [=](int x, int y, int z, const AsyncTask &callback) {
-		Chunk *chunk = world->rawGetChunk(chunk_x + x, chunk_y + y, chunk_z + z);
-		chunk->accessMutex.lock(callback);
-	}, [=]() {
-		_generate(phase);
-
-		/* Unlock chunks */
-		for (int x = spanMin.x; x <= spanMax.x; x++)
-			for (int y = spanMin.y; y <= spanMax.y; y++)
-				for (int z = spanMin.z; z <= spanMax.z; z++)
-				{
-					Chunk *chunk = world->rawGetChunk(chunk_x + x, chunk_y + y, chunk_z + z);
-					chunk->accessMutex.unlock();
-				}
-		_commonCallback();
-	});
+	return false;
 }
 
 void Chunk::_generate(int phase)
 {
-	/* Lock related chunks for current phase */
+	/* Add related chunks to WorldManipulator */
 	WorldGenerator *generator = WorldGenerator::getGenerator(phase);
 	int3 spanMin = generator->getSpanMin();
 	int3 spanMax = generator->getSpanMax();
@@ -337,74 +467,30 @@ void Chunk::_generate(int phase)
 	generationPhase = phase + 1;
 
 	if (phase + 1 == WorldGenerator::getPhaseCount())
-	{
-		/* We've done */
 		status = Status::Data;
-		dataCondition.notifyAll();
-	}
-	else
-		generateCondition[phase].notifyAll();
 }
 
 void Chunk::loadLightAsync()
 {
-	_loadLightAsync([](){});
+	_loadLightAsync(nullptr);
 }
 
-void Chunk::_loadLightAsync(const AsyncTask &callback)
+bool Chunk::_loadLightAsync(IAsyncTask *callback)
 {
 	if (status >= Status::Light)
-	{
-		callback();
-		return;
-	}
+		return true;
 
 	_raiseExpect(Status::Light);
 
 	if (_tryClaimWorking())
 		_commonCallback();
 
+	if (callback == nullptr)
+		return true;
+
 	if (lightCondition.tryAddWaitOn(callback))
-		callback();
-}
-
-void Chunk::_loadLightAsync_work()
-{
-	bool atTop = chunk_y > 5;
-	if (!atTop)
-	{
-		Chunk *chunk = world->rawGetChunk(chunk_x, chunk_y + 1, chunk_z);
-		if (chunk->status < Status::Light)
-		{
-			chunk->_loadLightAsync([=]() { _loadLightAsync_lock(); });
-			return;
-		}
-	}
-	_loadLightAsync_lock();
-}
-
-void Chunk::_loadLightAsync_lock()
-{
-	/* Lock surrounding chunks */
-	Async::forEach3(-1, 1, -1, 1, -1, 1, [=](int x, int y, int z, const AsyncTask &callback) {
-		Chunk *chunk = world->rawGetChunk(chunk_x + x, chunk_y + y, chunk_z + z);
-		if (chunk->getStatus() < Status::Data)
-			chunk->_loadDataAsync(callback);
-		else
-			callback();
-	}, [=]() {
-		_loadLight();
-
-		/* Unlock chunks */
-		for (int x = -1; x <= 1; x++)
-			for (int y = -1; y <= 1; y++)
-				for (int z = -1; z <= 1; z++)
-				{
-					Chunk *chunk = world->rawGetChunk(chunk_x + x, chunk_y + y, chunk_z + z);
-					chunk->accessMutex.unlock();
-				}
-		_commonCallback();
-	});
+		return true;
+	return false;
 }
 
 int Chunk::_diminishLight(int light)
@@ -546,7 +632,6 @@ void Chunk::_loadLight()
 	}
 
 	status = Status::Light;
-	lightCondition.notifyAll();
 }
 
 void Chunk::loadBufferAsync()
@@ -563,41 +648,6 @@ void Chunk::_loadBufferAsync()
 
 	if (_tryClaimWorking())
 		_commonCallback();
-}
-
-void Chunk::_loadBufferAsync_work()
-{
-	/* Ensuring all surrounding chunks are lighted (including self) */
-	Async::forEach3(-1, 1, -1, 1, -1, 1, [=](int x, int y, int z, const AsyncTask &callback) {
-		Chunk *chunk = world->rawGetChunk(chunk_x + x, chunk_y + y, chunk_z + z);
-		if (chunk->status < Status::Light)
-			chunk->_loadLightAsync([=]() { world->addTask(callback); });
-		else
-			callback();
-	}, [=]() {
-		_loadBufferAsync_lock();
-	});
-}
-
-void Chunk::_loadBufferAsync_lock()
-{
-	/* Lock surrounding chunks */
-	Async::forEach3(-1, 1, -1, 1, -1, 1, [=](int x, int y, int z, const AsyncTask &callback) {
-		Chunk *chunk = world->rawGetChunk(chunk_x + x, chunk_y + y, chunk_z + z);
-		chunk->accessMutex.lock(callback);
-	}, [=]() {
-		_loadBuffer();
-
-		/* Unlock chunks */
-		for (int x = -1; x <= 1; x++)
-			for (int y = -1; y <= 1; y++)
-				for (int z = -1; z <= 1; z++)
-				{
-					Chunk *chunk = world->rawGetChunk(chunk_x + x, chunk_y + y, chunk_z + z);
-					chunk->accessMutex.unlock();
-				}
-		_commonCallback();
-	});
 }
 
 void Chunk::_loadBuffer()

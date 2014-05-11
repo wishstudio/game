@@ -39,7 +39,7 @@ public:
 	bool getCameraIntersection(const Ray3D &ray, CameraIntersectionInfo **info);
 
 	ConcurrentMemoryPool<Chunk> *getChunkMemoryPool() { return &chunkMemoryPool; }
-	void addTask(const AsyncTask &task);
+	void addTask(IAsyncTask *task);
 
 private:
 	void run();
@@ -49,8 +49,8 @@ private:
 	Concurrency::concurrent_unordered_map<std::tuple<int, int, int>, Chunk *> chunks;
 	std::mutex chunksHashMutex;
 
-	Concurrency::concurrent_queue<AsyncTask> asyncTaskQueue;
-	//ConcurrentStack<AsyncTask> asyncTaskQueue;
+	Concurrency::concurrent_queue<IAsyncTask *> asyncTaskQueue;
+	//ConcurrentStack<IAsyncTask *> asyncTaskQueue;
 
 	Concurrency::concurrent_queue<Chunk *> saveQueue;
 	std::vector<std::thread> workerThreads;

@@ -12,7 +12,6 @@ using namespace sare;
 #include <concurrent_queue.h>
 #include <concurrent_unordered_map.h>
 #include <condition_variable>
-#include <functional>
 #include <limits>
 #include <memory>
 #include <mutex>
@@ -39,7 +38,13 @@ extern TileManager *tileManager;
 extern World *world;
 
 /* TODO */
-typedef std::function<void()> AsyncTask;
+class IAsyncTask
+{
+public:
+	virtual ~IAsyncTask() {}
+
+	virtual void runAsync() = 0;
+};
 
 extern Camera *camera;
 

@@ -55,7 +55,7 @@ void World::asyncDeleteTriangleCollector(TriangleCollector *collector)
 	triangleCollectorDeleteQueue.push(collector);
 }
 
-void World::addTask(const AsyncTask &task)
+void World::addTask(IAsyncTask *task)
 {
 	asyncTaskQueue.push(task);
 	std::lock_guard<std::mutex> lock(workerMutex);
@@ -149,9 +149,9 @@ void World::run()
 {
 	while (!shouldStop)
 	{
-		AsyncTask callback;
-		if (asyncTaskQueue.try_pop(callback))
-			callback();
+		IAsyncTask *task;
+		if (asyncTaskQueue.try_pop(task))
+			task->runAsync();
 		else
 		{
 			/* No remaining chunks to process, suspend */

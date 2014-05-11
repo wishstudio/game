@@ -35,7 +35,7 @@ void ChunkSceneNode::render()
 			{
 				Chunk *p = preloadChunk[x + PRELOAD_DISTANCE][y + PRELOAD_DISTANCE][z + PRELOAD_DISTANCE];
 				if (p == nullptr)
-					p = preloadChunk[x + PRELOAD_DISTANCE][y + PRELOAD_DISTANCE][z + PRELOAD_DISTANCE] = world->preloadChunk(current_x + x, current_y + y, current_z + z);
+					p = preloadChunk[x + PRELOAD_DISTANCE][y + PRELOAD_DISTANCE][z + PRELOAD_DISTANCE] = world->rawGetChunk(current_x + x, current_y + y, current_z + z);
 
 				AABB3D box(p->x() * CHUNK_SIZE, p->y() * CHUNK_SIZE, p->z() * CHUNK_SIZE,
 					(p->x() + 1) * CHUNK_SIZE, (p->y() + 1) * CHUNK_SIZE, (p->z() + 1) * CHUNK_SIZE);
