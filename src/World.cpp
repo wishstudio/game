@@ -109,25 +109,6 @@ Chunk *World::tryGetChunkForBlock(int x, int y, int z)
 	return tryGetChunk(divide(x, CHUNK_SIZE), divide(y, CHUNK_SIZE), divide(z, CHUNK_SIZE));
 }
 
-Chunk *World::preloadChunk(int chunk_x, int chunk_y, int chunk_z)
-{
-	Chunk *chunk = tryGetChunk(chunk_x, chunk_y, chunk_z);
-	if (chunk) /* Already preloaded */
-		return chunk;
-
-	/* Lock chunks hash */
-	std::lock_guard<std::mutex> lock(chunksHashMutex);
-	/* Double check */
-	chunk = tryGetChunk(chunk_x, chunk_y, chunk_z);
-	if (chunk)
-		return chunk;
-
-	chunk = new Chunk(chunk_x, chunk_y, chunk_z);
-	chunks.insert(std::make_pair(std::make_tuple(chunk_x, chunk_y, chunk_z), chunk));
-	asyncLoadChunk(chunk);
-	return chunk;
-}
-
 Chunk *World::rawGetChunk(int chunk_x, int chunk_y, int chunk_z)
 {
 	Chunk *chunk = tryGetChunk(chunk_x, chunk_y, chunk_z);

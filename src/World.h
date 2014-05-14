@@ -34,7 +34,6 @@ public:
 	Chunk *getChunkForBlock(int x, int y, int z);
 	Chunk *tryGetChunkForBlock(int x, int y, int z);
 
-	Chunk *preloadChunk(int chunk_x, int chunk_y, int chunk_z);
 	Chunk *rawGetChunk(int chunk_x, int chunk_y, int chunk_z);
 
 	bool getCameraIntersection(const Ray3D &ray, CameraIntersectionInfo **info);
