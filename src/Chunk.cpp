@@ -129,14 +129,15 @@ void Chunk::_generate(int phase)
 	int3 spanMin = generator->getSpanMin();
 	int3 spanMax = generator->getSpanMax();
 	WorldManipulator worldManipulator(spanMin.x, spanMin.y, spanMin.z, spanMax.x, spanMax.y, spanMax.z);
+	std::vector<std::unique_lock<std::mutex>> locks;
 	for (int x = spanMin.x; x <= spanMax.x; x++)
 		for (int y = spanMin.y; y <= spanMax.y; y++)
 			for (int z = spanMin.z; z <= spanMax.z; z++)
 			{
 				Chunk *chunk = world->rawGetChunk(chunk_x + x, chunk_y + y, chunk_z + z);
+				locks.push_back(std::unique_lock<std::mutex>(chunk->accessMutex));
 				worldManipulator.addChunk(x, y, z, &chunk->blocks);
 			}
-	std::lock_guard<std::mutex> lock(accessMutex);
 	if (generationPhase > phase) /* Double check */
 		return;
 
