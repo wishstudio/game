@@ -115,9 +115,9 @@ int main()
 
 	/* Create vertex format */
 	vertexFormat = video->createVertexFormat();
-	vertexFormat->addElement(TYPE_FLOAT3, SEMANTIC_POSITION);
-	vertexFormat->addElement(TYPE_UBYTE4_NORM, SEMANTIC_COLOR);
-	vertexFormat->addElement(TYPE_FLOAT2, SEMANTIC_TEXCOORD);
+	vertexFormat->addElement(TYPE_FLOAT3, "SV_POSITION");
+	vertexFormat->addElement(TYPE_UBYTE4_NORM, "COLOR");
+	vertexFormat->addElement(TYPE_FLOAT2, "TEXCOORD");
 
 	ShortcutItemUI shortcutItemUI;
 
