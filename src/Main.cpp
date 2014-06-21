@@ -25,7 +25,7 @@ struct PS_InputType
 	float2 tex: TEXCOORD;
 };
 
-PS_InputType VS_Main(float4 pos: SV_POSITION, float4 color: COLOR, float2 tex: TEXCOORD)
+PS_InputType VS_Main(float4 pos: POSITION, float4 color: COLOR, float2 tex: TEXCOORD)
 {
 	PS_InputType output;
 	output.pos = mul(pos, mvpMatrix);
@@ -44,42 +44,6 @@ float4 PS_Main(PS_InputType input): SV_TARGET
 )DELIM";
 
 static PTexture whiteTexture = nullptr;
-
-static void draw3DBox(const AABB3D &box, Color color)
-{
-	static PVertexBuffer buffer = video->createVertexBuffer(vertexFormat, 36);
-
-	video->setTexture(whiteTexture);
-	camera->apply(float4x4::identity());
-
-	float3 p000(box.minPoint.x, box.minPoint.y, box.minPoint.z);
-	float3 p001(box.minPoint.x, box.minPoint.y, box.maxPoint.z);
-	float3 p010(box.minPoint.x, box.maxPoint.y, box.minPoint.z);
-	float3 p011(box.minPoint.x, box.maxPoint.y, box.maxPoint.z);
-	float3 p100(box.maxPoint.x, box.minPoint.y, box.minPoint.z);
-	float3 p101(box.maxPoint.x, box.minPoint.y, box.maxPoint.z);
-	float3 p110(box.maxPoint.x, box.maxPoint.y, box.minPoint.z);
-	float3 p111(box.maxPoint.x, box.maxPoint.y, box.maxPoint.z);
-	Vertex vertices[36] =
-	{
-		{ p000, color, 0.f, 0.f }, { p001, color, 0.f, 0.f }, { p001, color, 0.f, 0.f },
-		{ p001, color, 0.f, 0.f }, { p011, color, 0.f, 0.f }, { p011, color, 0.f, 0.f },
-		{ p011, color, 0.f, 0.f }, { p010, color, 0.f, 0.f }, { p010, color, 0.f, 0.f },
-		{ p010, color, 0.f, 0.f }, { p000, color, 0.f, 0.f }, { p000, color, 0.f, 0.f },
-
-		{ p100, color, 0.f, 0.f }, { p101, color, 0.f, 0.f }, { p101, color, 0.f, 0.f },
-		{ p101, color, 0.f, 0.f }, { p111, color, 0.f, 0.f }, { p111, color, 0.f, 0.f },
-		{ p111, color, 0.f, 0.f }, { p110, color, 0.f, 0.f }, { p110, color, 0.f, 0.f },
-		{ p110, color, 0.f, 0.f }, { p100, color, 0.f, 0.f }, { p100, color, 0.f, 0.f },
-
-		{ p000, color, 0.f, 0.f }, { p100, color, 0.f, 0.f }, { p100, color, 0.f, 0.f },
-		{ p001, color, 0.f, 0.f }, { p101, color, 0.f, 0.f }, { p101, color, 0.f, 0.f },
-		{ p010, color, 0.f, 0.f }, { p110, color, 0.f, 0.f }, { p110, color, 0.f, 0.f },
-		{ p011, color, 0.f, 0.f }, { p111, color, 0.f, 0.f }, { p111, color, 0.f, 0.f },
-	};
-	buffer->update(0, 36, vertices);
-	video->draw(buffer, 0, 36, TOPOLOGY_TRIANGLELIST);
-}
 
 int main()
 {
@@ -105,17 +69,16 @@ int main()
 		PPass pass = boxMaterial->createPass();
 		pass->setVertexShader(vertexShader);
 		pass->setPixelShader(pixelShader);
-		pass->setFillMode(FILLMODE_WIREFRAME);
-		pass->setCullMode(CULLMODE_NONE);
-		pass->setDepthBias(-0.0003);
+		pass->setAntialiasedLineEnabled(true);
 	}
 
 	Color whiteData = 0xFFFFFFFF;
 	whiteTexture = video->createTexture(1, 1, &whiteData);
+	PGeometryMesh gridMesh(new GeometryMesh(video));
 
 	/* Create vertex format */
 	vertexFormat = video->createVertexFormat();
-	vertexFormat->addElement(TYPE_FLOAT3, "SV_POSITION");
+	vertexFormat->addElement(TYPE_FLOAT3, "POSITION");
 	vertexFormat->addElement(TYPE_UBYTE4_NORM, "COLOR");
 	vertexFormat->addElement(TYPE_FLOAT2, "TEXCOORD");
 
@@ -189,7 +152,11 @@ int main()
 		{
 			AABB3D box = info->block.getBoundingBox().translate(info->block.x(), info->block.y(), info->block.z());
 			video->setMaterial(boxMaterial);
-			draw3DBox(box, Color(255, 0, 0, 255));
+			video->setTexture(whiteTexture);
+			camera->apply(float4x4::identity());
+			gridMesh->clear();
+			gridMesh->addCubeFrame(box, Color(255, 0, 0, 255));
+			gridMesh->render();
 		}
 
 		painter->beginDraw();
